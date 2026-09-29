@@ -30,6 +30,7 @@ public static class PortfolioModule
         CreateProject.Map(group);
         GetProject.Map(group);
         UpdateProject.Map(group);
+        ArchiveProject.Map(group);
         return app;
     }
 }
