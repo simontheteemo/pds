@@ -22,7 +22,7 @@ To try another role locally, change `Auth:DevUser:Roles` in `src/PDS.Api/appsett
 ## Tests
 
 ```bash
-dotnet test                  # unit, architecture, integration (needs Docker), CDK assertions
+dotnet test                  # unit and integration (needs Docker)
 ```
 
 Frontend tests are not set up yet.
