@@ -69,7 +69,15 @@ function CognitoSession({ config, children }: { config: AppConfig; children: Rea
     [auth, config.auth.clientId, config.auth.logoutDomain],
   );
 
-  if (auth.error) return <FullPageMessage title="Sign-in failed" message={auth.error.message} />;
+  if (auth.error) {
+    return (
+      <FullPageMessage
+        title="Sign-in failed"
+        message={auth.error.message}
+        action={{ label: 'Sign in again', onClick: () => void auth.signinRedirect() }}
+      />
+    );
+  }
   if (!auth.isAuthenticated) return <FullPageMessage title="Signing you in…" loading />;
   return <SessionContext.Provider value={session}>{children}</SessionContext.Provider>;
 }
