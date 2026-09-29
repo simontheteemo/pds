@@ -26,6 +26,7 @@ public static class PortfolioModule
     public static IEndpointRouteBuilder MapPortfolioEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/portfolio").WithTags("Portfolio").RequireAuthorization(Policies.CanRead);
+        ListProjects.Map(group);
         CreateProject.Map(group);
         GetProject.Map(group);
         return app;
