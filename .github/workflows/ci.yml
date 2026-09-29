@@ -1,0 +1,62 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Check formatting
+        run: dotnet format --verify-no-changes --no-restore
+
+      - name: Build (regenerates the OpenAPI document)
+        run: dotnet build --no-restore
+
+      - name: OpenAPI document is committed and current
+        run: git diff --exit-code -- web/src/shared/api/openapi.json
+
+      - name: Test .NET (unit, architecture, integration, infra)
+        run: dotnet test --no-build
+
+      - name: Web install
+        working-directory: web
+        run: npm ci
+
+      - name: Generated API types are committed and current
+        working-directory: web
+        run: npm run gen:api && git diff --exit-code -- src/shared/api/schema.d.ts
+
+      - name: Web lint, typecheck and build
+        working-directory: web
+        run: |
+          npm run lint
+          npm run typecheck
+          npm run build
+
+      - name: Package Lambda
+        run: dotnet publish src/PDS.Api -c Release -r linux-arm64 --self-contained false -p:PublishReadyToRun=true -o artifacts/api
+
+      - name: CDK synth
+        working-directory: infra
+        run: npx --yes aws-cdk@2.1143.0 synth -c deployment=example-dev --quiet
