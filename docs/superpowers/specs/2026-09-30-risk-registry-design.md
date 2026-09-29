@@ -88,7 +88,7 @@ The project detail page gets a **Risks** card below the existing cards:
 - **Actions** (canWrite only):
   - Edit and Close, when the risk isn't closed.
   - Reopen, when it's closed.
-- **Add/edit:** a modal form with Title, Category, Likelihood (1–5 select with labels), Impact (1–5 select with labels), a live score/band preview, Owner, Due date, Status (edit only: Open or Mitigating), Description and Mitigation. Server 400s map onto the fields. A 409 shows an alert with "Reload latest".
+- **Add/edit:** a modal form with Title, Category, Likelihood (1–5 select with labels), Impact (1–5 select with labels), a live score/band preview, Owner, Due date, Status (edit only: Open or Mitigating), Description and Mitigation. Server 400s map onto the fields. A 409 closes the modal, refreshes the list and shows a notification explaining that someone else changed the risk.
 - **Close:** a modal asking for the closing note.
 - **Empty state:** "No open risks recorded." (or "No risks recorded." when "Show closed" is on).
 
