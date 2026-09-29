@@ -4,6 +4,7 @@ using PDS.Api;
 using PDS.Api.Security;
 using PDS.Portfolio;
 using PDS.Shared.Data;
+using PDS.Shared.Security;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
@@ -41,7 +42,11 @@ var app = builder.Build();
 
 app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseSerilogRequestLogging(o => o.EnrichDiagnosticContext = (diagnostics, http) =>
-    diagnostics.Set("UserName", http.User.Identity?.Name ?? "anonymous"));
+    diagnostics.Set(
+        "UserName",
+        http.User.Identity?.IsAuthenticated == true
+            ? http.RequestServices.GetService<ICurrentUser>()?.Name ?? "anonymous"
+            : "anonymous"));
 app.UseExceptionHandler(new ExceptionHandlerOptions
 {
     StatusCodeSelector = ex => ex is BadHttpRequestException bad ? bad.StatusCode : StatusCodes.Status500InternalServerError,
