@@ -100,6 +100,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/risks/projects/{projectId}/risks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListRisks"];
+        put?: never;
+        post: operations["CreateRisk"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/risks/projects/{projectId}/risks/{riskId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetRisk"];
+        put: operations["UpdateRisk"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/risks/projects/{projectId}/risks/{riskId}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["CloseRisk"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/risks/projects/{projectId}/risks/{riskId}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ReopenRisk"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -121,6 +185,11 @@ export interface components {
             timeZone: string;
             auth: components["schemas"]["ClientAuthConfig"];
         };
+        CloseRiskRequest: {
+            /** Format: int64 */
+            version: number;
+            note: string;
+        };
         CreateProjectRequest: {
             code: string;
             name: string;
@@ -139,6 +208,19 @@ export interface components {
             budgetAmount: null | number;
             projectManager: null | string;
             description: null | string;
+        };
+        CreateRiskRequest: {
+            title: string;
+            category: null | components["schemas"]["RiskCategory"];
+            description: null | string;
+            /** Format: int32 */
+            likelihood: null | number;
+            /** Format: int32 */
+            impact: null | number;
+            mitigation: null | string;
+            owner: null | string;
+            /** Format: date */
+            dueDate: null | string;
         };
         HttpValidationProblemDetails: {
             type?: null | string;
@@ -217,6 +299,49 @@ export interface components {
         ProjectStage: "Acquisition" | "Feasibility" | "Design" | "Consenting" | "Construction" | "Sales" | "Completed";
         /** @enum {unknown} */
         ProjectStatus: "OnTrack" | "AtRisk" | "Delayed" | "OnHold" | "Cancelled";
+        ReopenRiskRequest: {
+            /** Format: int64 */
+            version: number;
+        };
+        /** @enum {unknown} */
+        RiskBand: "Low" | "Medium" | "High" | "Extreme";
+        /** @enum {unknown} */
+        RiskCategory: "Geotechnical" | "Consenting" | "Contractual" | "ContractorDefault" | "Market" | "Financial" | "Design" | "HealthAndSafety" | "Environmental" | "Other";
+        RiskDetails: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            title: string;
+            category: components["schemas"]["RiskCategory"];
+            description: null | string;
+            /** Format: int32 */
+            likelihood: number;
+            /** Format: int32 */
+            impact: number;
+            /** Format: int32 */
+            score: number;
+            band: components["schemas"]["RiskBand"];
+            mitigation: null | string;
+            owner: null | string;
+            /** Format: date */
+            dueDate: null | string;
+            status: components["schemas"]["RiskStatus"];
+            closingNote: null | string;
+            /** Format: date-time */
+            closedAt: null | string;
+            closedBy: null | string;
+            /** Format: date-time */
+            createdAt: string;
+            createdBy: string;
+            /** Format: date-time */
+            updatedAt: string;
+            updatedBy: string;
+            /** Format: int64 */
+            version: number;
+        };
+        /** @enum {unknown} */
+        RiskStatus: "Open" | "Mitigating" | "Closed";
         SiteDto: {
             addressLine: string;
             suburb: null | string;
@@ -246,6 +371,22 @@ export interface components {
             budgetAmount: null | number;
             projectManager: null | string;
             description: null | string;
+            /** Format: int64 */
+            version: number;
+        };
+        UpdateRiskRequest: {
+            title: string;
+            category: null | components["schemas"]["RiskCategory"];
+            description: null | string;
+            /** Format: int32 */
+            likelihood: null | number;
+            /** Format: int32 */
+            impact: null | number;
+            mitigation: null | string;
+            owner: null | string;
+            /** Format: date */
+            dueDate: null | string;
+            status: null | components["schemas"]["RiskStatus"];
             /** Format: int64 */
             version: number;
         };
@@ -497,6 +638,238 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProjectDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ListRisks: {
+        parameters: {
+            query?: {
+                includeClosed?: boolean;
+            };
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiskDetails"][];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CreateRisk: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateRiskRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiskDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GetRisk: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                riskId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiskDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UpdateRisk: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                riskId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateRiskRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiskDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CloseRisk: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                riskId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CloseRiskRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiskDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ReopenRisk: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                riskId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReopenRiskRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiskDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
                 };
             };
             /** @description Not Found */

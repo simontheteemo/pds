@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../PDS.Shared/PDS.Shared.csproj" />
+    <!-- Only PDS.Portfolio.Contracts types may be used (module rule). -->
+    <ProjectReference Include="../PDS.Portfolio/PDS.Portfolio.csproj" />
+  </ItemGroup>
+</Project>
