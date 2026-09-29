@@ -30,9 +30,12 @@ internal static class CreateProject
         var currency = locale.Value.Currency;
         var project = Project.Create(request.ToFields(currency), new AuditStamp(clock.GetUtcNow(), user.Name));
 
-        if (await store.CreateAsync(project, ct) == SaveResult.CodeTaken)
-            return PortfolioProblems.CodeTaken();
-
-        return TypedResults.Created($"/api/portfolio/projects/{project.Id.Value}", ProjectDetails.From(project, currency));
+        var result = await store.CreateAsync(project, ct);
+        return result switch
+        {
+            SaveResult.Saved => TypedResults.Created($"/api/portfolio/projects/{project.Id.Value}", ProjectDetails.From(project, currency)),
+            SaveResult.CodeTaken => PortfolioProblems.CodeTaken(),
+            _ => throw new InvalidOperationException($"Project {project.Id} was not created: {result}."),
+        };
     }
 }
