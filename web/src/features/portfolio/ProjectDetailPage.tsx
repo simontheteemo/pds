@@ -1,4 +1,5 @@
 import { Alert, Badge, Button, Card, Group, Loader, SimpleGrid, Stack, Table, Text, Title } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import type { ReactNode } from 'react';
 import { Link, useParams } from 'react-router';
 import { ApiError } from '../../shared/api/client';
@@ -6,7 +7,7 @@ import { useConfig } from '../../shared/config';
 import { formatDate, formatDateTime, formatMoney } from '../../shared/format';
 import { NotFoundPage } from '../../shared/layout/NotFoundPage';
 import { usePermissions } from '../../shared/me';
-import { useProject } from './api';
+import { useProject, useSetArchived } from './api';
 import { StatusBadge } from './StatusBadge';
 import { stageLabel, type ProjectDetails } from './types';
 
@@ -21,14 +22,39 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-/** Extra actions (archive / restore) are added in Task 14 through this slot. */
 export function ProjectActions({ project }: { project: ProjectDetails }) {
-  const { canWrite } = usePermissions();
+  const { canWrite, canAdminister } = usePermissions();
+  const setArchived = useSetArchived(project.id);
+
   return (
     <Group>
       {canWrite && (
         <Button component={Link} to={`/projects/${project.id}/edit`} variant="light">
           Edit
+        </Button>
+      )}
+      {canAdminister && (
+        <Button
+          variant="default"
+          loading={setArchived.isPending}
+          onClick={() =>
+            setArchived.mutate(
+              { archived: !project.isArchived, version: project.version },
+              {
+                onError: (error) =>
+                  notifications.show({
+                    color: 'red',
+                    title:
+                      error instanceof ApiError && error.status === 409
+                        ? 'Someone else changed this project'
+                        : 'Could not update the project',
+                    message: 'Reload the page and try again.',
+                  }),
+              },
+            )
+          }
+        >
+          {project.isArchived ? 'Restore' : 'Archive'}
         </Button>
       )}
     </Group>
