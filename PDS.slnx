@@ -3,6 +3,9 @@
     <Project Path="src/PDS.Api/PDS.Api.csproj" />
     <Project Path="src/PDS.Shared/PDS.Shared.csproj" />
   </Folder>
+  <Folder Name="/src/Modules/">
+    <Project Path="src/Modules/PDS.Portfolio/PDS.Portfolio.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/PDS.IntegrationTests/PDS.IntegrationTests.csproj" />
     <Project Path="tests/PDS.Tests/PDS.Tests.csproj" />

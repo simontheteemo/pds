@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Amazon.Lambda.AspNetCoreServer.Hosting;
 using PDS.Api;
 using PDS.Api.Security;
+using PDS.Portfolio;
 using PDS.Shared.Data;
 using Serilog;
 using Serilog.Events;
@@ -34,6 +35,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddPdsSettings(builder.Configuration);
 builder.Services.AddPdsSecurity(builder.Configuration);
 builder.Services.AddDynamo();
+builder.Services.AddPortfolioModule();
 
 var app = builder.Build();
 
@@ -52,6 +54,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 
 app.MapHostEndpoints();
+app.MapPortfolioEndpoints();
 
 await app.RunAsync();
 
