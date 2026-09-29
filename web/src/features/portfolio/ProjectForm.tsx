@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 import { ApiError } from '../../shared/api/client';
 import { useConfig } from '../../shared/config';
+import { numberInputParts } from '../../shared/format';
 import { serverFieldErrors, zodValidate } from '../../shared/validation';
 import { projectSchema, type ProjectFormValues } from './projectFormModel';
 import { stageLabel, stages, statuses, statusLabel } from './types';
@@ -20,7 +21,8 @@ const stageOptions = stages.map((value) => ({ value, label: stageLabel[value] })
 const statusOptions = statuses.map((value) => ({ value, label: statusLabel[value] }));
 
 export function ProjectForm({ initialValues, submitLabel, cancelTo, onSubmit, onError }: Props) {
-  const { currency } = useConfig();
+  const { currency, culture } = useConfig();
+  const { currencySymbol, groupSeparator, decimalSeparator } = numberInputParts(culture, currency);
   const [submitting, setSubmitting] = useState(false);
   const form = useForm<ProjectFormValues>({
     mode: 'controlled',
@@ -62,7 +64,14 @@ export function ProjectForm({ initialValues, submitLabel, cancelTo, onSubmit, on
             <TextInput label="City" withAsterisk {...form.getInputProps('site.city')} />
             <TextInput label="Region" {...form.getInputProps('site.region')} />
             <TextInput label="Postcode" {...form.getInputProps('site.postcode')} />
-            <NumberInput label="Land area" suffix=" m²" min={0} thousandSeparator="," {...form.getInputProps('site.landAreaSqm')} />
+            <NumberInput
+              label="Land area"
+              suffix=" m²"
+              min={0}
+              thousandSeparator={groupSeparator}
+              decimalSeparator={decimalSeparator}
+              {...form.getInputProps('site.landAreaSqm')}
+            />
             <TextInput label="Legal description" {...form.getInputProps('site.legalDescription')} />
             <TextInput label="Title reference" {...form.getInputProps('site.titleReference')} />
           </SimpleGrid>
@@ -81,10 +90,11 @@ export function ProjectForm({ initialValues, submitLabel, cancelTo, onSubmit, on
           <SimpleGrid cols={{ base: 1, sm: 2 }}>
             <NumberInput
               label={`Budget (${currency})`}
-              prefix="$"
+              prefix={currencySymbol}
               min={0}
               decimalScale={2}
-              thousandSeparator=","
+              thousandSeparator={groupSeparator}
+              decimalSeparator={decimalSeparator}
               {...form.getInputProps('budgetAmount')}
             />
             <TextInput label="Project manager" {...form.getInputProps('projectManager')} />
