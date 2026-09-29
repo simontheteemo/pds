@@ -43,6 +43,29 @@ internal sealed class ProjectStore(IAmazonDynamoDB dynamo, TableNames names)
         return projects;
     }
 
+    /// <summary>BatchGetItem in chunks of 100 (the DynamoDB limit), retrying unprocessed keys. Duplicate ids are removed
+    /// first because BatchGetItem rejects duplicate keys.</summary>
+    public async Task<IReadOnlyList<Project>> GetManyAsync(IReadOnlyCollection<ProjectId> ids, CancellationToken ct)
+    {
+        var projects = new List<Project>();
+        foreach (var chunk in ids.Distinct().Chunk(100))
+        {
+            var pending = new Dictionary<string, KeysAndAttributes>
+            {
+                [Table] = new KeysAndAttributes { Keys = chunk.Select(ProjectItemMapper.Key).ToList(), ConsistentRead = true },
+            };
+            while (pending.Count > 0)
+            {
+                var response = await dynamo.BatchGetItemAsync(new BatchGetItemRequest { RequestItems = pending }, ct);
+                if (response.Responses?.TryGetValue(Table, out var items) == true)
+                    projects.AddRange(items.Select(ProjectItemMapper.FromItem));
+                pending = response.UnprocessedKeys is { Count: > 0 } unprocessed ? unprocessed : [];
+            }
+        }
+
+        return projects;
+    }
+
     public Task<SaveResult> CreateAsync(Project project, CancellationToken ct) =>
         TransactAsync(
             [

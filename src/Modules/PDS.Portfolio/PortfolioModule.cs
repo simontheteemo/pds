@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using PDS.Portfolio.Contracts;
 using PDS.Portfolio.Data;
 using PDS.Portfolio.Features;
 using PDS.Shared.Data;
@@ -19,6 +20,7 @@ public static class PortfolioModule
     {
         services.AddSingleton(PortfolioTable.Definition);
         services.AddSingleton<ProjectStore>();
+        services.AddScoped<IPortfolioQueries, PortfolioQueries>();
         services.AddValidatorsFromAssemblyContaining<CreateProjectValidator>(includeInternalTypes: true);
         return services;
     }
