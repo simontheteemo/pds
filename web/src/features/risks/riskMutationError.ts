@@ -4,9 +4,10 @@ import { ApiError } from '../../shared/api/client';
 import { serverFieldErrors } from '../../shared/validation';
 
 /**
- * Shared 400/409/generic handling for the risk form and close modals: a 400 maps field errors onto the form
- * (surfacing a top alert if every erroring key is `projectId`/`status`, since there's no such field to show it
- * on), a 409 shows a "changed by someone else" toast and closes the modal, and anything else is a generic toast.
+ * Shared 400/409/generic handling for the risk form and close modals: a 400 maps field errors onto the form's
+ * fields and surfaces a top alert for any erroring key that isn't one of the caller's field names (since there's
+ * no such field to show it on), a 409 shows a "changed by someone else" toast and closes the modal, and anything
+ * else is a generic toast.
  */
 export function handleRiskMutationError(
   error: unknown,
@@ -16,16 +17,23 @@ export function handleRiskMutationError(
     setTopError: (message: string | null) => void;
     onClose: () => void;
     failureTitle: string;
+    fieldNames: string[];
   },
 ): void {
-  const { form, setTopError, onClose, failureTitle } = opts;
+  const { form, setTopError, onClose, failureTitle, fieldNames } = opts;
   if (error instanceof ApiError && error.status === 400 && error.problem?.errors) {
     const fieldErrors = serverFieldErrors(error.problem);
-    form.setErrors(fieldErrors);
-    const keys = Object.keys(fieldErrors);
-    if (keys.length > 0 && keys.every((k) => k === 'projectId' || k === 'status')) {
-      setTopError(Object.values(fieldErrors)[0] ?? 'Invalid value');
+    const mappedErrors: Record<string, string> = {};
+    const unmappedMessages: string[] = [];
+    for (const [key, message] of Object.entries(fieldErrors)) {
+      if (fieldNames.includes(key)) {
+        mappedErrors[key] = message;
+      } else {
+        unmappedMessages.push(message);
+      }
     }
+    form.setErrors(mappedErrors);
+    setTopError(unmappedMessages.length > 0 ? unmappedMessages.join(' ') : null);
   } else if (error instanceof ApiError && error.status === 409) {
     notifications.show({
       color: 'yellow',

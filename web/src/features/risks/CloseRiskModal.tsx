@@ -38,7 +38,13 @@ function CloseRiskModalInner({ projectId, risk, onClose }: { projectId: string; 
       notifications.show({ color: 'green', message: 'Risk closed' });
       onClose();
     } catch (error) {
-      handleRiskMutationError(error, { form, setTopError, onClose, failureTitle: 'Could not close the risk' });
+      handleRiskMutationError(error, {
+        form,
+        setTopError,
+        onClose,
+        failureTitle: 'Could not close the risk',
+        fieldNames: Object.keys(form.values),
+      });
     } finally {
       setSubmitting(false);
     }

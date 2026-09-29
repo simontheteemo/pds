@@ -49,7 +49,13 @@ function RiskFormModalInner({ projectId, risk, onClose }: Props & { risk: RiskDe
       notifications.show({ color: 'green', message: 'Risk saved' });
       onClose();
     } catch (error) {
-      handleRiskMutationError(error, { form, setTopError, onClose, failureTitle: 'Could not save the risk' });
+      handleRiskMutationError(error, {
+        form,
+        setTopError,
+        onClose,
+        failureTitle: 'Could not save the risk',
+        fieldNames: Object.keys(form.values),
+      });
     } finally {
       setSubmitting(false);
     }
