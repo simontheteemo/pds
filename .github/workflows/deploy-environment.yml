@@ -1,0 +1,54 @@
+name: deploy-environment
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: bundle
+          path: .
+
+      - uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Deploy stacks
+        working-directory: infra
+        env:
+          DEPLOYMENT: ${{ vars.PDS_DEPLOYMENT }}
+        run: >
+          npx --yes aws-cdk@2.1143.0 deploy
+          "$DEPLOYMENT-data" "$DEPLOYMENT-auth" "$DEPLOYMENT-app"
+          -c deployment="$DEPLOYMENT"
+          --require-approval never
+          --outputs-file cdk-outputs.json
+
+      - name: Smoke test
+        env:
+          DEPLOYMENT: ${{ vars.PDS_DEPLOYMENT }}
+        run: |
+          api_url=$(jq -r --arg stack "$DEPLOYMENT-app" '.[$stack].ApiUrl' infra/cdk-outputs.json)
+          curl --fail --silent --show-error --retry 5 --retry-delay 5 "$api_url/api/config"

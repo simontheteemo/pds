@@ -1,0 +1,62 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Package Lambda
+        run: dotnet publish src/PDS.Api -c Release -r linux-arm64 --self-contained false -p:PublishReadyToRun=true -o artifacts/api
+
+      - name: Build SPA
+        working-directory: web
+        run: npm ci && npm run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bundle
+          path: |
+            artifacts/api
+            web/dist
+          if-no-files-found: error
+
+  dev:
+    needs: package
+    uses: ./.github/workflows/deploy-environment.yml
+    with:
+      environment: dev
+    permissions:
+      contents: read
+      id-token: write
+
+  prod:
+    needs: dev
+    uses: ./.github/workflows/deploy-environment.yml
+    with:
+      environment: prod
+    permissions:
+      contents: read
+      id-token: write
