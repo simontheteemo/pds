@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using PDS.Portfolio.Data;
 using PDS.Portfolio.Domain;
 using PDS.Shared;
 using PDS.Shared.Settings;
+using PDS.Shared.Web;
 
 namespace PDS.Portfolio.Features;
 
@@ -34,11 +36,25 @@ internal static class ListProjects
     public static void Map(RouteGroupBuilder group) =>
         group.MapGet("/projects", Handle).WithName("ListProjects");
 
-    internal static async Task<Ok<PagedResult<ProjectListItem>>> Handle(
-        [AsParameters] ListProjectsQuery query, ProjectStore store, IOptions<LocaleOptions> locale, CancellationToken ct)
+    internal static async Task<Results<Ok<PagedResult<ProjectListItem>>, ValidationProblem>> Handle(
+        [AsParameters] ListProjectsQuery query, ProjectStore store, IOptions<LocaleOptions> locale, HttpContext http, CancellationToken ct)
     {
+        if (IsInvalidEnumQuery(query.Stage, http.Request.Query["stage"]))
+            return Problems.Field("stage", "Choose a valid stage.");
+        if (IsInvalidEnumQuery(query.Status, http.Request.Query["status"]))
+            return Problems.Field("status", "Choose a valid status.");
+
         var projects = await store.ListAllAsync(ct);
         return TypedResults.Ok(Apply(projects, query, locale.Value.Currency));
+    }
+
+    private static bool IsInvalidEnumQuery<TEnum>(TEnum? value, StringValues raw) where TEnum : struct, Enum
+    {
+        if (value is { } defined && !Enum.IsDefined(defined))
+            return true;
+
+        var text = raw.ToString();
+        return text.Length > 0 && text.All(char.IsAsciiDigit);
     }
 
     internal static PagedResult<ProjectListItem> Apply(IEnumerable<Project> projects, ListProjectsQuery query, string currency)
