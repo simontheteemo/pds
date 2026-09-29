@@ -3,9 +3,9 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useState } from 'react';
 import { z } from 'zod';
-import { ApiError } from '../../shared/api/client';
-import { serverFieldErrors, zodValidate } from '../../shared/validation';
+import { zodValidate } from '../../shared/validation';
 import { useCloseRisk } from './api';
+import { handleRiskMutationError } from './riskMutationError';
 import type { RiskDetails } from './types';
 
 const closeSchema = z.object({
@@ -38,27 +38,7 @@ function CloseRiskModalInner({ projectId, risk, onClose }: { projectId: string; 
       notifications.show({ color: 'green', message: 'Risk closed' });
       onClose();
     } catch (error) {
-      if (error instanceof ApiError && error.status === 400 && error.problem?.errors) {
-        const fieldErrors = serverFieldErrors(error.problem);
-        form.setErrors(fieldErrors);
-        const keys = Object.keys(fieldErrors);
-        if (keys.length > 0 && keys.every((k) => k === 'projectId' || k === 'status')) {
-          setTopError(Object.values(fieldErrors)[0] ?? 'Invalid value');
-        }
-      } else if (error instanceof ApiError && error.status === 409) {
-        notifications.show({
-          color: 'yellow',
-          title: 'This risk was changed by someone else',
-          message: 'The list now shows the latest version. Open it again to make your changes.',
-        });
-        onClose();
-      } else {
-        notifications.show({
-          color: 'red',
-          title: 'Could not close the risk',
-          message: error instanceof Error ? error.message : 'Unexpected error',
-        });
-      }
+      handleRiskMutationError(error, { form, setTopError, onClose, failureTitle: 'Could not close the risk' });
     } finally {
       setSubmitting(false);
     }

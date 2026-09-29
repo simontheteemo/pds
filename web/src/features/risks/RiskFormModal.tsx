@@ -2,9 +2,9 @@ import { Alert, Button, Group, Modal, SegmentedControl, Select, SimpleGrid, Stac
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useState } from 'react';
-import { ApiError } from '../../shared/api/client';
-import { serverFieldErrors, zodValidate } from '../../shared/validation';
+import { zodValidate } from '../../shared/validation';
 import { useCreateRisk, useUpdateRisk } from './api';
+import { handleRiskMutationError } from './riskMutationError';
 import { emptyRiskValues, fromRisk, riskSchema, toRiskInput, type RiskFormValues } from './riskFormModel';
 import { RiskBandBadge } from './RiskBandBadge';
 import { bandFor, categories, categoryLabel, impactLabels, likelihoodLabels, type RiskDetails } from './types';
@@ -49,27 +49,7 @@ function RiskFormModalInner({ projectId, risk, onClose }: Props & { risk: RiskDe
       notifications.show({ color: 'green', message: 'Risk saved' });
       onClose();
     } catch (error) {
-      if (error instanceof ApiError && error.status === 400 && error.problem?.errors) {
-        const fieldErrors = serverFieldErrors(error.problem);
-        form.setErrors(fieldErrors);
-        const keys = Object.keys(fieldErrors);
-        if (keys.length > 0 && keys.every((k) => k === 'projectId' || k === 'status')) {
-          setTopError(Object.values(fieldErrors)[0] ?? 'Invalid value');
-        }
-      } else if (error instanceof ApiError && error.status === 409) {
-        notifications.show({
-          color: 'yellow',
-          title: 'This risk was changed by someone else',
-          message: 'The list now shows the latest version. Open it again to make your changes.',
-        });
-        onClose();
-      } else {
-        notifications.show({
-          color: 'red',
-          title: 'Could not save the risk',
-          message: error instanceof Error ? error.message : 'Unexpected error',
-        });
-      }
+      handleRiskMutationError(error, { form, setTopError, onClose, failureTitle: 'Could not save the risk' });
     } finally {
       setSubmitting(false);
     }

@@ -60,7 +60,7 @@ export function ProjectRisksSection({ projectId, projectArchived }: { projectId:
                 <Table.Th>Owner</Table.Th>
                 <Table.Th>Due</Table.Th>
                 <Table.Th>Status</Table.Th>
-                {canWrite && <Table.Th />}
+                {canWrite && <Table.Th>Actions</Table.Th>}
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
