@@ -29,6 +29,7 @@ public static class PortfolioModule
         ListProjects.Map(group);
         CreateProject.Map(group);
         GetProject.Map(group);
+        UpdateProject.Map(group);
         return app;
     }
 }
