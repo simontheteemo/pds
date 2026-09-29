@@ -202,7 +202,7 @@ public interface IPortfolioQueries
 Per-deployment values: `Branding:ProductName`, `Branding:LogoUrl`, `Branding:PrimaryColor`, `Locale:Currency`, `Locale:Culture`, `Locale:TimeZone`, `Auth:Mode`, `Auth:Authority`, `Auth:ClientId`, `Auth:LogoutDomain`, `Tables:Portfolio`. CDK reads `infra/deployments/<name>.json` and sets these as Lambda environment variables. A new client needs a new deployment file and a new AWS account; no code changes.
 
 ### 5.4 Observability
-Serilog writes compact JSON to stdout. Each request log carries `CorrelationId` (from the `X-Correlation-Id` header, or generated) and `UserName`. The correlation ID is echoed in the response header and in ProblemDetails. Prod alarms go to an SNS email topic: API 5xx, Lambda errors, Lambda throttles, DynamoDB system errors.
+Serilog writes compact JSON to stdout. Each request log carries `CorrelationId` (from the `X-Correlation-Id` header, or generated) and `UserName`. The correlation ID is echoed in the response header and in ProblemDetails. Alarms go to an SNS email topic: API 5xx, Lambda errors and Lambda throttles, plus a monthly AWS Budgets alert at 80% of the configured limit. DynamoDB failures surface as API 5xx.
 
 ## 6. Frontend
 
@@ -222,8 +222,8 @@ Per deployment (`<name>` = e.g. `seine-dev`):
 |---|---|
 | `<name>-data` | DynamoDB `<name>-portfolio` (on-demand, PITR, deletion protection + RETAIN in prod) |
 | `<name>-auth` | Cognito user pool (email sign-in, self-signup off), groups `Admin`/`Manager`/`Viewer`, hosted-UI domain. RETAIN in prod |
-| `<name>-app` | API Lambda (.NET 10, arm64, 1024 MB, 30 s), HTTP API + JWT authorizer + CORS, user pool client, S3 + CloudFront, SPA upload with generated `config.json`, alarms + SNS |
-| `pds-github-oidc` (once per account) | GitHub OIDC provider + deploy role scoped to this repo |
+| `<name>-app` | API Lambda (.NET 10, arm64, 1024 MB, 30 s), HTTP API + JWT authorizer + CORS, user pool client, S3 + CloudFront, SPA upload with generated `config.json`, alarms + SNS, monthly budget |
+| `<name>-github-oidc` (deployed by hand once per account) | GitHub OIDC provider + deploy role trusted only by this repo's matching GitHub environment |
 
 ## 8. Testing strategy
 
