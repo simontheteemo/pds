@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/infra/">
+    <Project Path="infra/PDS.Infra/PDS.Infra.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/PDS.Api/PDS.Api.csproj" />
     <Project Path="src/PDS.Shared/PDS.Shared.csproj" />

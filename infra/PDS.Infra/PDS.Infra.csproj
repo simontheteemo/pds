@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <!-- jsii-generated CDK types raise deprecation warnings we cannot fix at the call site. -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Amazon.CDK.Lib" />
+    <PackageReference Include="Constructs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/PDS.Shared/PDS.Shared.csproj" />
+    <ProjectReference Include="../../src/Modules/PDS.Portfolio/PDS.Portfolio.csproj" />
+  </ItemGroup>
+</Project>
