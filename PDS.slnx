@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PDS.Shared/PDS.Shared.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PDS.Tests/PDS.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,13 @@
+bin/
+obj/
+artifacts/
+TestResults/
+*.user
+.vs/
+.idea/
+.DS_Store
+node_modules/
+web/dist/
+coverage/
+infra/cdk.out/
+infra/cdk-outputs.json
