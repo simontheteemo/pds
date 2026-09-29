@@ -17,10 +17,10 @@ using Amazon.CDK.AwsApigatewayv2Authorizers;
 using Amazon.CDK.AwsApigatewayv2Integrations;
 using Constructs;
 using ApiHttpMethod = Amazon.CDK.AWS.Apigatewayv2.HttpMethod;
+using CloudFrontDistribution = Amazon.CDK.AWS.CloudFront.Distribution;
 using LambdaFunction = Amazon.CDK.AWS.Lambda.Function;
 using LambdaFunctionProps = Amazon.CDK.AWS.Lambda.FunctionProps;
 using S3AssetOptions = Amazon.CDK.AWS.S3.Assets.AssetOptions;
-using CloudFrontDistribution = Amazon.CDK.AWS.CloudFront.Distribution;
 
 namespace PDS.Infra;
 
