@@ -28,7 +28,10 @@ export function ProjectRisksSection({ projectId, projectArchived }: { projectId:
           notifications.show({
             color: 'red',
             title: error instanceof ApiError && error.status === 409 ? 'This risk was changed by someone else' : 'Could not reopen the risk',
-            message: 'The list now shows the latest version.',
+            message:
+              error instanceof ApiError && error.status === 409
+                ? 'The list now shows the latest version.'
+                : error.message,
           }),
       },
     );
@@ -79,7 +82,14 @@ export function ProjectRisksSection({ projectId, projectArchived }: { projectId:
                     <Table.Td>
                       <Group gap="xs" justify="flex-end" wrap="nowrap">
                         {risk.status === 'Closed' ? (
-                          <Button size="xs" variant="default" loading={reopen.isPending} onClick={() => onReopen(risk)}>Reopen</Button>
+                          <Button
+                            size="xs"
+                            variant="default"
+                            loading={reopen.isPending && reopen.variables?.riskId === risk.id}
+                            onClick={() => onReopen(risk)}
+                          >
+                            Reopen
+                          </Button>
                         ) : (
                           <>
                             <Button size="xs" variant="light" onClick={() => setEditing(risk)}>Edit</Button>
