@@ -53,6 +53,7 @@ public sealed class AppStack : Stack
             {
                 Origin = S3BucketOrigin.WithOriginAccessControl(site),
                 ViewerProtocolPolicy = ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+                ResponseHeadersPolicy = ResponseHeadersPolicy.SECURITY_HEADERS,
             },
             DefaultRootObject = "index.html",
             ErrorResponses =
@@ -142,15 +143,27 @@ public sealed class AppStack : Stack
         httpApi.AddRoutes(new AddRoutesOptions { Path = "/api/config", Methods = [ApiHttpMethod.GET], Integration = integration });
         httpApi.AddRoutes(new AddRoutesOptions { Path = "/api/{proxy+}", Methods = [ApiHttpMethod.ANY], Integration = integration, Authorizer = authorizer });
 
-        // SPA upload; config.json is generated per deployment so one build serves every client
+        // SPA upload; config.json is generated per deployment so one build serves every client.
+        // Hashed build assets are cached indefinitely; index.html and config.json must always be
+        // revalidated so clients pick up the latest deploy. Each deployment leaves the other's
+        // files alone (Prune = false) since neither knows about the other's sources.
+        _ = new BucketDeployment(this, "site-assets-deployment", new BucketDeploymentProps
+        {
+            DestinationBucket = site,
+            Sources = [Source.Asset(assets.Web, new S3AssetOptions { Exclude = ["index.html", "config.json"] })],
+            CacheControl = [CacheControl.FromString("public, max-age=31536000, immutable")],
+            Prune = false,
+        });
         _ = new BucketDeployment(this, "site-deployment", new BucketDeploymentProps
         {
             DestinationBucket = site,
             Sources =
             [
-                Source.Asset(assets.Web, new S3AssetOptions { Exclude = ["config.json"] }),
+                Source.Asset(assets.Web, new S3AssetOptions { Exclude = ["*", "!index.html"] }),
                 Source.JsonData("config.json", new Dictionary<string, object> { ["apiBaseUrl"] = httpApi.ApiEndpoint }),
             ],
+            CacheControl = [CacheControl.NoCache()],
+            Prune = false,
             Distribution = cdn,
             DistributionPaths = ["/*"],
         });
