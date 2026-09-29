@@ -16,8 +16,10 @@ export function useMe() {
 
 /** For showing or hiding actions only; the API enforces every permission. */
 export function usePermissions() {
-  const roles = useMe().data?.roles ?? [];
+  const me = useMe();
+  const roles = me.data?.roles ?? [];
   return {
+    loaded: me.isSuccess,
     canWrite: roles.includes('Manager') || roles.includes('Admin'),
     canAdminister: roles.includes('Admin'),
   };

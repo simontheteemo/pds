@@ -1,8 +1,10 @@
 import { Alert, Button, Loader, Stack, Text, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 import { ApiError } from '../../shared/api/client';
+import { NotFoundPage } from '../../shared/layout/NotFoundPage';
+import { usePermissions } from '../../shared/me';
 import { useProject, useUpdateProject } from './api';
 import { ProjectForm } from './ProjectForm';
 import { fromDetails, toProjectInput } from './projectFormModel';
@@ -12,9 +14,13 @@ export function ProjectEditPage() {
   const project = useProject(id);
   const update = useUpdateProject(id);
   const navigate = useNavigate();
+  const { loaded, canWrite } = usePermissions();
   const [conflict, setConflict] = useState(false);
   const [formGeneration, setFormGeneration] = useState(0);
 
+  if (project.error instanceof ApiError && project.error.status === 404) {
+    return <NotFoundPage message="This project doesn't exist or was removed." />;
+  }
   if (project.error) {
     return (
       <Alert color="red" title="Could not load the project">
@@ -23,6 +29,15 @@ export function ProjectEditPage() {
     );
   }
   if (!project.data) return <Loader />;
+  if (loaded && !canWrite) {
+    return (
+      <Alert color="red" title="You don't have permission to edit projects.">
+        <Button component={Link} to={`/projects/${id}`} variant="light" size="xs">
+          Back to project
+        </Button>
+      </Alert>
+    );
+  }
 
   const current = project.data;
   return (
