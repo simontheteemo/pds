@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using Amazon.Lambda.AspNetCoreServer.Hosting;
 using PDS.Api;
+using PDS.Api.Security;
 using PDS.Shared.Data;
 using Serilog;
 using Serilog.Events;
@@ -31,6 +32,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddPdsSettings(builder.Configuration);
+builder.Services.AddPdsSecurity(builder.Configuration);
 builder.Services.AddDynamo();
 
 var app = builder.Build();
@@ -43,6 +45,8 @@ app.UseExceptionHandler(new ExceptionHandlerOptions
     StatusCodeSelector = ex => ex is BadHttpRequestException bad ? bad.StatusCode : StatusCodes.Status500InternalServerError,
 });
 app.UseStatusCodePages();
+app.UseAuthentication();
+app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
     app.MapOpenApi();
