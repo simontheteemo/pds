@@ -4,6 +4,7 @@ on:
   pull_request:
   push:
     branches: [main]
+  workflow_call:
 
 permissions:
   contents: read
@@ -36,7 +37,7 @@ jobs:
       - name: OpenAPI document is committed and current
         run: git diff --exit-code -- web/src/shared/api/openapi.json
 
-      - name: Test .NET (unit, architecture, integration, infra)
+      - name: Test .NET (unit and integration)
         run: dotnet test --no-build
 
       - name: Web install
