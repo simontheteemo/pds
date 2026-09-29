@@ -1,6 +1,6 @@
 # ADR-0001: Target .NET 10 LTS instead of .NET 8
 
-- Status: **Proposed**, awaiting confirmation from @simon
+- Status: **Accepted** (2026-09-29, @simon)
 - Date: 2026-09-29
 
 ## Context

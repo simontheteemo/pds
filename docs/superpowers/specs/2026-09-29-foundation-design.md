@@ -1,257 +1,257 @@
 # PDS Foundation + Project Portfolio — Design Spec
 
-- Date: 2026-09-29
+- Date: 2026-09-29 (Rev B: DynamoDB)
 - Author: @simon (with Claude)
-- Status: **Draft for review**
-- Related: [Tech stack](../../tech-stack.md) · [ADR-0001 .NET 10](../../adr/0001-dotnet-10-lts.md)
+- Status: **Approved design; spec revised for DynamoDB**
+- Related: [Tech stack](../../tech-stack.md) · [ADR-0001 .NET 10](../../adr/0001-dotnet-10-lts.md) · [ADR-0002 DynamoDB](../../adr/0002-dynamodb.md) · [Architecture set](../../architecture/pds-architecture.html)
 
 ## 1. Purpose
 
 Seine Project Limited is replacing spreadsheets, email and scattered project files with one web system for its property development portfolio. This spec covers the **first sub-project**:
 
-1. **Foundation:** the codebase structure, auth, database, infrastructure, CI/CD and app shell that every module builds on.
+1. **Foundation:** the codebase structure, auth, data access, infrastructure, CI/CD and app shell that every module builds on.
 2. **Project Portfolio module:** the first vertical slice through that foundation. Every other module hangs off `Project`.
 
-This is the **real MVP foundation**, not a throwaway. Code quality, tests and deployability matter from day one.
+This is the **real MVP foundation**, not a throwaway prototype.
 
 ### What was stated vs assumed
 
 | Stated by @simon | Assumed (correct me if wrong) |
 |---|---|
-| Six core modules: Portfolio, Risk, Consents, Contractors/Contracts, Costs, Sales | The other five modules each get their own spec → plan → build cycle after this one |
-| Stack: AWS, C#/.NET, React/TypeScript, modular monolith | .NET 10 LTS instead of 8 (ADR-0001) |
-| Lightweight frameworks; provider-managed infrastructure | Low user count (an internal team, tens of users), so Lambda cold starts are acceptable |
-| Lambda for the API | NZ-based users; primary region `ap-southeast-2` (Sydney), or `ap-southeast-6` (Auckland) if it has every service we need |
-| Single-tenant, tenant-ready (one deployment per client) | Currency NZD, timezone Pacific/Auckland, both configurable per deployment |
-| Generic naming (`property-dev-system`), reusable for other clients | Repo folder is `pds/`; product and namespace prefix is `PDS` |
-| First slice = Project Portfolio | MVP scope beyond Portfolio is decided after Miller Consulting's phased plan |
+| Six core modules: Portfolio, Risk, Consents, Contractors/Contracts, Costs, Sales | Each of the other modules gets its own spec → plan → build cycle |
+| Stack: AWS, C#/.NET 10, React/TypeScript, modular monolith | Low user count (10–30 internal staff, < 5 req/s peak) |
+| Lightweight frameworks; provider-managed infrastructure | Primary region `ap-southeast-2` (Sydney); Auckland `ap-southeast-6` if every service is available there |
+| Lambda for the API; DynamoDB for data | Currency NZD, timezone Pacific/Auckland, both configurable |
+| Single-tenant, tenant-ready (one deployment per client) | Repo folder is `pds/`; namespace prefix is `PDS` |
+| Generic naming, reusable for other clients | MVP scope beyond Portfolio is decided after Miller Consulting's phased plan |
 
 ### Success criteria
 
-- A user signs in through Cognito and can view, filter, create and edit projects in the deployed `dev` environment.
-- The same code runs locally with `docker compose up` + `dotnet run` + `npm run dev`, with no AWS account needed.
-- A merge to `main` passes CI (build, tests, architecture tests, lint) and deploys to `dev`. Deploying to `prod` needs a manual approval.
-- Adding a second module means copying the Portfolio module's shape. No changes to the host beyond one `AddXModule()` / `MapXEndpoints()` line each.
-- No client-specific names, logos or rules appear anywhere in source code.
+- A user signs in through Cognito and can list, filter, view, create, edit, archive and restore projects in the deployed `dev` environment.
+- The same code runs locally with `docker compose up` + `dotnet run` + `npm run dev`, with no AWS account.
+- A merge to `main` passes CI and deploys to `dev`. Deploying to `prod` needs a manual approval, and prod receives the same build.
+- Adding a module means copying the Portfolio shape. The host changes by one `AddXModule()` / `MapXEndpoints()` line each.
+- No client-specific names, logos or rules appear in source code.
 
 ## 2. Scope
 
-**In scope**
-- Repo, solution and module structure; shared kernel
-- Portfolio module: domain, persistence, API, UI (list, detail, create, edit)
-- Authentication (Cognito) and role-based authorisation (Admin / Manager / Viewer)
-- Per-deployment configuration and branding
-- AWS infrastructure via CDK for `dev` and `prod` environments
-- CI/CD with GitHub Actions
-- Automated tests at unit, integration, architecture and frontend-component level
+**In scope:** repo and solution structure; shared kernel; Portfolio module (domain, persistence, API, UI); Cognito authentication with Admin/Manager/Viewer roles; per-deployment configuration and branding; CDK infrastructure for `dev` and `prod`; CI/CD; automated tests.
 
-**Out of scope (later sub-projects)**
+**Out of scope (later sub-projects):**
 - Risk, Consents, Contractors, Costs and Sales modules
-- **Actual** cost figures on projects. Portfolio stores the budget; actuals arrive with the Costs module through a `Contracts` query.
-- Documents / S3 uploads, reminders / scheduling, reporting dashboard, data import from existing spreadsheets
-- User management UI (users are managed in the Cognito console for now)
-- Multi-tenancy inside one deployment
+- **Actual** costs on projects. Portfolio stores the budget only.
+- Documents (S3), reminders, reporting and the Athena export, spreadsheet import
+- A user-management UI (users are managed in the Cognito console)
+- Multi-tenancy within one deployment
 
 ## 3. Architecture
 
-### 3.1 Shape
+### 3.1 Runtime shape (architecture set A-01)
 
 ```
-Browser ──► CloudFront ──► S3 (React SPA)
+Browser ──► CloudFront ──► S3 (SPA build + config.json)
    │
-   └─(JWT)─► API Gateway HTTP API ──(JWT authorizer: Cognito)──► Lambda (PDS.Api, .NET 10)
-                                                                    │  (VPC, private subnets)
-                                                                    ├─► Aurora Serverless v2 PostgreSQL
-                                                                    └─► Secrets Manager (VPC endpoint)
+   ├──► Cognito hosted login (OIDC code + PKCE) ──► ID token
+   │
+   └──(Bearer ID token, CORS)──► API Gateway HTTP API ──(JWT authorizer)──► Lambda PDS.Api ──► DynamoDB tables
+                                                                              └──► CloudWatch Logs
 ```
 
-- **No NAT gateway.** API Gateway validates JWTs, so the Lambda never has to fetch Cognito keys. Secrets Manager is reached through a VPC interface endpoint. Logs go through the Lambda service itself.
-- The ASP.NET Core app is identical locally (Kestrel) and in AWS (`AddAWSLambdaHosting(LambdaEventSource.HttpApi)`).
+- There's no VPC. The Lambda reaches DynamoDB over the AWS SDK with IAM permissions scoped to its tables.
+- The SPA reads `config.json` (API base URL) from its own bucket, then calls `GET /api/config` for branding, locale and auth settings. One build serves every deployment.
+- The API uses the **ID token** as the bearer token, so it has the user's email and groups without an extra call. API Gateway validates the token's `aud` against the app client id.
+- Configuration comes from the CDK deployment file and is passed to the Lambda as environment variables. There's no runtime config service.
 
 ### 3.2 Repository layout
 
 ```
 pds/
 ├── src/
-│   ├── PDS.Api/                   host: Program.cs, auth, config, module registration, ProblemDetails
-│   ├── PDS.Shared/                Entity base, typed IDs, Money, Result, ICurrentUser, IClock, EF conventions
+│   ├── PDS.Api/                   host: Program.cs, security, config endpoints, ProblemDetails, logging
+│   ├── PDS.Shared/                typed IDs, Money, ICurrentUser, Dynamo helpers, ITableDefinition, validation filter
 │   └── Modules/
 │       └── PDS.Portfolio/
 │           ├── Contracts/         PUBLIC: ProjectId, ProjectSummary, IPortfolioQueries
 │           ├── Domain/            internal: Project, Site, ProjectStage, ProjectStatus
-│           ├── Features/          internal: one file per use case (endpoint + request + handler + validator)
-│           ├── Data/              internal: PortfolioDbContext, configurations, Migrations/
+│           ├── Features/          internal: one file per use case (endpoint + request + validator + handler)
+│           ├── Data/              internal: ProjectStore, ProjectItemMapper, PortfolioTable
 │           └── PortfolioModule.cs public: AddPortfolioModule(), MapPortfolioEndpoints()
 ├── tests/
 │   ├── PDS.Tests/                 unit + architecture tests
-│   └── PDS.IntegrationTests/      API tests against real Postgres (Testcontainers)
+│   ├── PDS.IntegrationTests/      API tests against DynamoDB Local (Testcontainers)
+│   └── PDS.Infra.Tests/           CDK assertion tests
 ├── web/                           React SPA
-├── infra/                         CDK app (C#)
+├── infra/PDS.Infra/               CDK app (C#)
 ├── docs/
-├── docker-compose.yml             Postgres 17
-├── Directory.Build.props          shared: net10.0, nullable, warnings-as-errors, analyzers
-├── Directory.Packages.props       central package versions
+├── docker-compose.yml             DynamoDB Local
+├── global.json, Directory.Build.props, Directory.Packages.props, PDS.slnx
 └── .github/workflows/
 ```
 
 ### 3.3 Module rules
 
 1. A module is **one project**. Everything is `internal` except the `Contracts/` namespace and the `*Module.cs` registration class.
-2. A module may reference another module **only through its `Contracts/` types**. An architecture test (plain reflection, no library) fails the build if a module uses a non-contract type from another module.
-3. Each module owns a **Postgres schema** (`portfolio`, later `risks`, `costs`, …) and its own `DbContext` and migrations. **No foreign keys across schemas.** A cross-module link stores the other module's typed ID (e.g. `ProjectId`) and checks it exists through that module's `Contracts` query.
-4. Use cases are **vertical slices**: one file holds the endpoint mapping, the request/response records, the validator and the handler. Handlers use the `DbContext` directly, with no repository layer.
-5. Cross-module reads go through query interfaces in `Contracts/`, e.g. `IPortfolioQueries.GetSummaries(IEnumerable<ProjectId>)`. There's no event bus until a module needs async side-effects.
+2. Modules reference each other **only through `Contracts/`**. An architecture test fails the build otherwise.
+3. Each module **owns its DynamoDB table(s)**. No module reads or writes another module's table. A cross-module link stores the other module's ID, and existence is checked through that module's `Contracts` query.
+4. Use cases are **vertical slices**. Handlers use the module's store class directly; there's no generic repository.
+5. There's no event bus until a module needs async side-effects.
 
-### 3.4 Shared kernel (`PDS.Shared`) — kept deliberately small
+### 3.4 Shared kernel (`PDS.Shared`)
 
-- `Entity<TId>` with audit fields (`CreatedAt/By`, `UpdatedAt/By`) set automatically by a `SaveChanges` interceptor
-- Strongly-typed IDs (`readonly record struct ProjectId(Guid Value)`), using UUIDv7 for index-friendly ordering
-- `Money(decimal Amount, string Currency)` value object; the currency defaults to the configured deployment currency
-- `ICurrentUser` (from JWT claims, or the fixed dev user locally), `IClock`
-- EF conventions: snake_case naming, `numeric(18,2)` for money, Postgres `xmin` as the concurrency token
+- Strongly-typed IDs (`readonly record struct ProjectId(Guid Value)`, UUIDv7)
+- `Money(decimal Amount, string Currency)`
+- `ICurrentUser` (id, name, email, roles)
+- `TimeProvider` (built-in) for all timestamps
+- `ITableDefinition`: logical name, key schema and GSIs. Local dev and tests use it to create tables; CDK creates the real ones. An infra test checks that the two match.
+- `DynamoTableNames`: resolves the logical name (`portfolio`) to a physical name through the `Tables:<Logical>` config value, falling back to `pds-<logical>`
+- `ValidationFilter<T>`: runs the FluentValidation validator and returns `400 ValidationProblemDetails` with camelCase dotted keys (`site.city`)
+- Security constants: `Roles`, `Policies`
 
 ## 4. Project Portfolio module
 
 ### 4.1 Domain model
 
-**`Project` (aggregate root)**
+**`Project`**
 
 | Field | Type | Rules |
 |---|---|---|
-| `Id` | `ProjectId` | UUIDv7 |
-| `Code` | string(20) | Required, unique, e.g. `PDS-001` (user-entered) |
-| `Name` | string(200) | Required |
-| `Site` | `Site` (owned) | See below |
+| `Id` | `ProjectId` | UUIDv7, server-generated |
+| `Code` | string | Required. Normalised to trimmed upper-case. Pattern `^[A-Z0-9][A-Z0-9-]{0,19}$`. Unique per deployment |
+| `Name` | string | Required, ≤ 200 |
+| `Site` | `Site` | Required; see below |
 | `Stage` | `ProjectStage` | Required |
 | `Status` | `ProjectStatus` | Required |
-| `PlannedStart`, `PlannedCompletion` | `DateOnly?` | Completion ≥ start |
-| `ActualStart`, `ActualCompletion` | `DateOnly?` | Completion ≥ start |
-| `Budget` | `Money?` | ≥ 0 |
-| `ProjectManager` | string(200)? | Free text for now; becomes a user reference later |
-| `Description` | string(4000)? | |
-| `IsArchived` | bool | Archived projects are hidden by default; nothing is ever hard-deleted |
-| audit fields, `Version` (xmin) | | |
+| `PlannedStart`, `PlannedCompletion` | `DateOnly?` | If both are set, completion ≥ start |
+| `ActualStart`, `ActualCompletion` | `DateOnly?` | If both are set, completion ≥ start |
+| `Budget` | `Money?` | Amount ≥ 0, ≤ 2 decimal places, in the deployment currency |
+| `ProjectManager` | string? | ≤ 200 |
+| `Description` | string? | ≤ 4000 |
+| `IsArchived` | bool | Soft-archive only; no hard delete |
+| `CreatedAt/By`, `UpdatedAt/By` | | Set by the store |
+| `Version` | long | Starts at 1; +1 on every write |
 
-**`Site` (owned value object):** `AddressLine`, `Suburb`, `City`, `Region`, `Postcode`, `LegalDescription`, `TitleReference`, `LandAreaSqm` (decimal?). Only `AddressLine` and `City` are required.
+**`Site`:** `AddressLine` (required, ≤ 200), `Suburb`, `City` (required, ≤ 100), `Region`, `Postcode`, `LegalDescription`, `TitleReference`, `LandAreaSqm` (≥ 0).
 
-**`ProjectStage`** (lifecycle, ordered): `Acquisition → Feasibility → Design → Consenting → Construction → Sales → Completed`. Any stage change is allowed; the UI shows it as a stepper.
+**`ProjectStage`:** `Acquisition, Feasibility, Design, Consenting, Construction, Sales, Completed`. Any change is allowed.
+**`ProjectStatus`:** `OnTrack, AtRisk, Delayed, OnHold, Cancelled`.
+Both are serialised as strings in JSON and in DynamoDB.
 
-**`ProjectStatus`** (health): `OnTrack`, `AtRisk`, `Delayed`, `OnHold`, `Cancelled`.
+### 4.2 DynamoDB table `portfolio`
 
-Stage and status are stored as strings so the database stays readable.
+Key schema: `pk` (S, hash), `sk` (S, range). GSI `gsi1`: `gsi1pk` (S, hash), `gsi1sk` (S, range), projection ALL. On-demand billing, PITR on, deletion protection in prod.
 
-### 4.2 API
+| Item | `pk` | `sk` | `gsi1pk` | `gsi1sk` | Other attributes |
+|---|---|---|---|---|---|
+| Project | `PROJECT#<id>` | `PROJECT` | `PROJECT` | `<code>` | all fields above; `site` stored as a Map; dates as `yyyy-MM-dd` strings; timestamps as ISO-8601 UTC; `budgetAmount` (N) + `currency`; `version` (N) |
+| Code guard | `CODE#<code>` | `CODE` | – | – | `projectId` |
+
+| Access pattern | Operation |
+|---|---|
+| Get by id | `GetItem(pk, sk)` |
+| List / filter / search | `Query gsi1 where gsi1pk = PROJECT` (read all pages), then filter and page in memory, ordered by code |
+| Create | `TransactWriteItems`: Put project `attribute_not_exists(pk)` + Put code guard `attribute_not_exists(pk)` |
+| Update, same code | `PutItem` with `version = :expected` |
+| Update, code changed | `TransactWriteItems`: Put project (version check) + Delete old guard + Put new guard `attribute_not_exists(pk)` |
+| Archive / restore | Same as "update, same code" |
+
+A failed condition is resolved as follows. Missing item → 404. Version mismatch → 409. Code guard exists → 400 on `code` ("Code is already in use").
+
+### 4.3 API
 
 All routes sit under `/api/portfolio`. JSON uses camelCase. Errors are `application/problem+json`.
 
-| Method | Route | Role | Purpose |
+| Method | Route | Policy | Purpose / result |
 |---|---|---|---|
-| GET | `/projects?stage=&status=&search=&includeArchived=&page=&pageSize=` | Viewer+ | Paged list (search on code, name, suburb, city) |
-| GET | `/projects/{id}` | Viewer+ | Detail |
-| POST | `/projects` | Manager+ | Create → `201` + `Location` |
-| PUT | `/projects/{id}` | Manager+ | Full update; requires `version` (optimistic concurrency) |
-| POST | `/projects/{id}/archive` | Admin | Archive |
-| POST | `/projects/{id}/restore` | Admin | Restore |
+| GET | `/projects?stage=&status=&search=&includeArchived=false&page=1&pageSize=25` | CanRead | `PagedResult<ProjectListItem>`. `pageSize` is clamped to 1–100 and `page` to ≥ 1. Search is a case-insensitive substring match on code, name, suburb and city |
+| GET | `/projects/{id}` | CanRead | `ProjectDetails`, or 404 |
+| POST | `/projects` | CanWrite | `201` + `Location` + `ProjectDetails` |
+| PUT | `/projects/{id}` | CanWrite | Full replace; body includes `version`; `200` + `ProjectDetails` |
+| POST | `/projects/{id}/archive` | CanAdminister | Body `{ version }`; `200` + `ProjectDetails` |
+| POST | `/projects/{id}/restore` | CanAdminister | Body `{ version }`; `200` + `ProjectDetails` |
 
-Plus `GET /api/me` (current user and roles) and `GET /api/config` (branding, currency, locale). Both are in the host.
+Host endpoints: `GET /api/config` (anonymous; branding, locale, auth settings) and `GET /api/me` (authenticated; id, name, email, roles).
 
-### 4.3 Contracts exposed to future modules
+### 4.4 Contracts for future modules
 
 ```csharp
 public readonly record struct ProjectId(Guid Value);
-public sealed record ProjectSummary(ProjectId Id, string Code, string Name, string Stage, string Status);
+public sealed record ProjectSummary(ProjectId Id, string Code, string Name, string Stage, string Status, bool IsArchived);
 public interface IPortfolioQueries
 {
     Task<bool> Exists(ProjectId id, CancellationToken ct);
-    Task<IReadOnlyList<ProjectSummary>> GetSummaries(IEnumerable<ProjectId> ids, CancellationToken ct);
+    Task<IReadOnlyList<ProjectSummary>> GetSummaries(IReadOnlyCollection<ProjectId> ids, CancellationToken ct);
 }
 ```
 
 ## 5. Cross-cutting concerns
 
 ### 5.1 Authentication and authorisation
-- **Cloud:** the SPA signs in via Cognito managed login (OIDC authorization code + PKCE). API Gateway's JWT authorizer rejects invalid tokens. The app reads claims from the validated token and maps `cognito:groups` to roles.
-- **Policies:** `Viewer` (read), `Manager` (read + write), `Admin` (everything + archive/restore). Role inclusion: Admin ⊃ Manager ⊃ Viewer.
-- **Local:** with `Auth:Mode=Development`, a fixed dev user is signed in with a role chosen in `appsettings.Development.json`. This mode is **refused at startup** outside the Development environment.
+- **Cloud:** the API Gateway JWT authorizer validates the ID token (issuer = the user pool, audience = the app client). The `Gateway` auth scheme builds the principal from the authorizer's JWT claims, which the Lambda adapter passes in the request context. Claims arriving on `HttpContext.User` are the fallback.
+- **Group claims** can arrive as separate claims or as one bracketed string (`"[Admin Manager]"`). A claims transformation handles both shapes and maps them to role claims.
+- **Policies:** CanRead = Viewer|Manager|Admin; CanWrite = Manager|Admin; CanAdminister = Admin.
+- **Local:** `Auth:Mode=Development` signs in a fixed user whose roles come from config. Options validation **refuses to start** in this mode outside the Development environment.
+- **API Gateway routes:** `GET /api/config` has no authorizer; `ANY /api/{proxy+}` requires the JWT.
 
 ### 5.2 Errors
-- Validation failure → `400` with `ValidationProblemDetails` (field-keyed errors, shown against form fields in the UI)
-- Not found → `404`; concurrency conflict (stale `version`) → `409`, and the UI offers to reload
-- Unhandled → `500` with a correlation ID. Details are logged but never returned to the client.
+- Validation → `400 ValidationProblemDetails`, with camelCase dotted keys the UI shows against fields
+- Malformed JSON or an unknown enum value → `400` (never 500)
+- Not found → `404`; version conflict → `409`, and the UI offers to reload
+- Unhandled → `500` ProblemDetails with a `correlationId`. No exception details are returned outside Development.
 
 ### 5.3 Configuration and tenant-readiness
-- Per-deployment settings, read from SSM Parameter Store in AWS and from `appsettings` locally: `Branding:ProductName`, `Branding:LogoUrl`, `Branding:PrimaryColor`, `Locale:Currency` (NZD), `Locale:TimeZone` (Pacific/Auckland), `Locale:Culture` (en-NZ).
-- The SPA gets these from `GET /api/config` at start-up, so the same build artifact serves any client.
-- CDK takes a `deploymentName` + `environment` (e.g. `seine-dev`, `seine-prod`) and names every resource from them. A new client means a new AWS account and a new CDK context. No code changes.
+Per-deployment values: `Branding:ProductName`, `Branding:LogoUrl`, `Branding:PrimaryColor`, `Locale:Currency`, `Locale:Culture`, `Locale:TimeZone`, `Auth:Mode`, `Auth:Authority`, `Auth:ClientId`, `Auth:LogoutDomain`, `Tables:Portfolio`. CDK reads `infra/deployments/<name>.json` and sets these as Lambda environment variables. A new client needs a new deployment file and a new AWS account; no code changes.
 
-### 5.4 Data and migrations
-- Each module's migrations run in module order through a **migrator Lambda** (the same assembly with a separate handler). The deploy workflow invokes it after `cdk deploy`. The API Lambda never migrates on start-up.
-- Locally, `dotnet run` applies pending migrations automatically in Development only.
-- Aurora automated backups: 7 days in dev, 35 days in prod. Prod has deletion protection.
-
-### 5.5 Observability
-- Serilog writes structured JSON to stdout, which Lambda sends to CloudWatch. Every log line carries the request correlation ID and user ID.
-- CloudWatch alarms (prod): API 5xx rate, Lambda errors/throttles, Aurora CPU/ACU at maximum. Alerts go to an SNS email topic.
+### 5.4 Observability
+Serilog writes compact JSON to stdout. Each request log carries `CorrelationId` (from the `X-Correlation-Id` header, or generated) and `UserName`. The correlation ID is echoed in the response header and in ProblemDetails. Prod alarms go to an SNS email topic: API 5xx, Lambda errors, Lambda throttles, DynamoDB system errors.
 
 ## 6. Frontend
 
-- **App shell:** a Mantine `AppShell` with a sidebar nav. Only Portfolio is active; future modules appear only once they exist. The header shows the product name and logo from config, plus a user menu with sign-out.
+- **App shell:** a Mantine `AppShell`, sidebar navigation (Projects), and a header showing the configured product name and logo plus a user menu with the user's name, roles and sign-out.
 - **Pages:**
-  - Projects list: a table with stage/status filters, search, pagination, and colour-coded status badges
-  - Project detail: summary, site, timeline (planned vs actual), budget
-  - Create/edit form: Zod validation that mirrors the server rules; server `400` errors are mapped onto fields
-- **Structure:** `web/src/features/portfolio/…` (pages, components, hooks), `web/src/shared/…` (api client, auth, layout, formatting)
-- **Formatting:** money and dates use `Intl` with the configured locale and currency.
-- **Role-aware UI:** write actions are hidden for Viewers. The server still enforces this; the UI hiding is only for convenience.
+  - Projects list: stage/status filters, a debounced search box, pagination, a status badge, and an archived toggle for Admins
+  - Project detail: summary, site, planned vs actual timeline, budget. Edit, archive and restore actions are shown by role.
+  - Create and edit: a shared form with Zod validation mirroring the server rules. Server `400` errors are mapped onto fields; a `409` shows a reload prompt.
+- **Formatting:** money and dates go through `Intl`, using the configured culture and currency.
+- The UI hides write actions from Viewers for convenience only; the server enforces all permissions.
 
 ## 7. Infrastructure (CDK, C#)
 
-Four stacks per deployment:
+Per deployment (`<name>` = e.g. `seine-dev`):
 
 | Stack | Contents |
 |---|---|
-| `Network` | VPC (2 AZs, private isolated subnets, **no NAT**), Secrets Manager VPC endpoint, security groups |
-| `Data` | Aurora Serverless v2 Postgres cluster (dev: 0–2 ACU with auto-pause; prod: 0.5–4 ACU), DB secret |
-| `Auth` | Cognito user pool, groups, app client, managed login domain |
-| `App` | API + migrator Lambdas, HTTP API + JWT authorizer, S3 + CloudFront for the SPA, SSM parameters, alarms |
-
-Environments: `dev` and `prod`, **ideally in separate AWS accounts**.
+| `<name>-data` | DynamoDB `<name>-portfolio` (on-demand, PITR, deletion protection + RETAIN in prod) |
+| `<name>-auth` | Cognito user pool (email sign-in, self-signup off), groups `Admin`/`Manager`/`Viewer`, hosted-UI domain. RETAIN in prod |
+| `<name>-app` | API Lambda (.NET 10, arm64, 1024 MB, 30 s), HTTP API + JWT authorizer + CORS, user pool client, S3 + CloudFront, SPA upload with generated `config.json`, alarms + SNS |
+| `pds-github-oidc` (once per account) | GitHub OIDC provider + deploy role scoped to this repo |
 
 ## 8. Testing strategy
 
 | Layer | What | Tooling |
 |---|---|---|
-| Unit | Domain rules (dates, budget, stage), validators, Money | xUnit |
-| Architecture | Modules only use other modules' `Contracts`; `Domain` has no EF/ASP.NET dependencies | xUnit + reflection |
-| Integration | Every endpoint: happy path, validation, 404, 409, role enforcement | `WebApplicationFactory` + Testcontainers Postgres |
-| Frontend | List filtering, form validation and server-error mapping, role-based visibility | Vitest + RTL, API mocked with MSW |
-| Infra | CDK synth + snapshot/assertion tests (no NAT, deletion protection in prod, etc.) | xUnit + `Amazon.CDK.Assertions` |
-
-End-to-end browser tests are deferred until two or more modules exist.
+| Unit | Domain rules, validators, item mapper round-trip, claims transformation, Money | xUnit |
+| Architecture | Modules only use other modules' `Contracts`; `Domain` has no ASP.NET or AWS SDK dependencies | xUnit + reflection |
+| Integration | Every endpoint: happy path, validation, 404, 409, duplicate code, role enforcement, paging bounds | `WebApplicationFactory` + Testcontainers DynamoDB Local |
+| Frontend | List filters, form validation, server-error mapping, role-based visibility | Vitest + RTL + MSW |
+| Infra | Table keys match `ITableDefinition`; prod retention and deletion protection; JWT authorizer on the proxy route; no VPC | xUnit + `Amazon.CDK.Assertions` |
 
 ## 9. CI/CD (GitHub Actions)
 
-- **`ci.yml`** (every PR and push): restore → `dotnet format --verify-no-changes` → build (warnings as errors) → tests (Testcontainers on the runner) → `web`: lint, typecheck, test, build → `cdk synth`.
-- **`deploy.yml`** (on `main`): build artifacts → `cdk deploy` to **dev** → run the migrator → upload the SPA to S3 + invalidate CloudFront → smoke test (`GET /api/config`). **Prod** uses the same steps behind a GitHub Environment approval.
-- AWS access uses GitHub OIDC → a per-account IAM deploy role. No long-lived keys.
+- **`ci.yml`** (every PR and push): `dotnet format --verify-no-changes` → build → tests → web lint, typecheck, test and build → publish the Lambda → `cdk synth`.
+- **`deploy.yml`** (push to `main`): build once → deploy to `dev` → smoke test (`GET /api/config` returns 200) → a GitHub Environment approval → deploy the **same artifacts** to `prod`.
+- AWS access uses GitHub OIDC → a per-account deploy role.
 
 ## 10. Risks and open items
 
-| # | Item | Impact | Proposed handling |
-|---|---|---|---|
-| 1 | **.NET 10 vs .NET 8** (ADR-0001) | Runtime choice for everything | Confirm .NET 10; install the SDK |
-| 2 | Region: Sydney vs Auckland (`ap-southeast-6`) | Latency, data residency | Check that Aurora Serverless v2, Cognito managed login and Lambda .NET 10 are available in Auckland; otherwise use Sydney |
-| 3 | Lambda cold starts (~1–2 s after idle) | First request feels slow | Accept for an internal tool; ReadyToRun compilation; move to Fargate only if it becomes a real problem |
-| 4 | Aurora auto-pause resume (~15 s) in dev | First request after a long idle is slow | Dev only. Prod keeps min 0.5 ACU (roughly NZ$60–80/month) |
-| 5 | GitHub org/repo and AWS accounts not yet set up | Blocks the deploy pipeline | Local build and tests aren't blocked; the deploy tasks wait on these |
-| 6 | Project Code format | Minor | User-entered, unique. Auto-numbering is deferred |
-| 7 | Relationship to Miller Consulting's proposal | Their architecture recommendation may differ | This foundation is a reference point for that conversation; the ADRs record the reasoning |
+| # | Item | Handling |
+|---|---|---|
+| 1 | Lambda managed runtime for .NET 10 in the chosen region | Verify during infra work. Fallback: a container-image Lambda |
+| 2 | Region: Sydney vs Auckland | Check service availability. The deployment file sets the region |
+| 3 | In-memory list filtering | Fine up to a few thousand projects; revisit with per-filter GSIs |
+| 4 | Reporting without SQL | Running totals now; the Athena export in the reporting sub-project |
+| 5 | Lambda cold start (~1 s) | Accept; ReadyToRun publish |
+| 6 | GitHub repo and AWS accounts not yet set up | Local build and tests aren't blocked; the deploy tasks are |
 
-## 11. Roadmap after this spec (each gets its own spec)
+## 11. Roadmap (each item gets its own spec)
 
-1. **Risk Registry:** risks linked to `ProjectId` (and later to consents/contractors), with a likelihood × impact matrix
-2. **Contractors & Contracts:** register, contract terms, insurance/licence expiry
-3. **Cost Tracking:** budget lines, actuals by category and contract; feeds budget vs actual back to Portfolio
-4. **Consents:** consents, conditions, RFIs, expiry; EventBridge Scheduler reminders
-5. **Sales Pipeline:** units/lots, listed → settled, feeds cashflow
-6. Cross-cutting later: Documents (S3), reporting dashboard, cashflow forecasting
+1. Risk Registry → 2. Contractors & Contracts → 3. Cost Tracking (running totals) → 4. Consents (+ EventBridge reminders) → 5. Sales Pipeline → 6. Documents, reporting export, cashflow.
