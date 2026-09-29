@@ -7,6 +7,7 @@ import { useConfig } from '../../shared/config';
 import { formatDate, formatDateTime, formatMoney } from '../../shared/format';
 import { NotFoundPage } from '../../shared/layout/NotFoundPage';
 import { usePermissions } from '../../shared/me';
+import { ProjectRisksSection } from '../risks/ProjectRisksSection';
 import { useProject, useSetArchived } from './api';
 import { StatusBadge } from './StatusBadge';
 import { stageLabel, type ProjectDetails } from './types';
@@ -154,6 +155,8 @@ export function ProjectDetailPage() {
           <Text style={{ whiteSpace: 'pre-wrap' }}>{p.description}</Text>
         </Card>
       )}
+
+      <ProjectRisksSection projectId={p.id} projectArchived={p.isArchived} />
 
       <Text size="sm" c="dimmed">
         Created by {p.createdBy} on {formatDateTime(p.createdAt, config.culture, config.timeZone)} · Last updated by{' '}
