@@ -28,20 +28,30 @@ internal static class CloseRisk
     internal static Task<Results<Ok<RiskDetails>, NotFound, ProblemHttpResult>> Close(
         Guid projectId, Guid riskId, CloseRiskRequest request, RiskStore store, ICurrentUser user,
         TimeProvider clock, CancellationToken ct) =>
-        Change(projectId, riskId, request.Version, store, (risk, stamp) => risk.Close(request.Note, stamp), user, clock, ct);
+        Change(
+            projectId, riskId, request.Version, store,
+            isNoOp: risk => risk.Status == RiskStatus.Closed,
+            apply: (risk, stamp) => risk.Close(request.Note, stamp),
+            user, clock, ct);
 
     internal static Task<Results<Ok<RiskDetails>, NotFound, ProblemHttpResult>> Reopen(
         Guid projectId, Guid riskId, ReopenRiskRequest request, RiskStore store, ICurrentUser user,
         TimeProvider clock, CancellationToken ct) =>
-        Change(projectId, riskId, request.Version, store, (risk, stamp) => risk.Reopen(stamp), user, clock, ct);
+        Change(
+            projectId, riskId, request.Version, store,
+            isNoOp: risk => risk.Status != RiskStatus.Closed,
+            apply: (risk, stamp) => risk.Reopen(stamp),
+            user, clock, ct);
 
     private static async Task<Results<Ok<RiskDetails>, NotFound, ProblemHttpResult>> Change(
-        Guid projectId, Guid riskId, long version, RiskStore store, Func<Risk, AuditStamp, bool> apply,
-        ICurrentUser user, TimeProvider clock, CancellationToken ct)
+        Guid projectId, Guid riskId, long version, RiskStore store, Func<Risk, bool> isNoOp,
+        Func<Risk, AuditStamp, bool> apply, ICurrentUser user, TimeProvider clock, CancellationToken ct)
     {
         var risk = await store.GetAsync(new ProjectId(projectId), new RiskId(riskId), ct);
         if (risk is null)
             return TypedResults.NotFound();
+        if (isNoOp(risk))
+            return TypedResults.Ok(RiskDetails.From(risk));
         if (risk.Version != version)
             return RisksProblems.VersionConflict();
         if (!apply(risk, new AuditStamp(clock.GetUtcNow(), user.Name)))
