@@ -164,6 +164,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/sales/projects/{projectId}/units": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListUnits"];
+        put?: never;
+        post: operations["CreateUnit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sales/projects/{projectId}/units/{unitId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetUnit"];
+        put: operations["UpdateUnit"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -221,6 +253,23 @@ export interface components {
             owner: null | string;
             /** Format: date */
             dueDate: null | string;
+        };
+        CreateUnitRequest: {
+            identifier: string;
+            type: null | components["schemas"]["UnitType"];
+            /** Format: int32 */
+            bedrooms: null | number;
+            /** Format: int32 */
+            bathrooms: null | number;
+            /** Format: int32 */
+            carParks: null | number;
+            /** Format: double */
+            floorAreaSqm: null | number;
+            /** Format: double */
+            landAreaSqm: null | number;
+            /** Format: double */
+            listPriceAmount: null | number;
+            notes: null | string;
         };
         HttpValidationProblemDetails: {
             type?: null | string;
@@ -295,6 +344,10 @@ export interface components {
             currency: string;
             isArchived: boolean;
         };
+        ProjectSales: {
+            summary: components["schemas"]["SalesSummary"];
+            units: components["schemas"]["UnitDetails"][];
+        };
         /** @enum {unknown} */
         ProjectStage: "Acquisition" | "Feasibility" | "Design" | "Consenting" | "Construction" | "Sales" | "Completed";
         /** @enum {unknown} */
@@ -342,6 +395,31 @@ export interface components {
         };
         /** @enum {unknown} */
         RiskStatus: "Open" | "Mitigating" | "Closed";
+        SalesSummary: {
+            /** Format: int32 */
+            totalUnits: number;
+            /** Format: int32 */
+            available: number;
+            /** Format: int32 */
+            reserved: number;
+            /** Format: int32 */
+            conditional: number;
+            /** Format: int32 */
+            unconditional: number;
+            /** Format: int32 */
+            settled: number;
+            /** Format: int32 */
+            withdrawn: number;
+            /** Format: double */
+            listValue: number;
+            /** Format: double */
+            contractedValue: number;
+            /** Format: double */
+            settledValue: number;
+            currency: string;
+        };
+        /** @enum {unknown} */
+        SaleStatus: "Available" | "Reserved" | "Conditional" | "Unconditional" | "Settled" | "Withdrawn";
         SiteDto: {
             addressLine: string;
             suburb: null | string;
@@ -353,6 +431,53 @@ export interface components {
             /** Format: double */
             landAreaSqm: null | number;
         };
+        UnitDetails: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            identifier: string;
+            type: components["schemas"]["UnitType"];
+            /** Format: int32 */
+            bedrooms: null | number;
+            /** Format: int32 */
+            bathrooms: null | number;
+            /** Format: int32 */
+            carParks: null | number;
+            /** Format: double */
+            floorAreaSqm: null | number;
+            /** Format: double */
+            landAreaSqm: null | number;
+            /** Format: double */
+            listPriceAmount: null | number;
+            notes: null | string;
+            status: components["schemas"]["SaleStatus"];
+            buyerName: null | string;
+            buyerEmail: null | string;
+            buyerPhone: null | string;
+            buyerSolicitor: null | string;
+            /** Format: date */
+            agreementDate: null | string;
+            /** Format: double */
+            salePriceAmount: null | number;
+            /** Format: double */
+            depositAmount: null | number;
+            /** Format: date */
+            unconditionalDate: null | string;
+            /** Format: date */
+            settlementDate: null | string;
+            currency: string;
+            /** Format: date-time */
+            createdAt: string;
+            createdBy: string;
+            /** Format: date-time */
+            updatedAt: string;
+            updatedBy: string;
+            /** Format: int64 */
+            version: number;
+        };
+        /** @enum {unknown} */
+        UnitType: "Apartment" | "Townhouse" | "House" | "Lot" | "Commercial" | "Other";
         UpdateProjectRequest: {
             code: string;
             name: string;
@@ -387,6 +512,25 @@ export interface components {
             /** Format: date */
             dueDate: null | string;
             status: null | components["schemas"]["RiskStatus"];
+            /** Format: int64 */
+            version: number;
+        };
+        UpdateUnitRequest: {
+            identifier: string;
+            type: null | components["schemas"]["UnitType"];
+            /** Format: int32 */
+            bedrooms: null | number;
+            /** Format: int32 */
+            bathrooms: null | number;
+            /** Format: int32 */
+            carParks: null | number;
+            /** Format: double */
+            floorAreaSqm: null | number;
+            /** Format: double */
+            landAreaSqm: null | number;
+            /** Format: double */
+            listPriceAmount: null | number;
+            notes: null | string;
             /** Format: int64 */
             version: number;
         };
@@ -861,6 +1005,150 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RiskDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ListUnits: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectSales"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CreateUnit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateUnitRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnitDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GetUnit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                unitId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnitDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UpdateUnit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                unitId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateUnitRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnitDetails"];
                 };
             };
             /** @description Bad Request */

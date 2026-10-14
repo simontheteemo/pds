@@ -658,6 +658,196 @@
           }
         }
       }
+    },
+    "/api/sales/projects/{projectId}/units": {
+      "get": {
+        "tags": [
+          "Sales"
+        ],
+        "operationId": "ListUnits",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectSales"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Sales"
+        ],
+        "operationId": "CreateUnit",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUnitRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sales/projects/{projectId}/units/{unitId}": {
+      "get": {
+        "tags": [
+          "Sales"
+        ],
+        "operationId": "GetUnit",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "unitId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Sales"
+        ],
+        "operationId": "UpdateUnit",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "unitId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUnitRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -913,6 +1103,83 @@
               "string"
             ],
             "format": "date"
+          }
+        }
+      },
+      "CreateUnitRequest": {
+        "required": [
+          "identifier",
+          "type",
+          "bedrooms",
+          "bathrooms",
+          "carParks",
+          "floorAreaSqm",
+          "landAreaSqm",
+          "listPriceAmount",
+          "notes"
+        ],
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string"
+          },
+          "type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/UnitType"
+              }
+            ]
+          },
+          "bedrooms": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "bathrooms": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "carParks": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "floorAreaSqm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "landAreaSqm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "listPriceAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -1199,6 +1466,24 @@
           }
         }
       },
+      "ProjectSales": {
+        "required": [
+          "summary",
+          "units"
+        ],
+        "type": "object",
+        "properties": {
+          "summary": {
+            "$ref": "#/components/schemas/SalesSummary"
+          },
+          "units": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnitDetails"
+            }
+          }
+        }
+      },
       "ProjectStage": {
         "enum": [
           "Acquisition",
@@ -1382,6 +1667,77 @@
           "Closed"
         ]
       },
+      "SalesSummary": {
+        "required": [
+          "totalUnits",
+          "available",
+          "reserved",
+          "conditional",
+          "unconditional",
+          "settled",
+          "withdrawn",
+          "listValue",
+          "contractedValue",
+          "settledValue",
+          "currency"
+        ],
+        "type": "object",
+        "properties": {
+          "totalUnits": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "available": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "reserved": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "conditional": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "unconditional": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "settled": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "withdrawn": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "listValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "contractedValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "settledValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          }
+        }
+      },
+      "SaleStatus": {
+        "enum": [
+          "Available",
+          "Reserved",
+          "Conditional",
+          "Unconditional",
+          "Settled",
+          "Withdrawn"
+        ]
+      },
       "SiteDto": {
         "required": [
           "addressLine",
@@ -1439,6 +1795,195 @@
             "format": "double"
           }
         }
+      },
+      "UnitDetails": {
+        "required": [
+          "id",
+          "projectId",
+          "identifier",
+          "type",
+          "bedrooms",
+          "bathrooms",
+          "carParks",
+          "floorAreaSqm",
+          "landAreaSqm",
+          "listPriceAmount",
+          "notes",
+          "status",
+          "buyerName",
+          "buyerEmail",
+          "buyerPhone",
+          "buyerSolicitor",
+          "agreementDate",
+          "salePriceAmount",
+          "depositAmount",
+          "unconditionalDate",
+          "settlementDate",
+          "currency",
+          "createdAt",
+          "createdBy",
+          "updatedAt",
+          "updatedBy",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "identifier": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/UnitType"
+          },
+          "bedrooms": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "bathrooms": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "carParks": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "floorAreaSqm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "landAreaSqm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "listPriceAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/SaleStatus"
+          },
+          "buyerName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buyerEmail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buyerPhone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buyerSolicitor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "agreementDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "salePriceAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "depositAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "unconditionalDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "settlementDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedBy": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "UnitType": {
+        "enum": [
+          "Apartment",
+          "Townhouse",
+          "House",
+          "Lot",
+          "Commercial",
+          "Other"
+        ]
       },
       "UpdateProjectRequest": {
         "required": [
@@ -1623,6 +2168,88 @@
           }
         }
       },
+      "UpdateUnitRequest": {
+        "required": [
+          "identifier",
+          "type",
+          "bedrooms",
+          "bathrooms",
+          "carParks",
+          "floorAreaSqm",
+          "landAreaSqm",
+          "listPriceAmount",
+          "notes",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string"
+          },
+          "type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/UnitType"
+              }
+            ]
+          },
+          "bedrooms": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "bathrooms": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "carParks": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "floorAreaSqm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "landAreaSqm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "listPriceAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "VersionRequest": {
         "required": [
           "version"
@@ -1646,6 +2273,9 @@
     },
     {
       "name": "Risks"
+    },
+    {
+      "name": "Sales"
     }
   ]
 }
