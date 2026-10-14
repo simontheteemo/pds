@@ -40,7 +40,7 @@ internal static class AddCondition
             new ProjectId(projectId), new ConsentId(consentId), request.ToFields(), new AuditStamp(clock.GetUtcNow(), user.Name));
         await store.CreateConditionAsync(condition, ct);
         return TypedResults.Created(
-            $"/api/consents/projects/{projectId}/consents/{consentId}/conditions/{condition.Id.Value}",
+            $"/api/consents/projects/{projectId}/consents/{consentId}",
             ConditionDetails.From(condition, record.Consent.IsActive, LocalDate.Today(clock, locale.Value)));
     }
 }

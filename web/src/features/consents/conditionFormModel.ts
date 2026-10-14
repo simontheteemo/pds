@@ -30,18 +30,22 @@ export function fromCondition(c: ConditionDetails): ConditionFormValues {
   return { reference: c.reference ?? '', description: c.description, dueDate: c.dueDate ?? '' };
 }
 
-/** Today's date in the browser's local time zone as yyyy-MM-dd (not toISOString, which is UTC). */
-export function localToday(): string {
-  const d = new Date();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${d.getFullYear()}-${mm}-${dd}`;
+/** Today's date in the deployment time zone as yyyy-MM-dd (not the browser's zone, not toISOString's UTC). */
+export function localToday(timeZone: string): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
 }
 
-export const completeSchema = z.object({
-  completedOn: z
-    .string()
-    .min(1, 'Enter the completion date')
-    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Enter a valid date')
-    .refine((v) => v <= localToday(), 'Completion date cannot be in the future'),
-});
+export function completeSchema(timeZone: string) {
+  return z.object({
+    completedOn: z
+      .string()
+      .min(1, 'Enter the completion date')
+      .regex(/^\d{4}-\d{2}-\d{2}$/, 'Enter a valid date')
+      .refine((v) => v <= localToday(timeZone), 'Completion date cannot be in the future'),
+  });
+}

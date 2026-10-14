@@ -2,6 +2,7 @@ import { Alert, Button, Group, Modal, Stack, Text, TextInput } from '@mantine/co
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useState } from 'react';
+import { useConfig } from '../../shared/config';
 import { zodValidate } from '../../shared/validation';
 import { useCompleteCondition } from './api';
 import { completeSchema, localToday } from './conditionFormModel';
@@ -23,13 +24,14 @@ function CompleteConditionModalInner({
   condition,
   onClose,
 }: Props & { condition: ConditionDetails }) {
+  const { timeZone } = useConfig();
   const complete = useCompleteCondition(projectId);
   const [submitting, setSubmitting] = useState(false);
   const [topError, setTopError] = useState<string | null>(null);
   const form = useForm<CompleteFormValues>({
     mode: 'controlled',
-    initialValues: { completedOn: localToday() },
-    validate: zodValidate<CompleteFormValues>(completeSchema),
+    initialValues: { completedOn: localToday(timeZone) },
+    validate: zodValidate<CompleteFormValues>(completeSchema(timeZone)),
   });
 
   const handleSubmit = form.onSubmit(async (values) => {
@@ -70,7 +72,7 @@ function CompleteConditionModalInner({
             type="date"
             label="Completed on"
             withAsterisk
-            max={localToday()}
+            max={localToday(timeZone)}
             {...form.getInputProps('completedOn')}
           />
           <Group>

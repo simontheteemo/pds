@@ -89,12 +89,12 @@ function ConsentFormModalInner({ projectId, consent, onClose }: Props & { consen
             data={statusOptions}
             {...form.getInputProps('status')}
           />
-          <SimpleGrid cols={3}>
+          <SimpleGrid cols={{ base: 1, sm: 3 }}>
             <TextInput type="date" label="Lodged" {...form.getInputProps('lodgedDate')} />
             <TextInput type="date" label="Granted or issued" {...form.getInputProps('grantedDate')} />
             <TextInput type="date" label="Lapse or expiry" {...form.getInputProps('expiryDate')} />
           </SimpleGrid>
-          <Textarea label="Notes" autosize minRows={3} {...form.getInputProps('notes')} />
+          <Textarea label="Notes" maxLength={4000} autosize minRows={3} {...form.getInputProps('notes')} />
           <Group>
             <Button type="submit" loading={submitting}>
               Save
