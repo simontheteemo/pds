@@ -7,6 +7,7 @@ import type {
   ConsentDetails,
   ConsentInput,
   ConsentUpdateInput,
+  DueItem,
 } from './types';
 
 const consentsKey = (projectId: string) => ['consents', projectId];
@@ -28,6 +29,14 @@ export function useConsents(projectId: string) {
       unwrap<ConsentDetails[]>(
         api.GET('/api/consents/projects/{projectId}/consents', { params: { path: { projectId } } }),
       ),
+  });
+}
+
+export function useDueItems() {
+  const api = useApi();
+  return useQuery({
+    queryKey: ['consents-due'],
+    queryFn: () => unwrap<DueItem[]>(api.GET('/api/consents/due')),
   });
 }
 

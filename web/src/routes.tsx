@@ -1,4 +1,5 @@
 import { Navigate, type RouteObject } from 'react-router';
+import { ConsentsDuePage } from './features/consents/ConsentsDuePage';
 import { ProjectCreatePage } from './features/portfolio/ProjectCreatePage';
 import { ProjectDetailPage } from './features/portfolio/ProjectDetailPage';
 import { ProjectEditPage } from './features/portfolio/ProjectEditPage';
@@ -16,6 +17,7 @@ export const routes: RouteObject[] = [
       { path: 'projects/new', element: <ProjectCreatePage /> },
       { path: 'projects/:id', element: <ProjectDetailPage /> },
       { path: 'projects/:id/edit', element: <ProjectEditPage /> },
+      { path: 'consents', element: <ConsentsDuePage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
