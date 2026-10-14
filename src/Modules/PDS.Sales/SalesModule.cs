@@ -32,6 +32,11 @@ public static class SalesModule
         GetUnit.Map(units);
         CreateUnit.Map(units);
         UpdateUnit.Map(units);
+        UpdateSale.Map(units);
+        var sales = app.MapGroup("/api/sales")
+            .WithTags("Sales")
+            .RequireAuthorization(Policies.CanRead);
+        ListSalesSummaries.Map(sales);
         return app;
     }
 }

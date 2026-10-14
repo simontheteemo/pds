@@ -848,6 +848,92 @@
           }
         }
       }
+    },
+    "/api/sales/projects/{projectId}/units/{unitId}/sale": {
+      "put": {
+        "tags": [
+          "Sales"
+        ],
+        "operationId": "UpdateSale",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "unitId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSaleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sales/summary": {
+      "get": {
+        "tags": [
+          "Sales"
+        ],
+        "operationId": "ListSalesSummaries",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectSalesSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1481,6 +1567,34 @@
             "items": {
               "$ref": "#/components/schemas/UnitDetails"
             }
+          }
+        }
+      },
+      "ProjectSalesSummary": {
+        "required": [
+          "projectId",
+          "projectCode",
+          "projectName",
+          "projectArchived",
+          "summary"
+        ],
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectCode": {
+            "type": "string"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "projectArchived": {
+            "type": "boolean"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/SalesSummary"
           }
         }
       },
@@ -2161,6 +2275,97 @@
                 "$ref": "#/components/schemas/RiskStatus"
               }
             ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "UpdateSaleRequest": {
+        "required": [
+          "status",
+          "buyerName",
+          "buyerEmail",
+          "buyerPhone",
+          "buyerSolicitor",
+          "agreementDate",
+          "salePriceAmount",
+          "depositAmount",
+          "unconditionalDate",
+          "settlementDate",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/SaleStatus"
+              }
+            ]
+          },
+          "buyerName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buyerEmail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buyerPhone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buyerSolicitor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "agreementDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "salePriceAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "depositAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "unconditionalDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "settlementDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
           },
           "version": {
             "type": "integer",

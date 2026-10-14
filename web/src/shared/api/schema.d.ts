@@ -196,6 +196,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/sales/projects/{projectId}/units/{unitId}/sale": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["UpdateSale"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sales/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListSalesSummaries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -347,6 +379,14 @@ export interface components {
         ProjectSales: {
             summary: components["schemas"]["SalesSummary"];
             units: components["schemas"]["UnitDetails"][];
+        };
+        ProjectSalesSummary: {
+            /** Format: uuid */
+            projectId: string;
+            projectCode: string;
+            projectName: string;
+            projectArchived: boolean;
+            summary: components["schemas"]["SalesSummary"];
         };
         /** @enum {unknown} */
         ProjectStage: "Acquisition" | "Feasibility" | "Design" | "Consenting" | "Construction" | "Sales" | "Completed";
@@ -512,6 +552,25 @@ export interface components {
             /** Format: date */
             dueDate: null | string;
             status: null | components["schemas"]["RiskStatus"];
+            /** Format: int64 */
+            version: number;
+        };
+        UpdateSaleRequest: {
+            status: null | components["schemas"]["SaleStatus"];
+            buyerName: null | string;
+            buyerEmail: null | string;
+            buyerPhone: null | string;
+            buyerSolicitor: null | string;
+            /** Format: date */
+            agreementDate: null | string;
+            /** Format: double */
+            salePriceAmount: null | number;
+            /** Format: double */
+            depositAmount: null | number;
+            /** Format: date */
+            unconditionalDate: null | string;
+            /** Format: date */
+            settlementDate: null | string;
             /** Format: int64 */
             version: number;
         };
@@ -1166,6 +1225,69 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    UpdateSale: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                unitId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateSaleRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnitDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ListSalesSummaries: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectSalesSummary"][];
+                };
             };
         };
     };
