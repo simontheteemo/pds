@@ -317,7 +317,7 @@ export interface components {
             form: components["schemas"]["ContractForm"];
             /** Format: double */
             valueAmount: null | number;
-            currency: null | string;
+            currency: string;
             /** Format: date */
             startDate: null | string;
             /** Format: date */
@@ -352,7 +352,7 @@ export interface components {
             form: components["schemas"]["ContractForm"];
             /** Format: double */
             valueAmount: null | number;
-            currency: null | string;
+            currency: string;
             /** Format: date */
             startDate: null | string;
             /** Format: date */

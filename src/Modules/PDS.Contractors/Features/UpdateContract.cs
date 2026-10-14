@@ -39,6 +39,6 @@ internal static class UpdateContract
             return ContractorsProblems.VersionConflict("contract");
 
         var contractor = await contractors.GetAsync(contract.ContractorId, ct);
-        return TypedResults.Ok(ContractDetails.From(contract, contractor?.Fields.Name ?? ContractListing.UnknownContractor));
+        return TypedResults.Ok(ContractDetails.From(contract, contractor?.Fields.Name ?? ContractListing.UnknownContractor, locale.Value.Currency));
     }
 }

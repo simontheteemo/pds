@@ -2,9 +2,11 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
 using PDS.Contractors.Contracts;
 using PDS.Contractors.Data;
 using PDS.Portfolio.Contracts;
+using PDS.Shared.Settings;
 
 namespace PDS.Contractors.Features;
 
@@ -14,7 +16,8 @@ internal static class ListContractorContracts
         group.MapGet("/{contractorId:guid}/contracts", Handle).WithName("ListContractorContracts");
 
     internal static async Task<Results<Ok<List<ContractListItem>>, NotFound>> Handle(
-        Guid contractorId, ContractStore store, ContractorStore contractors, IPortfolioQueries portfolio, CancellationToken ct)
+        Guid contractorId, ContractStore store, ContractorStore contractors, IPortfolioQueries portfolio,
+        IOptions<LocaleOptions> locale, CancellationToken ct)
     {
         var contractor = await contractors.GetAsync(new ContractorId(contractorId), ct);
         if (contractor is null)
@@ -31,7 +34,7 @@ internal static class ListContractorContracts
             .Select(c =>
             {
                 projects.TryGetValue(c.ProjectId, out var p);
-                return ContractListing.ToListItem(c, contractor.Fields.Name, p?.Code, p?.Name);
+                return ContractListing.ToListItem(c, contractor.Fields.Name, p?.Code, p?.Name, locale.Value.Currency);
             })
             .ToList();
         return TypedResults.Ok(items);

@@ -2,9 +2,11 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
 using PDS.Contractors.Data;
 using PDS.Contractors.Domain;
 using PDS.Portfolio.Contracts;
+using PDS.Shared.Settings;
 
 namespace PDS.Contractors.Features;
 
@@ -22,7 +24,8 @@ internal static class ListProjectContracts
     public static void Map(RouteGroupBuilder group) => group.MapGet("", Handle).WithName("ListProjectContracts");
 
     internal static async Task<Results<Ok<List<ContractListItem>>, NotFound>> Handle(
-        Guid projectId, ContractStore store, ContractorStore contractors, IPortfolioQueries portfolio, CancellationToken ct)
+        Guid projectId, ContractStore store, ContractorStore contractors, IPortfolioQueries portfolio,
+        IOptions<LocaleOptions> locale, CancellationToken ct)
     {
         var project = await ProjectLookup.FindAsync(portfolio, projectId, ct);
         if (project is null)
@@ -38,7 +41,7 @@ internal static class ListProjectContracts
             .ThenBy(c => c.Fields.StartDate)
             .ThenBy(c => c.Fields.Title, StringComparer.OrdinalIgnoreCase)
             .Select(c => ContractListing.ToListItem(
-                c, names.GetValueOrDefault(c.ContractorId, ContractListing.UnknownContractor), project.Code, project.Name))
+                c, names.GetValueOrDefault(c.ContractorId, ContractListing.UnknownContractor), project.Code, project.Name, locale.Value.Currency))
             .ToList();
         return TypedResults.Ok(items);
     }

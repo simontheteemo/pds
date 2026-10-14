@@ -42,6 +42,6 @@ internal static class CreateContract
         await store.CreateAsync(contract, ct);
         return TypedResults.Created(
             $"/api/contractors/projects/{projectId}/contracts/{contract.Id.Value}",
-            ContractDetails.From(contract, contractor.Fields.Name));
+            ContractDetails.From(contract, contractor.Fields.Name, locale.Value.Currency));
     }
 }

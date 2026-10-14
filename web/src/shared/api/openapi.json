@@ -1339,10 +1339,7 @@
             "format": "double"
           },
           "currency": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "startDate": {
             "type": [
@@ -1471,10 +1468,7 @@
             "format": "double"
           },
           "currency": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": "string"
           },
           "startDate": {
             "type": [
