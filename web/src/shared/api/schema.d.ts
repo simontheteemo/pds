@@ -164,6 +164,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/contractors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListContractors"];
+        put?: never;
+        post: operations["CreateContractor"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/contractors/{contractorId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetContractor"];
+        put: operations["UpdateContractor"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/contractors/{contractorId}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["DeactivateContractor"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/contractors/{contractorId}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ActivateContractor"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -189,6 +253,70 @@ export interface components {
             /** Format: int64 */
             version: number;
             note: string;
+        };
+        /** @enum {unknown} */
+        ComplianceStatus: "Current" | "ExpiringSoon" | "Expired" | "NotRecorded";
+        ContractorDetails: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            type: components["schemas"]["ContractorType"];
+            trade: null | string;
+            nzbn: null | string;
+            contactName: null | string;
+            email: null | string;
+            phone: null | string;
+            address: null | string;
+            /** Format: date */
+            publicLiabilityExpiry: null | string;
+            /** Format: date */
+            professionalIndemnityExpiry: null | string;
+            licenceNumber: null | string;
+            /** Format: date */
+            licenceExpiry: null | string;
+            notes: null | string;
+            compliance: components["schemas"]["ComplianceStatus"];
+            publicLiabilityStatus: components["schemas"]["ComplianceStatus"];
+            professionalIndemnityStatus: components["schemas"]["ComplianceStatus"];
+            licenceStatus: components["schemas"]["ComplianceStatus"];
+            isActive: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            createdBy: string;
+            /** Format: date-time */
+            updatedAt: string;
+            updatedBy: string;
+            /** Format: int64 */
+            version: number;
+        };
+        ContractorListItem: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            type: components["schemas"]["ContractorType"];
+            trade: null | string;
+            compliance: components["schemas"]["ComplianceStatus"];
+            isActive: boolean;
+        };
+        /** @enum {unknown} */
+        ContractorType: "Contractor" | "Subcontractor" | "Consultant" | "Supplier";
+        CreateContractorRequest: {
+            name: string;
+            type: null | components["schemas"]["ContractorType"];
+            trade: null | string;
+            nzbn: null | string;
+            contactName: null | string;
+            email: null | string;
+            phone: null | string;
+            address: null | string;
+            /** Format: date */
+            publicLiabilityExpiry: null | string;
+            /** Format: date */
+            professionalIndemnityExpiry: null | string;
+            licenceNumber: null | string;
+            /** Format: date */
+            licenceExpiry: null | string;
+            notes: null | string;
         };
         CreateProjectRequest: {
             code: string;
@@ -342,6 +470,10 @@ export interface components {
         };
         /** @enum {unknown} */
         RiskStatus: "Open" | "Mitigating" | "Closed";
+        SetActiveRequest: {
+            /** Format: int64 */
+            version: number;
+        };
         SiteDto: {
             addressLine: string;
             suburb: null | string;
@@ -352,6 +484,26 @@ export interface components {
             titleReference: null | string;
             /** Format: double */
             landAreaSqm: null | number;
+        };
+        UpdateContractorRequest: {
+            name: string;
+            type: null | components["schemas"]["ContractorType"];
+            trade: null | string;
+            nzbn: null | string;
+            contactName: null | string;
+            email: null | string;
+            phone: null | string;
+            address: null | string;
+            /** Format: date */
+            publicLiabilityExpiry: null | string;
+            /** Format: date */
+            professionalIndemnityExpiry: null | string;
+            licenceNumber: null | string;
+            /** Format: date */
+            licenceExpiry: null | string;
+            notes: null | string;
+            /** Format: int64 */
+            version: number;
         };
         UpdateProjectRequest: {
             code: string;
@@ -861,6 +1013,227 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RiskDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ListContractors: {
+        parameters: {
+            query?: {
+                search?: string;
+                type?: components["schemas"]["ContractorType"];
+                includeInactive?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContractorListItem"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+        };
+    };
+    CreateContractor: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateContractorRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContractorDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+        };
+    };
+    GetContractor: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contractorId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContractorDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UpdateContractor: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contractorId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateContractorRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContractorDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    DeactivateContractor: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contractorId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetActiveRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContractorDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ActivateContractor: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contractorId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetActiveRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContractorDetails"];
                 };
             };
             /** @description Bad Request */
