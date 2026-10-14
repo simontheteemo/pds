@@ -59,7 +59,7 @@ export function SalesSummaryStrip({ summary }: { summary: SalesSummary }) {
         <Figure label="Settled value" value={money(summary.settledValue)} />
         <Figure
           label="Sold"
-          value={sold === null ? '—' : new Intl.NumberFormat(config.culture, { style: 'percent' }).format(sold)}
+          value={sold === null ? '—' : new Intl.NumberFormat(config.culture, { style: 'percent', maximumFractionDigits: 1 }).format(sold)}
         />
       </SimpleGrid>
     </Stack>

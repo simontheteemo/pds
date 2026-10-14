@@ -27,7 +27,7 @@ export function SalesPage() {
   const config = useConfig();
   const summaries = useSalesSummaries();
   const data = summaries.data;
-  const percent = new Intl.NumberFormat(config.culture, { style: 'percent' });
+  const percent = new Intl.NumberFormat(config.culture, { style: 'percent', maximumFractionDigits: 1 });
   const sold = (s: SalesSummary) => {
     const value = soldPercent(s);
     return value === null ? '—' : percent.format(value);
