@@ -4,12 +4,19 @@ import type { DeepRequired } from '../../shared/api/types';
 type ContractorsPath = paths['/api/contractors'];
 type ContractorPath = paths['/api/contractors/{contractorId}'];
 type ContractsPath = paths['/api/contractors/{contractorId}/contracts'];
+type ProjectContractsPath = paths['/api/contractors/projects/{projectId}/contracts'];
+type ProjectContractPath = paths['/api/contractors/projects/{projectId}/contracts/{contractId}'];
 
 export type ContractorListItem = DeepRequired<ContractorsPath['get']['responses'][200]['content']['application/json']>[number];
 export type ContractorDetails = DeepRequired<ContractorPath['get']['responses'][200]['content']['application/json']>;
 export type ContractorInput = ContractorsPath['post']['requestBody']['content']['application/json'];
 export type ContractorUpdateInput = ContractorPath['put']['requestBody']['content']['application/json'];
 export type ContractorContract = DeepRequired<ContractsPath['get']['responses'][200]['content']['application/json']>[number];
+
+export type ProjectContract = DeepRequired<ProjectContractsPath['get']['responses'][200]['content']['application/json']>[number];
+export type ContractDetails = DeepRequired<ProjectContractPath['get']['responses'][200]['content']['application/json']>;
+export type ContractInput = ProjectContractsPath['post']['requestBody']['content']['application/json'];
+export type ContractUpdateInput = ProjectContractPath['put']['requestBody']['content']['application/json'];
 
 export type ContractorListQuery = {
   search?: string;
