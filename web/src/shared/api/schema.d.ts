@@ -164,6 +164,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/consents/projects/{projectId}/consents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListConsents"];
+        put?: never;
+        post: operations["CreateConsent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/consents/projects/{projectId}/consents/{consentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetConsent"];
+        put: operations["UpdateConsent"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -189,6 +221,88 @@ export interface components {
             /** Format: int64 */
             version: number;
             note: string;
+        };
+        ConditionDetails: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            /** Format: uuid */
+            consentId: string;
+            reference: null | string;
+            description: string;
+            /** Format: date */
+            dueDate: null | string;
+            dueState: components["schemas"]["DueState"];
+            /** Format: date */
+            completedOn: null | string;
+            /** Format: date-time */
+            completedAt: null | string;
+            completedBy: null | string;
+            /** Format: date-time */
+            createdAt: string;
+            createdBy: string;
+            /** Format: date-time */
+            updatedAt: string;
+            updatedBy: string;
+            /** Format: int64 */
+            version: number;
+        };
+        ConsentDetails: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            type: components["schemas"]["ConsentType"];
+            title: string;
+            authority: null | string;
+            reference: null | string;
+            status: components["schemas"]["ConsentStatus"];
+            /** Format: date */
+            lodgedDate: null | string;
+            /** Format: date */
+            grantedDate: null | string;
+            /** Format: date */
+            expiryDate: null | string;
+            notes: null | string;
+            isActive: boolean;
+            expiryState: components["schemas"]["DueState"];
+            attention: components["schemas"]["DueState"];
+            /** Format: int32 */
+            conditionCount: number;
+            /** Format: int32 */
+            openConditionCount: number;
+            /** Format: int32 */
+            overdueConditionCount: number;
+            /** Format: int32 */
+            dueSoonConditionCount: number;
+            conditions: components["schemas"]["ConditionDetails"][];
+            /** Format: date-time */
+            createdAt: string;
+            createdBy: string;
+            /** Format: date-time */
+            updatedAt: string;
+            updatedBy: string;
+            /** Format: int64 */
+            version: number;
+        };
+        /** @enum {unknown} */
+        ConsentStatus: "Preparing" | "Lodged" | "InfoRequested" | "Granted" | "Declined" | "Withdrawn";
+        /** @enum {unknown} */
+        ConsentType: "ResourceConsent" | "SubdivisionConsent" | "BuildingConsent" | "Section224c" | "CodeComplianceCertificate" | "Other";
+        CreateConsentRequest: {
+            type: null | components["schemas"]["ConsentType"];
+            title: string;
+            authority: null | string;
+            reference: null | string;
+            status: null | components["schemas"]["ConsentStatus"];
+            /** Format: date */
+            lodgedDate: null | string;
+            /** Format: date */
+            grantedDate: null | string;
+            /** Format: date */
+            expiryDate: null | string;
+            notes: null | string;
         };
         CreateProjectRequest: {
             code: string;
@@ -222,6 +336,8 @@ export interface components {
             /** Format: date */
             dueDate: null | string;
         };
+        /** @enum {unknown} */
+        DueState: "None" | "Upcoming" | "DueSoon" | "Overdue" | "Done";
         HttpValidationProblemDetails: {
             type?: null | string;
             title?: null | string;
@@ -352,6 +468,22 @@ export interface components {
             titleReference: null | string;
             /** Format: double */
             landAreaSqm: null | number;
+        };
+        UpdateConsentRequest: {
+            type: null | components["schemas"]["ConsentType"];
+            title: string;
+            authority: null | string;
+            reference: null | string;
+            status: null | components["schemas"]["ConsentStatus"];
+            /** Format: date */
+            lodgedDate: null | string;
+            /** Format: date */
+            grantedDate: null | string;
+            /** Format: date */
+            expiryDate: null | string;
+            notes: null | string;
+            /** Format: int64 */
+            version: number;
         };
         UpdateProjectRequest: {
             code: string;
@@ -861,6 +993,150 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RiskDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ListConsents: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsentDetails"][];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CreateConsent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateConsentRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsentDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GetConsent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                consentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsentDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UpdateConsent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                consentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateConsentRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsentDetails"];
                 };
             };
             /** @description Bad Request */

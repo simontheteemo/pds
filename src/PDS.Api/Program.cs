@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Amazon.Lambda.AspNetCoreServer.Hosting;
 using PDS.Api;
 using PDS.Api.Security;
+using PDS.Consents;
 using PDS.Portfolio;
 using PDS.Risks;
 using PDS.Shared.Data;
@@ -39,6 +40,7 @@ builder.Services.AddPdsSecurity(builder.Configuration);
 builder.Services.AddDynamo();
 builder.Services.AddPortfolioModule();
 builder.Services.AddRisksModule();
+builder.Services.AddConsentsModule();
 
 var app = builder.Build();
 
@@ -63,6 +65,7 @@ if (app.Environment.IsDevelopment())
 app.MapHostEndpoints();
 app.MapPortfolioEndpoints();
 app.MapRisksEndpoints();
+app.MapConsentsEndpoints();
 
 await app.RunAsync();
 

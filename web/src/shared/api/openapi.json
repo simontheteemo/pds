@@ -658,6 +658,199 @@
           }
         }
       }
+    },
+    "/api/consents/projects/{projectId}/consents": {
+      "get": {
+        "tags": [
+          "Consents"
+        ],
+        "operationId": "ListConsents",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConsentDetails"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Consents"
+        ],
+        "operationId": "CreateConsent",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConsentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/consents/projects/{projectId}/consents/{consentId}": {
+      "get": {
+        "tags": [
+          "Consents"
+        ],
+        "operationId": "GetConsent",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "consentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Consents"
+        ],
+        "operationId": "UpdateConsent",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "consentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateConsentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -751,6 +944,331 @@
           },
           "note": {
             "type": "string"
+          }
+        }
+      },
+      "ConditionDetails": {
+        "required": [
+          "id",
+          "projectId",
+          "consentId",
+          "reference",
+          "description",
+          "dueDate",
+          "dueState",
+          "completedOn",
+          "completedAt",
+          "completedBy",
+          "createdAt",
+          "createdBy",
+          "updatedAt",
+          "updatedBy",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "consentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "dueDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "dueState": {
+            "$ref": "#/components/schemas/DueState"
+          },
+          "completedOn": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "completedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "completedBy": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedBy": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ConsentDetails": {
+        "required": [
+          "id",
+          "projectId",
+          "type",
+          "title",
+          "authority",
+          "reference",
+          "status",
+          "lodgedDate",
+          "grantedDate",
+          "expiryDate",
+          "notes",
+          "isActive",
+          "expiryState",
+          "attention",
+          "conditionCount",
+          "openConditionCount",
+          "overdueConditionCount",
+          "dueSoonConditionCount",
+          "conditions",
+          "createdAt",
+          "createdBy",
+          "updatedAt",
+          "updatedBy",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ConsentType"
+          },
+          "title": {
+            "type": "string"
+          },
+          "authority": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "reference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/ConsentStatus"
+          },
+          "lodgedDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "grantedDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "expiryDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "expiryState": {
+            "$ref": "#/components/schemas/DueState"
+          },
+          "attention": {
+            "$ref": "#/components/schemas/DueState"
+          },
+          "conditionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "openConditionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "overdueConditionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "dueSoonConditionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "conditions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConditionDetails"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedBy": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ConsentStatus": {
+        "enum": [
+          "Preparing",
+          "Lodged",
+          "InfoRequested",
+          "Granted",
+          "Declined",
+          "Withdrawn"
+        ]
+      },
+      "ConsentType": {
+        "enum": [
+          "ResourceConsent",
+          "SubdivisionConsent",
+          "BuildingConsent",
+          "Section224c",
+          "CodeComplianceCertificate",
+          "Other"
+        ]
+      },
+      "CreateConsentRequest": {
+        "required": [
+          "type",
+          "title",
+          "authority",
+          "reference",
+          "status",
+          "lodgedDate",
+          "grantedDate",
+          "expiryDate",
+          "notes"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ConsentType"
+              }
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "authority": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "reference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ConsentStatus"
+              }
+            ]
+          },
+          "lodgedDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "grantedDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "expiryDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -915,6 +1433,15 @@
             "format": "date"
           }
         }
+      },
+      "DueState": {
+        "enum": [
+          "None",
+          "Upcoming",
+          "DueSoon",
+          "Overdue",
+          "Done"
+        ]
       },
       "HttpValidationProblemDetails": {
         "type": "object",
@@ -1440,6 +1967,89 @@
           }
         }
       },
+      "UpdateConsentRequest": {
+        "required": [
+          "type",
+          "title",
+          "authority",
+          "reference",
+          "status",
+          "lodgedDate",
+          "grantedDate",
+          "expiryDate",
+          "notes",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ConsentType"
+              }
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "authority": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "reference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ConsentStatus"
+              }
+            ]
+          },
+          "lodgedDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "grantedDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "expiryDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "UpdateProjectRequest": {
         "required": [
           "code",
@@ -1646,6 +2256,9 @@
     },
     {
       "name": "Risks"
+    },
+    {
+      "name": "Consents"
     }
   ]
 }
