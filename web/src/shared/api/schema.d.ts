@@ -196,6 +196,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/consents/projects/{projectId}/consents/{consentId}/conditions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AddCondition"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/consents/projects/{projectId}/consents/{consentId}/conditions/{conditionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["UpdateCondition"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/consents/projects/{projectId}/consents/{consentId}/conditions/{conditionId}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["CompleteCondition"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/consents/projects/{projectId}/consents/{consentId}/conditions/{conditionId}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ReopenCondition"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/consents/due": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListDueConsentItems"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -221,6 +301,12 @@ export interface components {
             /** Format: int64 */
             version: number;
             note: string;
+        };
+        CompleteConditionRequest: {
+            /** Format: int64 */
+            version: number;
+            /** Format: date */
+            completedOn: null | string;
         };
         ConditionDetails: {
             /** Format: uuid */
@@ -290,6 +376,12 @@ export interface components {
         ConsentStatus: "Preparing" | "Lodged" | "InfoRequested" | "Granted" | "Declined" | "Withdrawn";
         /** @enum {unknown} */
         ConsentType: "ResourceConsent" | "SubdivisionConsent" | "BuildingConsent" | "Section224c" | "CodeComplianceCertificate" | "Other";
+        CreateConditionRequest: {
+            reference: null | string;
+            description: string;
+            /** Format: date */
+            dueDate: null | string;
+        };
         CreateConsentRequest: {
             type: null | components["schemas"]["ConsentType"];
             title: string;
@@ -336,6 +428,27 @@ export interface components {
             /** Format: date */
             dueDate: null | string;
         };
+        DueItem: {
+            kind: components["schemas"]["DueItemKind"];
+            /** Format: uuid */
+            projectId: string;
+            projectCode: string;
+            projectName: string;
+            /** Format: uuid */
+            consentId: string;
+            consentType: components["schemas"]["ConsentType"];
+            consentTitle: string;
+            consentReference: null | string;
+            /** Format: uuid */
+            conditionId: null | string;
+            conditionReference: null | string;
+            description: string;
+            /** Format: date */
+            date: string;
+            state: components["schemas"]["DueState"];
+        };
+        /** @enum {unknown} */
+        DueItemKind: "Condition" | "Expiry";
         /** @enum {unknown} */
         DueState: "None" | "Upcoming" | "DueSoon" | "Overdue" | "Done";
         HttpValidationProblemDetails: {
@@ -415,6 +528,10 @@ export interface components {
         ProjectStage: "Acquisition" | "Feasibility" | "Design" | "Consenting" | "Construction" | "Sales" | "Completed";
         /** @enum {unknown} */
         ProjectStatus: "OnTrack" | "AtRisk" | "Delayed" | "OnHold" | "Cancelled";
+        ReopenConditionRequest: {
+            /** Format: int64 */
+            version: number;
+        };
         ReopenRiskRequest: {
             /** Format: int64 */
             version: number;
@@ -468,6 +585,14 @@ export interface components {
             titleReference: null | string;
             /** Format: double */
             landAreaSqm: null | number;
+        };
+        UpdateConditionRequest: {
+            reference: null | string;
+            description: string;
+            /** Format: date */
+            dueDate: null | string;
+            /** Format: int64 */
+            version: number;
         };
         UpdateConsentRequest: {
             type: null | components["schemas"]["ConsentType"];
@@ -1154,6 +1279,201 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    AddCondition: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                consentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateConditionRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConditionDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UpdateCondition: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                consentId: string;
+                conditionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateConditionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConditionDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CompleteCondition: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                consentId: string;
+                conditionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompleteConditionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConditionDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ReopenCondition: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                consentId: string;
+                conditionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReopenConditionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConditionDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ListDueConsentItems: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DueItem"][];
+                };
             };
         };
     };

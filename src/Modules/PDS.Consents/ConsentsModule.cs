@@ -32,6 +32,14 @@ public static class ConsentsModule
         GetConsent.Map(group);
         CreateConsent.Map(group);
         UpdateConsent.Map(group);
+        AddCondition.Map(group);
+        UpdateCondition.Map(group);
+        CompleteCondition.Map(group);
+
+        var due = app.MapGroup("/api/consents")
+            .WithTags("Consents")
+            .RequireAuthorization(Policies.CanRead);
+        ListDue.Map(due);
         return app;
     }
 }
