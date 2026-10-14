@@ -19,6 +19,7 @@ public static class ContractorsModule
     {
         services.AddSingleton(ContractorsTable.Definition);
         services.AddSingleton<ContractorStore>();
+        services.AddSingleton<ContractStore>();
         services.AddValidatorsFromAssemblyContaining<CreateContractorValidator>(includeInternalTypes: true);
         return services;
     }
@@ -33,6 +34,15 @@ public static class ContractorsModule
         CreateContractor.Map(group);
         UpdateContractor.Map(group);
         SetContractorActive.Map(group);
+        ListContractorContracts.Map(group);
+
+        var contracts = app.MapGroup("/api/contractors/projects/{projectId:guid}/contracts")
+            .WithTags("Contracts")
+            .RequireAuthorization(Policies.CanRead);
+        ListProjectContracts.Map(contracts);
+        GetContract.Map(contracts);
+        CreateContract.Map(contracts);
+        UpdateContract.Map(contracts);
         return app;
     }
 }
