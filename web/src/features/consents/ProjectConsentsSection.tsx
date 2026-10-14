@@ -4,6 +4,7 @@ import { useConfig } from '../../shared/config';
 import { formatDate } from '../../shared/format';
 import { usePermissions } from '../../shared/me';
 import { useConsents } from './api';
+import { ConsentConditionsTable } from './ConsentConditionsTable';
 import { ConsentFormModal } from './ConsentFormModal';
 import { DueStateBadge } from './DueStateBadge';
 import {
@@ -104,7 +105,12 @@ export function ProjectConsentsSection({
                     Edit
                   </Button>
                 )}
-                <Text c="dimmed">Conditions</Text>
+                <ConsentConditionsTable
+                  projectId={projectId}
+                  consent={c}
+                  canWrite={canWrite}
+                  projectArchived={projectArchived}
+                />
               </Accordion.Panel>
             </Accordion.Item>
           ))}

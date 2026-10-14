@@ -1,6 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { unwrap, useApi } from '../../shared/api/client';
-import type { ConsentDetails, ConsentInput, ConsentUpdateInput } from './types';
+import type {
+  ConditionDetails,
+  ConditionInput,
+  ConditionUpdateInput,
+  ConsentDetails,
+  ConsentInput,
+  ConsentUpdateInput,
+} from './types';
 
 const consentsKey = (projectId: string) => ['consents', projectId];
 
@@ -45,6 +52,95 @@ export function useUpdateConsent(projectId: string) {
         api.PUT('/api/consents/projects/{projectId}/consents/{consentId}', {
           params: { path: { projectId, consentId } },
           body,
+        }),
+      ),
+    onSettled: refresh,
+  });
+}
+
+export function useCreateCondition(projectId: string) {
+  const api = useApi();
+  const refresh = useRefreshConsents(projectId);
+  return useMutation({
+    mutationFn: ({ consentId, body }: { consentId: string; body: ConditionInput }) =>
+      unwrap<ConditionDetails>(
+        api.POST('/api/consents/projects/{projectId}/consents/{consentId}/conditions', {
+          params: { path: { projectId, consentId } },
+          body,
+        }),
+      ),
+    onSettled: refresh,
+  });
+}
+
+export function useUpdateCondition(projectId: string) {
+  const api = useApi();
+  const refresh = useRefreshConsents(projectId);
+  return useMutation({
+    mutationFn: ({
+      consentId,
+      conditionId,
+      body,
+    }: {
+      consentId: string;
+      conditionId: string;
+      body: ConditionUpdateInput;
+    }) =>
+      unwrap<ConditionDetails>(
+        api.PUT('/api/consents/projects/{projectId}/consents/{consentId}/conditions/{conditionId}', {
+          params: { path: { projectId, consentId, conditionId } },
+          body,
+        }),
+      ),
+    onSettled: refresh,
+  });
+}
+
+export function useCompleteCondition(projectId: string) {
+  const api = useApi();
+  const refresh = useRefreshConsents(projectId);
+  return useMutation({
+    mutationFn: ({
+      consentId,
+      conditionId,
+      version,
+      completedOn,
+    }: {
+      consentId: string;
+      conditionId: string;
+      version: number;
+      completedOn: string;
+    }) =>
+      unwrap<ConditionDetails>(
+        api.POST(
+          '/api/consents/projects/{projectId}/consents/{consentId}/conditions/{conditionId}/complete',
+          {
+            params: { path: { projectId, consentId, conditionId } },
+            body: { version, completedOn },
+          },
+        ),
+      ),
+    onSettled: refresh,
+  });
+}
+
+export function useReopenCondition(projectId: string) {
+  const api = useApi();
+  const refresh = useRefreshConsents(projectId);
+  return useMutation({
+    mutationFn: ({
+      consentId,
+      conditionId,
+      version,
+    }: {
+      consentId: string;
+      conditionId: string;
+      version: number;
+    }) =>
+      unwrap<ConditionDetails>(
+        api.POST('/api/consents/projects/{projectId}/consents/{consentId}/conditions/{conditionId}/reopen', {
+          params: { path: { projectId, consentId, conditionId } },
+          body: { version },
         }),
       ),
     onSettled: refresh,
