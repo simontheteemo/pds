@@ -7,6 +7,7 @@ import { useProjectSales } from './api';
 import { SalesSummaryStrip } from './SalesSummaryStrip';
 import { SaleStatusBadge } from './SaleStatusBadge';
 import { unitTypeLabel, type UnitDetails } from './types';
+import { SaleFormModal } from './SaleFormModal';
 import { UnitFormModal } from './UnitFormModal';
 
 const DASH = '—';
@@ -32,6 +33,7 @@ export function ProjectSalesSection({ projectId, projectArchived }: { projectId:
   const config = useConfig();
   const { canWrite } = usePermissions();
   const [editing, setEditing] = useState<UnitDetails | 'new' | undefined>(undefined);
+  const [sale, setSale] = useState<UnitDetails | undefined>(undefined);
   const sales = useProjectSales(projectId);
   const areaFormat = new Intl.NumberFormat(config.culture, { maximumFractionDigits: 2 });
   const area = (v: number | null) => (v === null ? DASH : areaFormat.format(v));
@@ -86,6 +88,7 @@ export function ProjectSalesSection({ projectId, projectArchived }: { projectId:
                       <Table.Td>
                         <Group gap="xs" justify="flex-end" wrap="nowrap">
                           <Button size="xs" variant="light" onClick={() => setEditing(unit)}>Edit</Button>
+                          <Button size="xs" variant="light" onClick={() => setSale(unit)}>Sale</Button>
                         </Group>
                       </Table.Td>
                     )}
@@ -98,6 +101,7 @@ export function ProjectSalesSection({ projectId, projectArchived }: { projectId:
       )}
 
       <UnitFormModal projectId={projectId} unit={editing} onClose={() => setEditing(undefined)} />
+      <SaleFormModal projectId={projectId} unit={sale} onClose={() => setSale(undefined)} />
     </Card>
   );
 }

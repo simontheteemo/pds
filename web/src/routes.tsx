@@ -3,6 +3,7 @@ import { ProjectCreatePage } from './features/portfolio/ProjectCreatePage';
 import { ProjectDetailPage } from './features/portfolio/ProjectDetailPage';
 import { ProjectEditPage } from './features/portfolio/ProjectEditPage';
 import { ProjectsPage } from './features/portfolio/ProjectsPage';
+import { SalesPage } from './features/sales/SalesPage';
 import { AppLayout } from './shared/layout/AppLayout';
 import { NotFoundPage } from './shared/layout/NotFoundPage';
 
@@ -16,6 +17,7 @@ export const routes: RouteObject[] = [
       { path: 'projects/new', element: <ProjectCreatePage /> },
       { path: 'projects/:id', element: <ProjectDetailPage /> },
       { path: 'projects/:id/edit', element: <ProjectEditPage /> },
+      { path: 'sales', element: <SalesPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
