@@ -55,7 +55,7 @@ function ContractFormBody({
     validate: zodValidate<ContractFormValues>(contractSchema),
   });
 
-  const contractorOptions = (contractors.data ?? []).map((c) => ({ value: c.id, label: `${c.name} — ${c.trade ?? ''}` }));
+  const contractorOptions = (contractors.data ?? []).map((c) => ({ value: c.id, label: c.trade ? `${c.name} — ${c.trade}` : c.name }));
   // When editing, the contractor may be inactive and absent from the list; keep it selectable.
   if (existing && !contractorOptions.some((o) => o.value === existing.contractorId)) {
     contractorOptions.push({ value: existing.contractorId, label: existing.contractorName });
@@ -114,7 +114,7 @@ function ContractFormBody({
         <TextInput label="Title" withAsterisk {...form.getInputProps('title')} />
         <SimpleGrid cols={{ base: 1, sm: 2 }}>
           <TextInput label="Reference" {...form.getInputProps('reference')} />
-          <Select label="Form" clearable data={formOptions} {...form.getInputProps('form')} />
+          <Select label="Form" withAsterisk data={formOptions} {...form.getInputProps('form')} />
           <NumberInput
             label={`Value (${currency})`}
             prefix={currencySymbol}

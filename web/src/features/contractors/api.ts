@@ -18,6 +18,7 @@ function useStoreContractor() {
   return (contractor: ContractorDetails) => {
     queryClient.setQueryData(['contractor', contractor.id], contractor);
     void queryClient.invalidateQueries({ queryKey: ['contractors'] });
+    void queryClient.invalidateQueries({ queryKey: ['project-contracts'] });
   };
 }
 

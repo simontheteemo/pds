@@ -35,7 +35,7 @@ export function ContractorsPage() {
       <Group align="flex-end" wrap="wrap">
         <TextInput
           label="Search"
-          placeholder="Name or trade"
+          placeholder="Name, trade or contact"
           value={search}
           onChange={(event) => setSearch(event.currentTarget.value)}
         />

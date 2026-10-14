@@ -43,8 +43,8 @@ export const contractSchema = z
   .object({
     contractorId: z.string({ error: 'Choose a contractor' }).min(1, 'Choose a contractor'),
     title: z.string().trim().min(1, 'Title is required').max(200, 'Use 200 characters or fewer'),
-    reference: z.string().max(100, 'Use 100 characters or fewer'),
-    form: z.enum(contractForms).nullable(),
+    reference: z.string().max(50, 'Use 50 characters or fewer'),
+    form: z.enum(contractForms, { error: 'Choose a contract form.' }),
     valueAmount: z
       .union([z.number().min(0, 'Value must be 0 or more'), z.literal('')])
       .refine(maxDp(2), 'Use at most 2 decimal places'),
