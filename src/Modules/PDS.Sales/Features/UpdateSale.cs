@@ -32,7 +32,8 @@ internal static class UpdateSale
             return SalesProblems.VersionConflict();
 
         var currency = locale.Value.Currency;
-        unit.UpdateSale(request.Status!.Value, request.ToSale(currency), new AuditStamp(clock.GetUtcNow(), user.Name));
+        var status = request.Status!.Value;
+        unit.UpdateSale(status, SaleRules.HasSale(status) ? request.ToSale(currency) : null, new AuditStamp(clock.GetUtcNow(), user.Name));
         return await store.UpdateAsync(unit, request.Version, ct)
             ? TypedResults.Ok(UnitDetails.From(unit, currency))
             : SalesProblems.VersionConflict();
