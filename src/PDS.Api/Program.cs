@@ -3,6 +3,7 @@ using Amazon.Lambda.AspNetCoreServer.Hosting;
 using PDS.Api;
 using PDS.Api.Security;
 using PDS.Portfolio;
+using PDS.Risks;
 using PDS.Shared.Data;
 using PDS.Shared.Security;
 using Serilog;
@@ -37,6 +38,7 @@ builder.Services.AddPdsSettings(builder.Configuration);
 builder.Services.AddPdsSecurity(builder.Configuration);
 builder.Services.AddDynamo();
 builder.Services.AddPortfolioModule();
+builder.Services.AddRisksModule();
 
 var app = builder.Build();
 
@@ -60,6 +62,7 @@ if (app.Environment.IsDevelopment())
 
 app.MapHostEndpoints();
 app.MapPortfolioEndpoints();
+app.MapRisksEndpoints();
 
 await app.RunAsync();
 

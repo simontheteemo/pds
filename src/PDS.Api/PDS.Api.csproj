@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="../PDS.Shared/PDS.Shared.csproj" />
     <ProjectReference Include="../Modules/PDS.Portfolio/PDS.Portfolio.csproj" />
+    <ProjectReference Include="../Modules/PDS.Risks/PDS.Risks.csproj" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="PDS.Tests" />

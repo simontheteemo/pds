@@ -332,6 +332,332 @@
           }
         }
       }
+    },
+    "/api/risks/projects/{projectId}/risks": {
+      "get": {
+        "tags": [
+          "Risks"
+        ],
+        "operationId": "ListRisks",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "includeClosed",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RiskDetails"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Risks"
+        ],
+        "operationId": "CreateRisk",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRiskRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RiskDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/risks/projects/{projectId}/risks/{riskId}": {
+      "get": {
+        "tags": [
+          "Risks"
+        ],
+        "operationId": "GetRisk",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "riskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RiskDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Risks"
+        ],
+        "operationId": "UpdateRisk",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "riskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRiskRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RiskDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/risks/projects/{projectId}/risks/{riskId}/close": {
+      "post": {
+        "tags": [
+          "Risks"
+        ],
+        "operationId": "CloseRisk",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "riskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CloseRiskRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RiskDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/risks/projects/{projectId}/risks/{riskId}/reopen": {
+      "post": {
+        "tags": [
+          "Risks"
+        ],
+        "operationId": "ReopenRisk",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "riskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReopenRiskRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RiskDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -409,6 +735,22 @@
           },
           "auth": {
             "$ref": "#/components/schemas/ClientAuthConfig"
+          }
+        }
+      },
+      "CloseRiskRequest": {
+        "required": [
+          "version",
+          "note"
+        ],
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "note": {
+            "type": "string"
           }
         }
       },
@@ -504,6 +846,73 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "CreateRiskRequest": {
+        "required": [
+          "title",
+          "category",
+          "description",
+          "likelihood",
+          "impact",
+          "mitigation",
+          "owner",
+          "dueDate"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "category": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/RiskCategory"
+              }
+            ]
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "likelihood": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "impact": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "mitigation": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "owner": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "dueDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
           }
         }
       },
@@ -810,6 +1219,169 @@
           "Cancelled"
         ]
       },
+      "ReopenRiskRequest": {
+        "required": [
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "RiskBand": {
+        "enum": [
+          "Low",
+          "Medium",
+          "High",
+          "Extreme"
+        ]
+      },
+      "RiskCategory": {
+        "enum": [
+          "Geotechnical",
+          "Consenting",
+          "Contractual",
+          "ContractorDefault",
+          "Market",
+          "Financial",
+          "Design",
+          "HealthAndSafety",
+          "Environmental",
+          "Other"
+        ]
+      },
+      "RiskDetails": {
+        "required": [
+          "id",
+          "projectId",
+          "title",
+          "category",
+          "description",
+          "likelihood",
+          "impact",
+          "score",
+          "band",
+          "mitigation",
+          "owner",
+          "dueDate",
+          "status",
+          "closingNote",
+          "closedAt",
+          "closedBy",
+          "createdAt",
+          "createdBy",
+          "updatedAt",
+          "updatedBy",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "category": {
+            "$ref": "#/components/schemas/RiskCategory"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "likelihood": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "impact": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "score": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "band": {
+            "$ref": "#/components/schemas/RiskBand"
+          },
+          "mitigation": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "owner": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "dueDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RiskStatus"
+          },
+          "closingNote": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "closedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "closedBy": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedBy": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "RiskStatus": {
+        "enum": [
+          "Open",
+          "Mitigating",
+          "Closed"
+        ]
+      },
       "SiteDto": {
         "required": [
           "addressLine",
@@ -968,6 +1540,89 @@
           }
         }
       },
+      "UpdateRiskRequest": {
+        "required": [
+          "title",
+          "category",
+          "description",
+          "likelihood",
+          "impact",
+          "mitigation",
+          "owner",
+          "dueDate",
+          "status",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "category": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/RiskCategory"
+              }
+            ]
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "likelihood": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "impact": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "mitigation": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "owner": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "dueDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "status": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/RiskStatus"
+              }
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "VersionRequest": {
         "required": [
           "version"
@@ -988,6 +1643,9 @@
     },
     {
       "name": "Portfolio"
+    },
+    {
+      "name": "Risks"
     }
   ]
 }

@@ -8,6 +8,7 @@
   </Folder>
   <Folder Name="/src/Modules/">
     <Project Path="src/Modules/PDS.Portfolio/PDS.Portfolio.csproj" />
+    <Project Path="src/Modules/PDS.Risks/PDS.Risks.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/PDS.IntegrationTests/PDS.IntegrationTests.csproj" />

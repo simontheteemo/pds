@@ -11,5 +11,6 @@
   <ItemGroup>
     <ProjectReference Include="../../src/PDS.Shared/PDS.Shared.csproj" />
     <ProjectReference Include="../../src/Modules/PDS.Portfolio/PDS.Portfolio.csproj" />
+    <ProjectReference Include="../../src/Modules/PDS.Risks/PDS.Risks.csproj" />
   </ItemGroup>
 </Project>
