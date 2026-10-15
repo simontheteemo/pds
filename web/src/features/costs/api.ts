@@ -14,7 +14,11 @@ export const costReportKey = (projectId: string) => ['cost-report', projectId];
 
 function useRefreshReport(projectId: string) {
   const queryClient = useQueryClient();
-  return () => queryClient.invalidateQueries({ queryKey: costReportKey(projectId) });
+  return () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: costReportKey(projectId) }),
+      queryClient.invalidateQueries({ queryKey: ['cashflow', projectId] }),
+    ]);
 }
 
 export function useCostReport(projectId: string) {

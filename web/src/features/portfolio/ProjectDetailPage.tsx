@@ -10,6 +10,7 @@ import { usePermissions } from '../../shared/me';
 import { ProjectContractsSection } from '../contractors/ProjectContractsSection';
 import { ProjectRisksSection } from '../risks/ProjectRisksSection';
 import { ProjectCostsCard } from '../costs/ProjectCostsCard';
+import { ProjectCashflowCard } from '../cashflow/ProjectCashflowCard';
 import { ProjectConsentsSection } from '../consents/ProjectConsentsSection';
 import { ProjectSalesSection } from '../sales/ProjectSalesSection';
 import { useProject, useSetArchived } from './api';
@@ -163,6 +164,7 @@ export function ProjectDetailPage() {
       <ProjectRisksSection projectId={p.id} projectArchived={p.isArchived} />
       <ProjectContractsSection projectId={p.id} projectArchived={p.isArchived} />
       <ProjectCostsCard projectId={p.id} />
+      <ProjectCashflowCard projectId={p.id} />
       <ProjectConsentsSection projectId={p.id} projectArchived={p.isArchived} />
       <ProjectSalesSection projectId={p.id} projectArchived={p.isArchived} />
 

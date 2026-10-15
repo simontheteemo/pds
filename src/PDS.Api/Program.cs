@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Amazon.Lambda.AspNetCoreServer.Hosting;
 using PDS.Api;
 using PDS.Api.Security;
+using PDS.Cashflow;
 using PDS.Consents;
 using PDS.Contractors;
 using PDS.Costs;
@@ -47,6 +48,7 @@ builder.Services.AddContractorsModule();
 builder.Services.AddCostsModule();
 builder.Services.AddConsentsModule();
 builder.Services.AddSalesModule();
+builder.Services.AddCashflowModule();
 
 var app = builder.Build();
 
@@ -75,6 +77,7 @@ app.MapContractorsEndpoints();
 app.MapCostsEndpoints();
 app.MapConsentsEndpoints();
 app.MapSalesEndpoints();
+app.MapCashflowEndpoints();
 
 await app.RunAsync();
 

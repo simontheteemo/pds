@@ -580,6 +580,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/cashflow/projects/{projectId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetProjectCashflow"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -634,6 +650,48 @@ export interface components {
             updatedBy: string;
             /** Format: int64 */
             version: number;
+        };
+        CashflowMonthDto: {
+            month: string;
+            /** Format: double */
+            costActual: number;
+            /** Format: double */
+            costForecast: number;
+            /** Format: double */
+            outflow: number;
+            /** Format: double */
+            salesSettled: number;
+            /** Format: double */
+            salesForecast: number;
+            /** Format: double */
+            inflow: number;
+            /** Format: double */
+            net: number;
+            /** Format: double */
+            cumulative: number;
+        };
+        CashflowTotalsDto: {
+            /** Format: double */
+            costActual: number;
+            /** Format: double */
+            costForecast: number;
+            /** Format: double */
+            outflow: number;
+            /** Format: double */
+            salesSettled: number;
+            /** Format: double */
+            salesForecast: number;
+            /** Format: double */
+            inflow: number;
+            /** Format: double */
+            net: number;
+            /** Format: double */
+            unscheduledCost: number;
+            /** Format: double */
+            unscheduledSales: number;
+            /** Format: double */
+            peakFunding: null | number;
+            peakFundingMonth: null | string;
         };
         ClientAuthConfig: {
             mode: components["schemas"]["AuthMode"];
@@ -1095,6 +1153,23 @@ export interface components {
             /** Format: int32 */
             totalCount: number;
         };
+        ProjectCashflow: {
+            /** Format: uuid */
+            projectId: string;
+            projectCode: string;
+            projectName: string;
+            projectArchived: boolean;
+            currency: string;
+            /** Format: date */
+            asOf: string;
+            /** Format: date */
+            scheduleStart: null | string;
+            /** Format: date */
+            scheduleCompletion: null | string;
+            months: components["schemas"]["CashflowMonthDto"][];
+            totals: components["schemas"]["CashflowTotalsDto"];
+            unscheduledSales: components["schemas"]["UnscheduledSaleDto"][];
+        };
         ProjectCostReport: {
             /** Format: uuid */
             projectId: string;
@@ -1305,6 +1380,14 @@ export interface components {
         };
         /** @enum {unknown} */
         UnitType: "Apartment" | "Townhouse" | "House" | "Lot" | "Commercial" | "Other";
+        UnscheduledSaleDto: {
+            /** Format: uuid */
+            unitId: string;
+            unitIdentifier: string;
+            status: string;
+            /** Format: double */
+            salePrice: number;
+        };
         UpdateActualCostRequest: {
             /** Format: uuid */
             budgetLineId: null | string;
@@ -3355,6 +3438,35 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ProjectSalesSummary"][];
                 };
+            };
+        };
+    };
+    GetProjectCashflow: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectCashflow"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

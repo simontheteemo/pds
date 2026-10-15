@@ -53,10 +53,14 @@ export function useCreateProject() {
 export function useUpdateProject(id: string) {
   const api = useApi();
   const store = useStoreProject();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (body: ProjectUpdateInput) =>
       unwrap<ProjectDetails>(api.PUT('/api/portfolio/projects/{id}', { params: { path: { id } }, body })),
-    onSuccess: store,
+    onSuccess: (project) => {
+      store(project);
+      void queryClient.invalidateQueries({ queryKey: ['cashflow', id] });
+    },
   });
 }
 
@@ -74,6 +78,7 @@ export function useSetArchived(id: string) {
     onSuccess: (project) => {
       store(project);
       void queryClient.invalidateQueries({ queryKey: ['cost-report', id] });
+      void queryClient.invalidateQueries({ queryKey: ['cashflow', id] });
     },
   });
 }

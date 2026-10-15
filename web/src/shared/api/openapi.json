@@ -2535,6 +2535,40 @@
           }
         }
       }
+    },
+    "/api/cashflow/projects/{projectId}": {
+      "get": {
+        "tags": [
+          "Cashflow"
+        ],
+        "operationId": "GetProjectCashflow",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectCashflow"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2708,6 +2742,124 @@
           "version": {
             "type": "integer",
             "format": "int64"
+          }
+        }
+      },
+      "CashflowMonthDto": {
+        "required": [
+          "month",
+          "costActual",
+          "costForecast",
+          "outflow",
+          "salesSettled",
+          "salesForecast",
+          "inflow",
+          "net",
+          "cumulative"
+        ],
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string"
+          },
+          "costActual": {
+            "type": "number",
+            "format": "double"
+          },
+          "costForecast": {
+            "type": "number",
+            "format": "double"
+          },
+          "outflow": {
+            "type": "number",
+            "format": "double"
+          },
+          "salesSettled": {
+            "type": "number",
+            "format": "double"
+          },
+          "salesForecast": {
+            "type": "number",
+            "format": "double"
+          },
+          "inflow": {
+            "type": "number",
+            "format": "double"
+          },
+          "net": {
+            "type": "number",
+            "format": "double"
+          },
+          "cumulative": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "CashflowTotalsDto": {
+        "required": [
+          "costActual",
+          "costForecast",
+          "outflow",
+          "salesSettled",
+          "salesForecast",
+          "inflow",
+          "net",
+          "unscheduledCost",
+          "unscheduledSales",
+          "peakFunding",
+          "peakFundingMonth"
+        ],
+        "type": "object",
+        "properties": {
+          "costActual": {
+            "type": "number",
+            "format": "double"
+          },
+          "costForecast": {
+            "type": "number",
+            "format": "double"
+          },
+          "outflow": {
+            "type": "number",
+            "format": "double"
+          },
+          "salesSettled": {
+            "type": "number",
+            "format": "double"
+          },
+          "salesForecast": {
+            "type": "number",
+            "format": "double"
+          },
+          "inflow": {
+            "type": "number",
+            "format": "double"
+          },
+          "net": {
+            "type": "number",
+            "format": "double"
+          },
+          "unscheduledCost": {
+            "type": "number",
+            "format": "double"
+          },
+          "unscheduledSales": {
+            "type": "number",
+            "format": "double"
+          },
+          "peakFunding": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "peakFundingMonth": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -4641,6 +4793,73 @@
           }
         }
       },
+      "ProjectCashflow": {
+        "required": [
+          "projectId",
+          "projectCode",
+          "projectName",
+          "projectArchived",
+          "currency",
+          "asOf",
+          "scheduleStart",
+          "scheduleCompletion",
+          "months",
+          "totals",
+          "unscheduledSales"
+        ],
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectCode": {
+            "type": "string"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "projectArchived": {
+            "type": "boolean"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "asOf": {
+            "type": "string",
+            "format": "date"
+          },
+          "scheduleStart": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "scheduleCompletion": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "months": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CashflowMonthDto"
+            }
+          },
+          "totals": {
+            "$ref": "#/components/schemas/CashflowTotalsDto"
+          },
+          "unscheduledSales": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnscheduledSaleDto"
+            }
+          }
+        }
+      },
       "ProjectCostReport": {
         "required": [
           "projectId",
@@ -5451,6 +5670,31 @@
           "Commercial",
           "Other"
         ]
+      },
+      "UnscheduledSaleDto": {
+        "required": [
+          "unitId",
+          "unitIdentifier",
+          "status",
+          "salePrice"
+        ],
+        "type": "object",
+        "properties": {
+          "unitId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "unitIdentifier": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "salePrice": {
+            "type": "number",
+            "format": "double"
+          }
+        }
       },
       "UpdateActualCostRequest": {
         "required": [
@@ -6368,6 +6612,9 @@
     },
     {
       "name": "Sales"
+    },
+    {
+      "name": "Cashflow"
     }
   ]
 }

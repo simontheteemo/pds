@@ -16,4 +16,9 @@ internal sealed class PortfolioQueries(ProjectStore store) : IPortfolioQueries
             .Select(p => new ProjectSummary(p.Id, p.Fields.Code, p.Fields.Name, p.Fields.Stage.ToString(), p.Fields.Status.ToString(), p.IsArchived))
             .ToList();
     }
+
+    public async Task<ProjectSchedule?> GetSchedule(ProjectId id, CancellationToken ct) =>
+        await store.GetAsync(id, ct) is { } p
+            ? new ProjectSchedule(p.Fields.PlannedStart, p.Fields.PlannedCompletion, p.Fields.ActualStart, p.Fields.ActualCompletion)
+            : null;
 }
