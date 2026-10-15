@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using PDS.Consents.Data;
 using PDS.Consents.Features;
+using PDS.Consents.Reminders;
 using PDS.Reporting.Contracts;
 using PDS.Shared.Data;
 using PDS.Shared.Security;
@@ -20,6 +21,8 @@ public static class ConsentsModule
     {
         services.AddSingleton(ConsentsTable.Definition);
         services.AddSingleton<ConsentStore>();
+        services.AddScoped<DueItemsQuery>();
+        services.AddOptions<ConsentRemindersOptions>().BindConfiguration(ConsentRemindersOptions.Section);
         services.AddScoped<IExportDataset, ConsentsExport>();
         services.AddScoped<IExportDataset, ConsentConditionsExport>();
         services.AddValidatorsFromAssemblyContaining<CreateConsentValidator>(includeInternalTypes: true);
@@ -43,6 +46,11 @@ public static class ConsentsModule
             .WithTags("Consents")
             .RequireAuthorization(Policies.CanRead);
         ListDue.Map(due);
+
+        var reminders = app.MapGroup("/api/consents/reminders")
+            .WithTags("Consents")
+            .RequireAuthorization(Policies.CanAdminister);
+        PreviewReminders.Map(reminders);
         return app;
     }
 }
