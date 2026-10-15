@@ -5,6 +5,15 @@ import { ApiError, useApi } from '../../shared/api/client';
 import { useMe } from '../../shared/me';
 import { downloadExport, useExports } from './api';
 
+function downloadErrorToast(err: unknown): { title: string; message: string } {
+  if (!(err instanceof ApiError)) return { title: 'Download failed', message: 'Something went wrong.' };
+  const { problem } = err;
+  if (problem?.title && (err.status === 408 || err.status === 413)) {
+    return { title: problem.title, message: problem.detail ?? err.message };
+  }
+  return { title: 'Download failed', message: problem?.detail ?? problem?.title ?? err.message };
+}
+
 export function ReportsPage() {
   const api = useApi();
   const me = useMe();
@@ -17,16 +26,7 @@ export function ReportsPage() {
     try {
       await downloadExport(api, name);
     } catch (err) {
-      notifications.show({
-        color: 'red',
-        title: err instanceof ApiError && err.status === 413 ? (err.problem?.title ?? 'Download failed') : 'Download failed',
-        message:
-          err instanceof ApiError
-            ? err.status === 413
-              ? (err.problem?.detail ?? err.message)
-              : (err.problem?.detail ?? err.problem?.title ?? err.message)
-            : 'Something went wrong.',
-      });
+      notifications.show({ color: 'red', ...downloadErrorToast(err) });
     } finally {
       setBusy(null);
     }
