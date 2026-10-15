@@ -3,7 +3,9 @@ import { Link, useParams } from 'react-router';
 import { ApiError } from '../../shared/api/client';
 import { NotFoundPage } from '../../shared/layout/NotFoundPage';
 import { useCostReport } from './api';
+import { ActualsTab } from './ActualsTab';
 import { BudgetTab } from './BudgetTab';
+import { CommitmentsTab } from './CommitmentsTab';
 import { CostFiguresStrip } from './CostFiguresStrip';
 
 export function CostReportPage() {
@@ -50,10 +52,10 @@ export function CostReportPage() {
           <BudgetTab report={r} />
         </Tabs.Panel>
         <Tabs.Panel value="commitments" pt="md">
-          {null}
+          <CommitmentsTab report={r} />
         </Tabs.Panel>
         <Tabs.Panel value="actuals" pt="md">
-          {null}
+          <ActualsTab report={r} />
         </Tabs.Panel>
       </Tabs>
     </Stack>

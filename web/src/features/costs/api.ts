@@ -1,6 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { unwrap, useApi } from '../../shared/api/client';
-import type { BudgetLineInput, BudgetLineUpdateInput, ProjectCostReport } from './types';
+import type {
+  ActualCostInput,
+  ActualCostUpdateInput,
+  BudgetLineInput,
+  BudgetLineUpdateInput,
+  CommitmentInput,
+  CommitmentUpdateInput,
+  ProjectCostReport,
+} from './types';
 
 export const costReportKey = (projectId: string) => ['cost-report', projectId];
 
@@ -58,6 +66,78 @@ export function useDeleteBudgetLine(projectId: string) {
       unwrap<void>(
         api.DELETE('/api/costs/projects/{projectId}/lines/{lineId}', {
           params: { path: { projectId, lineId }, query: { version } },
+        }),
+      ),
+    onSettled: refresh,
+  });
+}
+
+export function useCreateCommitment(projectId: string) {
+  const api = useApi();
+  const refresh = useRefreshReport(projectId);
+  return useMutation({
+    mutationFn: (body: CommitmentInput) =>
+      unwrap<unknown>(api.POST('/api/costs/projects/{projectId}/commitments', { params: { path: { projectId } }, body })),
+    onSettled: refresh,
+  });
+}
+
+export function useUpdateCommitment(projectId: string) {
+  const api = useApi();
+  const refresh = useRefreshReport(projectId);
+  return useMutation({
+    mutationFn: ({ entryId, body }: { entryId: string; body: CommitmentUpdateInput }) =>
+      unwrap<unknown>(
+        api.PUT('/api/costs/projects/{projectId}/commitments/{entryId}', { params: { path: { projectId, entryId } }, body }),
+      ),
+    onSettled: refresh,
+  });
+}
+
+export function useDeleteCommitment(projectId: string) {
+  const api = useApi();
+  const refresh = useRefreshReport(projectId);
+  return useMutation({
+    mutationFn: ({ entryId, version }: { entryId: string; version: number }) =>
+      unwrap<void>(
+        api.DELETE('/api/costs/projects/{projectId}/commitments/{entryId}', {
+          params: { path: { projectId, entryId }, query: { version } },
+        }),
+      ),
+    onSettled: refresh,
+  });
+}
+
+export function useCreateActualCost(projectId: string) {
+  const api = useApi();
+  const refresh = useRefreshReport(projectId);
+  return useMutation({
+    mutationFn: (body: ActualCostInput) =>
+      unwrap<unknown>(api.POST('/api/costs/projects/{projectId}/actuals', { params: { path: { projectId } }, body })),
+    onSettled: refresh,
+  });
+}
+
+export function useUpdateActualCost(projectId: string) {
+  const api = useApi();
+  const refresh = useRefreshReport(projectId);
+  return useMutation({
+    mutationFn: ({ entryId, body }: { entryId: string; body: ActualCostUpdateInput }) =>
+      unwrap<unknown>(
+        api.PUT('/api/costs/projects/{projectId}/actuals/{entryId}', { params: { path: { projectId, entryId } }, body }),
+      ),
+    onSettled: refresh,
+  });
+}
+
+export function useDeleteActualCost(projectId: string) {
+  const api = useApi();
+  const refresh = useRefreshReport(projectId);
+  return useMutation({
+    mutationFn: ({ entryId, version }: { entryId: string; version: number }) =>
+      unwrap<void>(
+        api.DELETE('/api/costs/projects/{projectId}/actuals/{entryId}', {
+          params: { path: { projectId, entryId }, query: { version } },
         }),
       ),
     onSettled: refresh,
