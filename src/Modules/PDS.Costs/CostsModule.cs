@@ -29,6 +29,7 @@ public static class CostsModule
         var costs = app.MapGroup("/api/costs/projects/{projectId:guid}")
             .WithTags("Costs")
             .RequireAuthorization(Policies.CanRead);
+        GetCostReport.Map(costs);
         CreateBudgetLine.Map(costs);
         AddStandardLines.Map(costs);
         UpdateBudgetLine.Map(costs);

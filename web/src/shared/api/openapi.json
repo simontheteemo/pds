@@ -1177,6 +1177,40 @@
         }
       }
     },
+    "/api/costs/projects/{projectId}": {
+      "get": {
+        "tags": [
+          "Costs"
+        ],
+        "operationId": "GetCostReport",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectCostReport"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/api/costs/projects/{projectId}/lines": {
       "post": {
         "tags": [
@@ -2499,6 +2533,160 @@
           "Terminated"
         ]
       },
+      "CostFiguresDto": {
+        "required": [
+          "budget",
+          "committed",
+          "actual",
+          "forecastFinalCost",
+          "forecastToComplete",
+          "variance"
+        ],
+        "type": "object",
+        "properties": {
+          "budget": {
+            "type": "number",
+            "format": "double"
+          },
+          "committed": {
+            "type": "number",
+            "format": "double"
+          },
+          "actual": {
+            "type": "number",
+            "format": "double"
+          },
+          "forecastFinalCost": {
+            "type": "number",
+            "format": "double"
+          },
+          "forecastToComplete": {
+            "type": "number",
+            "format": "double"
+          },
+          "variance": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "CostReportActual": {
+        "required": [
+          "entry",
+          "budgetLineName",
+          "contractTitle",
+          "contractorName"
+        ],
+        "type": "object",
+        "properties": {
+          "entry": {
+            "$ref": "#/components/schemas/ActualCostDetails"
+          },
+          "budgetLineName": {
+            "type": "string"
+          },
+          "contractTitle": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "contractorName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "CostReportCommitment": {
+        "required": [
+          "entry",
+          "budgetLineName",
+          "contractTitle",
+          "contractorName"
+        ],
+        "type": "object",
+        "properties": {
+          "entry": {
+            "$ref": "#/components/schemas/CommitmentDetails"
+          },
+          "budgetLineName": {
+            "type": "string"
+          },
+          "contractTitle": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "contractorName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "CostReportContract": {
+        "required": [
+          "id",
+          "contractorId",
+          "contractorName",
+          "title",
+          "reference",
+          "status",
+          "valueAmount"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "contractorId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "contractorName": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "reference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "valueAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "CostReportLine": {
+        "required": [
+          "line",
+          "figures"
+        ],
+        "type": "object",
+        "properties": {
+          "line": {
+            "$ref": "#/components/schemas/BudgetLineDetails"
+          },
+          "figures": {
+            "$ref": "#/components/schemas/CostFiguresDto"
+          }
+        }
+      },
       "CreateActualCostRequest": {
         "required": [
           "budgetLineId",
@@ -3144,6 +3332,66 @@
           "totalCount": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "ProjectCostReport": {
+        "required": [
+          "projectId",
+          "projectCode",
+          "projectName",
+          "projectArchived",
+          "currency",
+          "totals",
+          "lines",
+          "commitments",
+          "actuals",
+          "contracts"
+        ],
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectCode": {
+            "type": "string"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "projectArchived": {
+            "type": "boolean"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/CostFiguresDto"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CostReportLine"
+            }
+          },
+          "commitments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CostReportCommitment"
+            }
+          },
+          "actuals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CostReportActual"
+            }
+          },
+          "contracts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CostReportContract"
+            }
           }
         }
       },

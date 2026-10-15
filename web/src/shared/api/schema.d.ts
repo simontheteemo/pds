@@ -276,6 +276,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/costs/projects/{projectId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetCostReport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/costs/projects/{projectId}/lines": {
         parameters: {
             query?: never;
@@ -595,6 +611,48 @@ export interface components {
         ContractorType: "Contractor" | "Subcontractor" | "Consultant" | "Supplier";
         /** @enum {unknown} */
         ContractStatus: "Draft" | "Active" | "PracticalCompletion" | "Complete" | "Terminated";
+        CostFiguresDto: {
+            /** Format: double */
+            budget: number;
+            /** Format: double */
+            committed: number;
+            /** Format: double */
+            actual: number;
+            /** Format: double */
+            forecastFinalCost: number;
+            /** Format: double */
+            forecastToComplete: number;
+            /** Format: double */
+            variance: number;
+        };
+        CostReportActual: {
+            entry: components["schemas"]["ActualCostDetails"];
+            budgetLineName: string;
+            contractTitle: null | string;
+            contractorName: null | string;
+        };
+        CostReportCommitment: {
+            entry: components["schemas"]["CommitmentDetails"];
+            budgetLineName: string;
+            contractTitle: null | string;
+            contractorName: null | string;
+        };
+        CostReportContract: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            contractorId: string;
+            contractorName: string;
+            title: string;
+            reference: null | string;
+            status: string;
+            /** Format: double */
+            valueAmount: null | number;
+        };
+        CostReportLine: {
+            line: components["schemas"]["BudgetLineDetails"];
+            figures: components["schemas"]["CostFiguresDto"];
+        };
         CreateActualCostRequest: {
             /** Format: uuid */
             budgetLineId: null | string;
@@ -726,6 +784,19 @@ export interface components {
             pageSize: number;
             /** Format: int32 */
             totalCount: number;
+        };
+        ProjectCostReport: {
+            /** Format: uuid */
+            projectId: string;
+            projectCode: string;
+            projectName: string;
+            projectArchived: boolean;
+            currency: string;
+            totals: components["schemas"]["CostFiguresDto"];
+            lines: components["schemas"]["CostReportLine"][];
+            commitments: components["schemas"]["CostReportCommitment"][];
+            actuals: components["schemas"]["CostReportActual"][];
+            contracts: components["schemas"]["CostReportContract"][];
         };
         ProjectDetails: {
             /** Format: uuid */
@@ -1831,6 +1902,35 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GetCostReport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectCostReport"];
                 };
             };
             /** @description Not Found */
