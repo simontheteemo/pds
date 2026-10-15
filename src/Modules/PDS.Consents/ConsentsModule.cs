@@ -1,3 +1,6 @@
+using Amazon;
+using Amazon.Runtime;
+using Amazon.SimpleNotificationService;
 using FluentValidation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -14,6 +17,9 @@ namespace PDS.Consents;
 
 public static class ConsentsModule
 {
+    /// <summary>Endpoint the CDK schedule targets to send the daily digest; changing it needs a matching infra change.</summary>
+    public const string ReminderSendPath = "/api/consents/reminders/send";
+
     /// <summary>Tables this module owns. The host creates them locally; CDK creates them in AWS.</summary>
     public static IReadOnlyList<TableDefinition> Tables { get; } = [ConsentsTable.Definition];
 
@@ -23,6 +29,19 @@ public static class ConsentsModule
         services.AddSingleton<ConsentStore>();
         services.AddScoped<DueItemsQuery>();
         services.AddOptions<ConsentRemindersOptions>().BindConfiguration(ConsentRemindersOptions.Section);
+        // Created lazily: only /send with a configured topic resolves it, so local dev and OpenAPI generation never do.
+        services.AddSingleton<IAmazonSimpleNotificationService>(_ =>
+        {
+            try
+            {
+                return new AmazonSimpleNotificationServiceClient();
+            }
+            catch (AmazonClientException)
+            {
+                return new AmazonSimpleNotificationServiceClient(RegionEndpoint.APSoutheast2);
+            }
+        });
+        services.AddSingleton<IReminderSender, SnsReminderSender>();
         services.AddScoped<IExportDataset, ConsentsExport>();
         services.AddScoped<IExportDataset, ConsentConditionsExport>();
         services.AddValidatorsFromAssemblyContaining<CreateConsentValidator>(includeInternalTypes: true);
@@ -51,6 +70,7 @@ public static class ConsentsModule
             .WithTags("Consents")
             .RequireAuthorization(Policies.CanAdminister);
         PreviewReminders.Map(reminders);
+        SendReminders.Map(reminders);
         return app;
     }
 }

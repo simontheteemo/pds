@@ -2280,6 +2280,26 @@
         }
       }
     },
+    "/api/consents/reminders/send": {
+      "post": {
+        "tags": [
+          "Consents"
+        ],
+        "operationId": "SendConsentReminders",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReminderSendResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/sales/projects/{projectId}/units": {
       "get": {
         "tags": [
@@ -6010,6 +6030,36 @@
           },
           "deliveryConfigured": {
             "type": "boolean"
+          }
+        }
+      },
+      "ReminderSendOutcome": {
+        "enum": [
+          "Sent",
+          "NothingDue",
+          "NotConfigured"
+        ]
+      },
+      "ReminderSendResult": {
+        "required": [
+          "outcome",
+          "itemCount",
+          "messageId"
+        ],
+        "type": "object",
+        "properties": {
+          "outcome": {
+            "$ref": "#/components/schemas/ReminderSendOutcome"
+          },
+          "itemCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "messageId": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
