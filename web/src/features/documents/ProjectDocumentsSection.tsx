@@ -21,6 +21,7 @@ import { formatBytes } from './format';
 import { DeleteDocumentModal } from './DeleteDocumentModal';
 import { EditDocumentModal } from './EditDocumentModal';
 import { NewVersionModal } from './NewVersionModal';
+import type { DocumentDetails } from './types';
 import { UploadDocumentModal } from './UploadDocumentModal';
 import { VersionsModal } from './VersionsModal';
 
@@ -36,10 +37,10 @@ export function ProjectDocumentsSection({
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [newVersionId, setNewVersionId] = useState<string | null>(null);
+  const [editing, setEditing] = useState<DocumentDetails | undefined>(undefined);
+  const [newVersion, setNewVersion] = useState<DocumentDetails | undefined>(undefined);
   const [versionsId, setVersionsId] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<DocumentDetails | undefined>(undefined);
   const documents = useDocuments(projectId);
   const settings = useDocumentSettings();
   const download = useDownload(projectId);
@@ -168,16 +169,16 @@ export function ProjectDocumentsSection({
                       )}
                       {canWrite && !projectArchived && (
                         <>
-                          <Button size="xs" variant="light" onClick={() => setEditingId(d.id)}>
+                          <Button size="xs" variant="light" onClick={() => setEditing(d)}>
                             Edit
                           </Button>
-                          <Button size="xs" variant="default" onClick={() => setNewVersionId(d.id)}>
+                          <Button size="xs" variant="default" onClick={() => setNewVersion(d)}>
                             New version
                           </Button>
                         </>
                       )}
                       {canAdminister && (
-                        <Button size="xs" color="red" variant="subtle" onClick={() => setDeletingId(d.id)}>
+                        <Button size="xs" color="red" variant="subtle" onClick={() => setDeleting(d)}>
                           Delete
                         </Button>
                       )}
@@ -200,23 +201,23 @@ export function ProjectDocumentsSection({
           />
           <EditDocumentModal
             projectId={projectId}
-            document={byId(editingId)}
+            document={editing}
             settings={settings.data}
-            onClose={() => setEditingId(null)}
+            onClose={() => setEditing(undefined)}
           />
           <NewVersionModal
             projectId={projectId}
-            document={byId(newVersionId)}
+            document={newVersion}
             settings={settings.data}
-            onClose={() => setNewVersionId(null)}
+            onClose={() => setNewVersion(undefined)}
           />
         </>
       )}
       <VersionsModal projectId={projectId} document={byId(versionsId)} onClose={() => setVersionsId(null)} />
       <DeleteDocumentModal
         projectId={projectId}
-        document={byId(deletingId)}
-        onClose={() => setDeletingId(null)}
+        document={deleting}
+        onClose={() => setDeleting(undefined)}
       />
     </Card>
   );

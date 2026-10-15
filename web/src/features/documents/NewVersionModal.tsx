@@ -47,50 +47,48 @@ function NewVersionForm({ projectId, document, settings, onClose }: Props & { do
   };
 
   return (
-    <Modal
-      opened
-      onClose={onClose}
-      title={`New version of “${document.title}”`}
-      size="lg"
-      closeOnClickOutside={!submitting}
-      closeOnEscape={!submitting}
-      withCloseButton={!submitting}
-    >
-      <form onSubmit={handleSubmit} noValidate>
-        <Stack gap="md">
-          {topError && <Alert color="red">{topError}</Alert>}
-          <Text size="sm" c="dimmed">
-            Currently v{document.currentVersion}: {document.fileName}
-          </Text>
-          <FileInput
-            label="File"
-            withAsterisk
-            description={`Up to ${formatBytes(settings.maxFileSizeBytes, config.culture)}. Allowed: ${settings.allowedExtensions.join(', ')}`}
-            accept={settings.allowedExtensions.map((e) => (e.startsWith('.') ? e : `.${e}`)).join(',')}
-            value={file}
-            onChange={(next) => {
-              setFile(next);
-              setFileError(null);
-            }}
-            error={fileError}
-            clearable
-          />
-          <Group>
-            <Button type="submit" loading={submitting}>
-              {submitting ? 'Uploading…' : 'Upload'}
-            </Button>
-            <Button variant="default" onClick={onClose} disabled={submitting}>
-              Cancel
-            </Button>
-          </Group>
-        </Stack>
-      </form>
-    </Modal>
+    <form onSubmit={handleSubmit} noValidate>
+      <Stack gap="md">
+        {topError && <Alert color="red">{topError}</Alert>}
+        <Text size="sm" c="dimmed">
+          Currently v{document.currentVersion}: {document.fileName}
+        </Text>
+        <FileInput
+          label="File"
+          withAsterisk
+          description={`Up to ${formatBytes(settings.maxFileSizeBytes, config.culture)}. Allowed: ${settings.allowedExtensions.join(', ')}`}
+          accept={settings.allowedExtensions.map((e) => (e.startsWith('.') ? e : `.${e}`)).join(',')}
+          value={file}
+          onChange={(next) => {
+            setFile(next);
+            setFileError(null);
+          }}
+          error={fileError}
+          clearable
+        />
+        <Group>
+          <Button type="submit" loading={submitting}>
+            {submitting ? 'Uploading…' : 'Upload'}
+          </Button>
+          <Button variant="default" onClick={onClose} disabled={submitting}>
+            Cancel
+          </Button>
+        </Group>
+      </Stack>
+    </form>
   );
 }
 
 export function NewVersionModal(props: Props) {
   const { document } = props;
-  if (!document) return null;
-  return <NewVersionForm key={`${document.id}-${document.version}`} {...props} document={document} />;
+  return (
+    <Modal
+      opened={document !== undefined}
+      onClose={props.onClose}
+      title={document ? `New version of “${document.title}”` : ''}
+      size="lg"
+    >
+      {document && <NewVersionForm key={document.id} {...props} document={document} />}
+    </Modal>
+  );
 }

@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 namespace PDS.Documents.Storage;
@@ -9,8 +8,10 @@ namespace PDS.Documents.Storage;
 /// <summary>
 /// Development stand-in for S3: files under a local directory, "presigned" URLs pointing at the anonymous
 /// /api/documents/local-files endpoints, guarded by an HMAC signature (random key per process) and an expiry.
+/// URLs are root-relative so the browser resolves them against the SPA origin (and so through the Vite proxy,
+/// avoiding a cross-origin PUT to the API port).
 /// </summary>
-internal sealed class LocalFileStorage(IOptions<DocumentsOptions> options, IHttpContextAccessor http) : IFileStorage
+internal sealed class LocalFileStorage(IOptions<DocumentsOptions> options) : IFileStorage
 {
     public const string RoutePrefix = "/api/documents/local-files";
     private const string TypeSuffix = ".type";
@@ -23,7 +24,7 @@ internal sealed class LocalFileStorage(IOptions<DocumentsOptions> options, IHttp
     {
         var expires = expiresAt.ToUnixTimeSeconds();
         var sig = Sign("PUT", key, expires, contentType, string.Empty);
-        return Task.FromResult($"{BaseUrl()}{RoutePrefix}/{key}?expires={expires}&sig={sig}");
+        return Task.FromResult($"{RoutePrefix}/{key}?expires={expires}&sig={sig}");
     }
 
     public Task<string> CreateDownloadUrlAsync(
@@ -32,7 +33,7 @@ internal sealed class LocalFileStorage(IOptions<DocumentsOptions> options, IHttp
         var expires = expiresAt.ToUnixTimeSeconds();
         var sig = Sign("GET", key, expires, contentType, fileName);
         return Task.FromResult(
-            $"{BaseUrl()}{RoutePrefix}/{key}?expires={expires}&type={Uri.EscapeDataString(contentType)}" +
+            $"{RoutePrefix}/{key}?expires={expires}&type={Uri.EscapeDataString(contentType)}" +
             $"&name={Uri.EscapeDataString(fileName)}&sig={sig}");
     }
 
@@ -95,8 +96,4 @@ internal sealed class LocalFileStorage(IOptions<DocumentsOptions> options, IHttp
         Convert.ToHexStringLower(HMACSHA256.HashData(
             _signingKey,
             Encoding.UTF8.GetBytes(string.Join('\n', method, key, expires.ToString(CultureInfo.InvariantCulture), contentType, fileName))));
-
-    /// <summary>The caller's scheme and host, so URLs work through the Vite proxy too.</summary>
-    private string BaseUrl() =>
-        http.HttpContext?.Request is { } request ? $"{request.Scheme}://{request.Host}" : string.Empty;
 }

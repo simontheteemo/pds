@@ -37,7 +37,8 @@ internal static class CreateDocument
         var documentId = DocumentId.New();
         var stamp = new AuditStamp(clock.GetUtcNow(), user.Name);
         var (upload, problem) = await UploadConfirmation.ConfirmAsync(
-            storage, options.Value.MaxFileSizeBytes, pid, documentId, request.UploadId, request.FileName, 1, stamp, ct);
+            storage, options.Value.MaxFileSizeBytes, pid, documentId, request.UploadId, request.FileName, 1, stamp,
+            loggers.CreateLogger(nameof(CreateDocument)), ct);
         if (problem is not null)
             return problem;
 

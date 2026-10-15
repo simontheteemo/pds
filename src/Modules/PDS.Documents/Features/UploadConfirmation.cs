@@ -17,7 +17,7 @@ internal static class UploadConfirmation
 {
     public static async Task<(ConfirmedUpload? Upload, ValidationProblem? Problem)> ConfirmAsync(
         IFileStorage storage, long maxFileSizeBytes, ProjectId projectId, DocumentId documentId, Guid uploadId,
-        string fileName, int number, AuditStamp stamp, CancellationToken ct)
+        string fileName, int number, AuditStamp stamp, ILogger logger, CancellationToken ct)
     {
         var cleanName = FileTypes.CleanFileName(fileName);
         if (FileTypes.ContentTypeFor(cleanName) is not { } contentType)
@@ -34,7 +34,7 @@ internal static class UploadConfirmation
             : null;
         if (problem is not null)
         {
-            await storage.DeleteAsync(pendingKey, ct);
+            await DiscardPendingAsync(storage, pendingKey, logger, ct);
             return (null, problem);
         }
 

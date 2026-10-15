@@ -44,7 +44,7 @@ internal static class AddVersion
         var stamp = new AuditStamp(clock.GetUtcNow(), user.Name);
         var (upload, problem) = await UploadConfirmation.ConfirmAsync(
             storage, options.Value.MaxFileSizeBytes, pid, doc.Id, request.UploadId, request.FileName,
-            doc.CurrentVersion.Number + 1, stamp, ct);
+            doc.CurrentVersion.Number + 1, stamp, loggers.CreateLogger(nameof(AddVersion)), ct);
         if (problem is not null)
             return problem;
 

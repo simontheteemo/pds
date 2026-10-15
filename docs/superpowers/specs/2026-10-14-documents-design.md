@@ -57,7 +57,7 @@ Browser ──(1) POST /uploads {fileName,size} ──► API Lambda ── sign
 - A new module, `src/Modules/PDS.Documents`, with the same shape as Consents:
   - `Contracts/` (public) holds `DocumentId`.
   - `Domain/`, `Data/`, `Features/` and `Storage/` are internal.
-  - `DocumentsModule.cs` is public: `Tables`, `AddDocumentsModule(IConfiguration)` and `MapDocumentsEndpoints()`.
+  - `DocumentsModule.cs` is public: `Tables`, `AddDocumentsModule()` (options bind via `BindConfiguration`) and `MapDocumentsEndpoints()`.
 - It references `PDS.Portfolio` for Contracts only. Its one new package is **`AWSSDK.S3`** (4.0.103.4, the official SDK). That version uses the same `AWSSDK.Core` as the existing DynamoDB package. There's no lighter way to sign S3 URLs or call S3.
 - `Storage/IFileStorage`: `CreateUploadUrl`, `CreateDownloadUrl`, `Head`, `Copy` and `Delete`, with two implementations:
   - `S3FileStorage` (bucket from `Documents:BucketName`)
@@ -146,7 +146,7 @@ The project-scoped group is `/api/documents/projects/{projectId}/documents`, and
 
 | Method | Route | Policy | Behaviour |
 |---|---|---|---|
-| GET | `` | CanRead | 404 for an unknown project. Returns `DocumentListItem[]`, not deleted, ordered by most recent upload first |
+| GET | `` | CanRead | 404 for an unknown project. Returns `DocumentDetails[]` (including `versions[]`, which the UI uses), not deleted, ordered by most recent upload first |
 | GET | `/{documentId}` | CanRead | `DocumentDetails` (list fields + `versions[]`, newest first) or 404 (deleted → 404) |
 | POST | `/uploads` | CanWrite | Body `{ fileName, sizeBytes }`. 404 unknown project; 400 `projectId` if archived; 400 `fileName` for a disallowed type; 400 `sizeBytes` if ≤ 0 or > max. Returns `{ uploadId, uploadUrl, contentType, expiresAt }`. The client must `PUT` with exactly `Content-Type: <contentType>` |
 | POST | `` | CanWrite | Body `{ uploadId, fileName, title, category, link?, tags, notes }`. Confirms the upload and creates the document with version 1. 400 `uploadId` "The upload wasn't found or has expired. Upload the file again." when the pending object is missing; 400 `sizeBytes` if it's too large (the object is deleted). `201 DocumentDetails` |
@@ -167,7 +167,7 @@ Errors follow the ProblemDetails conventions. A 409 says "This document was chan
 
 - `Documents:Storage` is `S3` (the default) or `Local`. `Local` + a non-Development environment → startup fails with options validation.
 - `LocalFileStorage` writes to `Documents:LocalPath`, defaulting to `<temp>/pds-documents`. Each object's content type goes in a `.type` sidecar file.
-- Signed URLs are built from the request's scheme and host, so the Vite proxy works: `…/api/documents/local-files/{key}?expires=<unix>&sig=<hmac>`.
+- Signed URLs are **root-relative** (`/api/documents/local-files/{key}?expires=<unix>&sig=<hmac>`). The browser resolves them against the SPA origin, so they go through the Vite proxy and never make a cross-origin request to the API port.
   - The HMAC-SHA256 key is random per process.
   - The signature covers the method, key, expiry and content type.
 - `PUT` and `GET` on `local-files/{**key}` are mapped **only in Local mode**. They're `AllowAnonymous`, like a real presigned URL.

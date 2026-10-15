@@ -90,7 +90,7 @@ export function EditDocumentModal(props: Props) {
   const { document } = props;
   return (
     <Modal opened={document !== undefined} onClose={props.onClose} title="Edit document" size="lg">
-      {document && <EditForm key={`${document.id}-${document.version}`} {...props} document={document} />}
+      {document && <EditForm key={document.id} {...props} document={document} />}
     </Modal>
   );
 }

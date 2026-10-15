@@ -19,6 +19,7 @@ type Risk = DeepRequired<
 
 type Option = { value: string; label: string };
 const SAVED = ' (saved)';
+const MAX_LABEL = 200;
 
 function useOptions(projectId: string) {
   const api = useApi();
@@ -91,7 +92,7 @@ export function LinkedRecordSelect({ projectId, value, onChange, error }: Props)
     const recordId = next.slice(split + 1);
     const option = groups.flatMap((g) => g.items).find((o) => o.value === next);
     const label = (option?.label ?? '').replace(/ \(saved\)$/, '');
-    onChange({ module, recordId, label });
+    onChange({ module, recordId, label: label.length > MAX_LABEL ? `${label.slice(0, MAX_LABEL - 1)}…` : label });
   };
 
   return (

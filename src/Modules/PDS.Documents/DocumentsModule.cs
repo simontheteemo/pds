@@ -31,7 +31,6 @@ public static class DocumentsModule
                 "Documents:Storage=Local is only allowed when ASPNETCORE_ENVIRONMENT is Development.")
             .Validate(options => options.MaxFileSizeBytes > 0, "Documents:MaxFileSizeBytes must be positive.")
             .ValidateOnStart();
-        services.AddHttpContextAccessor();
 
         // Created lazily: Local mode and build-time OpenAPI generation never construct the S3 client.
         services.AddSingleton<IAmazonS3>(_ =>
