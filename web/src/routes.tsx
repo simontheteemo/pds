@@ -1,4 +1,5 @@
 import { Navigate, type RouteObject } from 'react-router';
+import { CostReportPage } from './features/costs/CostReportPage';
 import { ContractorCreatePage } from './features/contractors/ContractorCreatePage';
 import { ContractorDetailPage } from './features/contractors/ContractorDetailPage';
 import { ContractorEditPage } from './features/contractors/ContractorEditPage';
@@ -20,6 +21,7 @@ export const routes: RouteObject[] = [
       { path: 'projects/new', element: <ProjectCreatePage /> },
       { path: 'projects/:id', element: <ProjectDetailPage /> },
       { path: 'projects/:id/edit', element: <ProjectEditPage /> },
+      { path: 'projects/:id/costs', element: <CostReportPage /> },
       { path: 'contractors', element: <ContractorsPage /> },
       { path: 'contractors/new', element: <ContractorCreatePage /> },
       { path: 'contractors/:id', element: <ContractorDetailPage /> },
