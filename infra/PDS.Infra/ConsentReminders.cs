@@ -1,6 +1,7 @@
 using Amazon.CDK;
 using Amazon.CDK.AWS.CloudWatch;
 using Amazon.CDK.AWS.CloudWatch.Actions;
+using Amazon.CDK.AWS.Lambda;
 using Amazon.CDK.AWS.Logs;
 using Amazon.CDK.AWS.Scheduler;
 using Amazon.CDK.AWS.Scheduler.Targets;
@@ -92,6 +93,10 @@ public sealed class ConsentReminders : Construct
                 MaxEventAge = Duration.Hours(1),
             }),
         });
+
+        // Only the scheduler invokes this function asynchronously. Lambda's default async policy (2 retries, 6h max
+        // age) would otherwise stack on top of the schedule's own retries and risk a double-send or a stale digest.
+        api.ConfigureAsyncInvoke(new EventInvokeConfigOptions { RetryAttempts = 0, MaxEventAge = Duration.Hours(1) });
 
         var failures = new MetricFilter(this, "failures", new MetricFilterProps
         {

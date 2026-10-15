@@ -74,6 +74,9 @@ Set `consentReminders` in the deployment file to email a weekday digest of due c
 - `timeZone`: IANA name. Default is `locale.timeZone`.
 - `emails`: recipients, subscribed to an SNS topic named `<name>-consent-reminders`. Each recipient must click the confirmation link in the AWS subscription email before they receive digests.
 
+- "Today" in the digest always uses `locale.timeZone` (Locale:TimeZone), even when `consentReminders.timeZone` differs.
+- Every email carries SNS's unsubscribe link; an unsubscribed address must be re-subscribed (re-deploy or the SNS console).
+
 A Scheduler rule invokes the API function directly (as a system Admin principal) on `POST /api/consents/reminders/send`. Admins can see the digest content beforehand with `POST /api/consents/reminders/preview`, and trigger a send on demand with `POST /api/consents/reminders/send`. A failed send logs `ConsentReminderSendFailed`, which raises an alarm sent to `alarmEmail`. After the first deploy you can confirm the filter with "Test pattern" in the CloudWatch console.
 
 ### Adding a user

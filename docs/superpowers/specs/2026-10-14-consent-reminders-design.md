@@ -54,7 +54,7 @@ Options considered:
 
 **Route constant.** `ConsentsModule.ReminderSendPath = "/api/consents/reminders/send"` is public, and infra (which already references `PDS.Consents` for `Tables`) uses it to build the payload, so the two can't drift.
 
-**Retries.** The target uses `RetryAttempts = 2` and `MaxEventAge = 1 hour`. A digest that arrives hours late is noise, and a retry after a partial success could double-send.
+**Retries.** The target uses `RetryAttempts = 2` and `MaxEventAge = 1 hour`. A digest that arrives hours late is noise, and a retry after a partial success could double-send. The function's own async invoke config is set to 0 retries and a 1 hour max age, so Lambda's default async retries (2 retries, 6h) don't undercut this.
 
 ### 2.2 Delivery: SNS email
 

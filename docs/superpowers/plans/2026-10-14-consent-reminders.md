@@ -41,7 +41,7 @@
 2. **Not configured → never throws.** With no `ConsentReminders:TopicArn` (local dev, or reminders disabled), `/send` returns `NotConfigured` without constructing or calling the SNS client. App startup and build-time OpenAPI generation must not need AWS credentials or a region.
 3. **SNS limits.** The subject is ≤ 100 chars, ASCII, with no line breaks. Long or multi-line condition descriptions are collapsed to one line and truncated to 200 chars. More than 100 items are summarised as "…and N more". The body stays well under 256 KB.
 4. **Scheduled payload fidelity.** The synthesized schedule input must deserialize as `APIGatewayHttpApiV2ProxyRequest` and reach `POST /api/consents/reminders/send` as an authenticated Admin in Gateway mode. A bad path, method, stage or claims shape returns a silent 401/404 that nobody sees. Verify end to end with the fake Runtime API (Task 3).
-5. **Failure visibility.** Any exception in send logs EventId name `ConsentReminderSendFailed` at Error before it propagates, and the metric filter pattern matches Serilog's compact JSON (`"EventId":{"Id":…,"Name":"ConsentReminderSendFailed"}`).
+5. **Failure visibility.** Any exception in send logs EventId name `ConsentReminderSendFailed` at Error before it propagates, and the metric filter pattern matches Serilog's compact JSON (`"EventId":{"Id":…,"Name":"ConsentReminderSendFailed"}`). (Superseded by ruling: the filter is a term match on `ConsentReminderSendFailed`; see spec §2.4.)
 
 ---
 
@@ -586,7 +586,7 @@ if (settings.ConsentReminders is { Enabled: true } reminders)
   - `AWS::Scheduler::Schedule` with `ScheduleExpressionTimezone: Pacific/Auckland`, the cron, `RetryPolicy`, and `Target.Input` containing `"rawPath":"/api/consents/reminders/send"`
   - the API function env has `ConsentReminders__TopicArn` and `ConsentReminders__AppUrl`
   - an `sns:Publish` statement in the function's policy
-  - an `AWS::Logs::MetricFilter` with pattern `{ $.EventId.Name = "ConsentReminderSendFailed" }`, plus its alarm
+  - an `AWS::Logs::MetricFilter` with pattern `{ $.EventId.Name = "ConsentReminderSendFailed" }`, plus its alarm (Superseded by ruling: the filter is a term match on `ConsentReminderSendFailed`; see spec §2.4.)
 
   Then copy the deployment file to a scratch name with `"enabled": false` (in `infra/deployments/`, deleted afterwards and never committed) and confirm none of the above appears.
 

@@ -24,17 +24,18 @@ internal static partial class SendReminders
         try
         {
             if (!options.Value.IsConfigured)
-                return Done(log, new ReminderSendResult(ReminderSendOutcome.NotConfigured, 0, null));
+                return Done(log, new ReminderSendResult(ReminderSendOutcome.NotConfigured, 0, null), 0, 0);
 
             var (today, items) = await query.LoadAsync(ct);
             var digest = ConsentDigest.Build(today, items, CultureInfo.GetCultureInfo(locale.Value.Culture), options.Value.AppUrl);
             if (digest is null)
-                return Done(log, new ReminderSendResult(ReminderSendOutcome.NothingDue, 0, null));
+                return Done(log, new ReminderSendResult(ReminderSendOutcome.NothingDue, 0, null), 0, 0);
 
             // Resolved here, not injected, so the SNS client is never built unless we actually send.
             var sender = services.GetRequiredService<IReminderSender>();
             var messageId = await sender.PublishAsync(digest.Subject, digest.Body, ct);
-            return Done(log, new ReminderSendResult(ReminderSendOutcome.Sent, digest.ItemCount, messageId));
+            return Done(log, new ReminderSendResult(ReminderSendOutcome.Sent, digest.ItemCount, messageId),
+                digest.OverdueCount, digest.DueSoonCount);
         }
         catch (Exception ex)
         {
@@ -43,15 +44,16 @@ internal static partial class SendReminders
         }
     }
 
-    private static Ok<ReminderSendResult> Done(ILogger log, ReminderSendResult result)
+    private static Ok<ReminderSendResult> Done(ILogger log, ReminderSendResult result, int overdue, int dueSoon)
     {
-        Completed(log, result.Outcome, result.ItemCount);
+        Completed(log, result.Outcome, result.ItemCount, overdue, dueSoon);
         return TypedResults.Ok(result);
     }
 
     [LoggerMessage(EventId = 4100, EventName = "ConsentReminderSendCompleted", Level = LogLevel.Information,
-        Message = "Consent reminder digest: {Outcome} ({ItemCount} items)")]
-    private static partial void Completed(ILogger log, ReminderSendOutcome outcome, int itemCount);
+        Message = "Consent reminder digest: {Outcome} ({ItemCount} items: {OverdueCount} overdue, {DueSoonCount} due soon)")]
+    private static partial void Completed(
+        ILogger log, ReminderSendOutcome outcome, int itemCount, int overdueCount, int dueSoonCount);
 
     /// <summary>The CDK metric filter alarms on this event name; don't rename it.</summary>
     [LoggerMessage(EventId = 4101, EventName = "ConsentReminderSendFailed", Level = LogLevel.Error,
