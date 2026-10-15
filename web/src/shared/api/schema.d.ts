@@ -276,6 +276,134 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/costs/projects/{projectId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetCostReport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/costs/projects/{projectId}/lines": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["CreateBudgetLine"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/costs/projects/{projectId}/lines/standard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AddStandardBudgetLines"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/costs/projects/{projectId}/lines/{lineId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["UpdateBudgetLine"];
+        post?: never;
+        delete: operations["DeleteBudgetLine"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/costs/projects/{projectId}/commitments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["CreateCommitment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/costs/projects/{projectId}/commitments/{entryId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["UpdateCommitment"];
+        post?: never;
+        delete: operations["DeleteCommitment"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/costs/projects/{projectId}/actuals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["CreateActualCost"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/costs/projects/{projectId}/actuals/{entryId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["UpdateActualCost"];
+        post?: never;
+        delete: operations["DeleteActualCost"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/consents/projects/{projectId}/consents": {
         parameters: {
             query?: never;
@@ -456,8 +584,57 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        ActualCostDetails: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            budgetLineId: string;
+            type: components["schemas"]["ActualCostType"];
+            /** Format: uuid */
+            contractId: null | string;
+            payee: null | string;
+            description: string;
+            reference: null | string;
+            /** Format: date */
+            date: string;
+            /** Format: double */
+            amount: number;
+            currency: string;
+            notes: null | string;
+            /** Format: date-time */
+            createdAt: string;
+            createdBy: string;
+            /** Format: date-time */
+            updatedAt: string;
+            updatedBy: string;
+            /** Format: int64 */
+            version: number;
+        };
+        /** @enum {unknown} */
+        ActualCostType: "Invoice" | "Claim" | "Other";
         /** @enum {unknown} */
         AuthMode: "Gateway" | "Development";
+        BudgetLineDetails: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** Format: int32 */
+            sortOrder: number;
+            /** Format: double */
+            budgetAmount: number;
+            /** Format: double */
+            forecastRemainingAmount: null | number;
+            currency: string;
+            notes: null | string;
+            /** Format: date-time */
+            createdAt: string;
+            createdBy: string;
+            /** Format: date-time */
+            updatedAt: string;
+            updatedBy: string;
+            /** Format: int64 */
+            version: number;
+        };
         ClientAuthConfig: {
             mode: components["schemas"]["AuthMode"];
             authority: null | string;
@@ -478,6 +655,33 @@ export interface components {
             version: number;
             note: string;
         };
+        CommitmentDetails: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            budgetLineId: string;
+            type: components["schemas"]["CommitmentType"];
+            /** Format: uuid */
+            contractId: null | string;
+            description: string;
+            reference: null | string;
+            /** Format: date */
+            date: string;
+            /** Format: double */
+            amount: number;
+            currency: string;
+            notes: null | string;
+            /** Format: date-time */
+            createdAt: string;
+            createdBy: string;
+            /** Format: date-time */
+            updatedAt: string;
+            updatedBy: string;
+            /** Format: int64 */
+            version: number;
+        };
+        /** @enum {unknown} */
+        CommitmentType: "Contract" | "Variation" | "Order";
         CompleteConditionRequest: {
             /** Format: int64 */
             version: number;
@@ -657,6 +861,87 @@ export interface components {
         ContractorType: "Contractor" | "Subcontractor" | "Consultant" | "Supplier";
         /** @enum {unknown} */
         ContractStatus: "Draft" | "Active" | "PracticalCompletion" | "Complete" | "Terminated";
+        CostFiguresDto: {
+            /** Format: double */
+            budget: number;
+            /** Format: double */
+            committed: number;
+            /** Format: double */
+            actual: number;
+            /** Format: double */
+            forecastFinalCost: number;
+            /** Format: double */
+            forecastToComplete: number;
+            /** Format: double */
+            variance: number;
+        };
+        CostReportActual: {
+            entry: components["schemas"]["ActualCostDetails"];
+            budgetLineName: string;
+            contractTitle: null | string;
+            contractorName: null | string;
+        };
+        CostReportCommitment: {
+            entry: components["schemas"]["CommitmentDetails"];
+            budgetLineName: string;
+            contractTitle: null | string;
+            contractorName: null | string;
+        };
+        CostReportContract: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            contractorId: string;
+            contractorName: string;
+            title: string;
+            reference: null | string;
+            status: string;
+            /** Format: double */
+            valueAmount: null | number;
+        };
+        CostReportLine: {
+            line: components["schemas"]["BudgetLineDetails"];
+            figures: components["schemas"]["CostFiguresDto"];
+        };
+        CreateActualCostRequest: {
+            /** Format: uuid */
+            budgetLineId: null | string;
+            type: null | components["schemas"]["ActualCostType"];
+            /** Format: uuid */
+            contractId: null | string;
+            payee: null | string;
+            description: null | string;
+            reference: null | string;
+            /** Format: date */
+            date: null | string;
+            /** Format: double */
+            amount: null | number;
+            notes: null | string;
+        };
+        CreateBudgetLineRequest: {
+            name: null | string;
+            /** Format: int32 */
+            sortOrder: null | number;
+            /** Format: double */
+            budgetAmount: null | number;
+            /** Format: double */
+            forecastRemainingAmount: null | number;
+            notes: null | string;
+        };
+        CreateCommitmentRequest: {
+            /** Format: uuid */
+            budgetLineId: null | string;
+            type: null | components["schemas"]["CommitmentType"];
+            /** Format: uuid */
+            contractId: null | string;
+            description: null | string;
+            reference: null | string;
+            /** Format: date */
+            date: null | string;
+            /** Format: double */
+            amount: null | number;
+            notes: null | string;
+        };
         CreateConditionRequest: {
             reference: null | string;
             description: string;
@@ -809,6 +1094,19 @@ export interface components {
             pageSize: number;
             /** Format: int32 */
             totalCount: number;
+        };
+        ProjectCostReport: {
+            /** Format: uuid */
+            projectId: string;
+            projectCode: string;
+            projectName: string;
+            projectArchived: boolean;
+            currency: string;
+            totals: components["schemas"]["CostFiguresDto"];
+            lines: components["schemas"]["CostReportLine"][];
+            commitments: components["schemas"]["CostReportCommitment"][];
+            actuals: components["schemas"]["CostReportActual"][];
+            contracts: components["schemas"]["CostReportContract"][];
         };
         ProjectDetails: {
             /** Format: uuid */
@@ -1007,6 +1305,51 @@ export interface components {
         };
         /** @enum {unknown} */
         UnitType: "Apartment" | "Townhouse" | "House" | "Lot" | "Commercial" | "Other";
+        UpdateActualCostRequest: {
+            /** Format: uuid */
+            budgetLineId: null | string;
+            type: null | components["schemas"]["ActualCostType"];
+            /** Format: uuid */
+            contractId: null | string;
+            payee: null | string;
+            description: null | string;
+            reference: null | string;
+            /** Format: date */
+            date: null | string;
+            /** Format: double */
+            amount: null | number;
+            notes: null | string;
+            /** Format: int64 */
+            version: number;
+        };
+        UpdateBudgetLineRequest: {
+            name: null | string;
+            /** Format: int32 */
+            sortOrder: null | number;
+            /** Format: double */
+            budgetAmount: null | number;
+            /** Format: double */
+            forecastRemainingAmount: null | number;
+            notes: null | string;
+            /** Format: int64 */
+            version: number;
+        };
+        UpdateCommitmentRequest: {
+            /** Format: uuid */
+            budgetLineId: null | string;
+            type: null | components["schemas"]["CommitmentType"];
+            /** Format: uuid */
+            contractId: null | string;
+            description: null | string;
+            reference: null | string;
+            /** Format: date */
+            date: null | string;
+            /** Format: double */
+            amount: null | number;
+            notes: null | string;
+            /** Format: int64 */
+            version: number;
+        };
         UpdateConditionRequest: {
             reference: null | string;
             description: string;
@@ -2011,6 +2354,445 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ContractDetails"];
                 };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GetCostReport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectCostReport"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CreateBudgetLine: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateBudgetLineRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BudgetLineDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AddStandardBudgetLines: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BudgetLineDetails"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UpdateBudgetLine: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                lineId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBudgetLineRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BudgetLineDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    DeleteBudgetLine: {
+        parameters: {
+            query?: {
+                version?: number;
+            };
+            header?: never;
+            path: {
+                projectId: string;
+                lineId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CreateCommitment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCommitmentRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommitmentDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UpdateCommitment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                entryId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCommitmentRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommitmentDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    DeleteCommitment: {
+        parameters: {
+            query?: {
+                version?: number;
+            };
+            header?: never;
+            path: {
+                projectId: string;
+                entryId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CreateActualCost: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateActualCostRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActualCostDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UpdateActualCost: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                entryId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateActualCostRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActualCostDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    DeleteActualCost: {
+        parameters: {
+            query?: {
+                version?: number;
+            };
+            header?: never;
+            path: {
+                projectId: string;
+                entryId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Bad Request */
             400: {

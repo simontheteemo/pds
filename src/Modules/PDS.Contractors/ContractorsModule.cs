@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using PDS.Contractors.Contracts;
 using PDS.Contractors.Data;
 using PDS.Contractors.Features;
 using PDS.Shared.Data;
@@ -20,6 +21,7 @@ public static class ContractorsModule
         services.AddSingleton(ContractorsTable.Definition);
         services.AddSingleton<ContractorStore>();
         services.AddSingleton<ContractStore>();
+        services.AddSingleton<IContractQueries, ContractQueries>();
         services.AddValidatorsFromAssemblyContaining<CreateContractorValidator>(includeInternalTypes: true);
         return services;
     }

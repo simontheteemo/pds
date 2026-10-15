@@ -13,6 +13,7 @@
     <ProjectReference Include="../../src/Modules/PDS.Portfolio/PDS.Portfolio.csproj" />
     <ProjectReference Include="../../src/Modules/PDS.Risks/PDS.Risks.csproj" />
     <ProjectReference Include="../../src/Modules/PDS.Contractors/PDS.Contractors.csproj" />
+    <ProjectReference Include="../../src/Modules/PDS.Costs/PDS.Costs.csproj" />
     <ProjectReference Include="../../src/Modules/PDS.Consents/PDS.Consents.csproj" />
     <ProjectReference Include="../../src/Modules/PDS.Sales/PDS.Sales.csproj" />
   </ItemGroup>
