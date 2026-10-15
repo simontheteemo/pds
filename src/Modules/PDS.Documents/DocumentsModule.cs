@@ -45,6 +45,7 @@ public static class DocumentsModule
                 return new AmazonS3Client(RegionEndpoint.APSoutheast2);
             }
         });
+        services.AddSingleton<DocumentStore>();
         services.AddSingleton<S3FileStorage>();
         services.AddSingleton<LocalFileStorage>();
         services.AddSingleton<IFileStorage>(sp =>
@@ -65,6 +66,13 @@ public static class DocumentsModule
             .WithTags("Documents")
             .RequireAuthorization(Policies.CanRead);
         RequestUpload.Map(group);
+        ListDocuments.Map(group);
+        GetDocument.Map(group);
+        CreateDocument.Map(group);
+        AddVersion.Map(group);
+        UpdateDocument.Map(group);
+        DeleteDocument.Map(group);
+        DownloadVersion.Map(group);
 
         if (app.ServiceProvider.GetRequiredService<IOptions<DocumentsOptions>>().Value.Storage == StorageMode.Local)
             LocalFileEndpoints.Map(app);
