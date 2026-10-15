@@ -8,6 +8,7 @@ import { ProjectCreatePage } from './features/portfolio/ProjectCreatePage';
 import { ProjectDetailPage } from './features/portfolio/ProjectDetailPage';
 import { ProjectEditPage } from './features/portfolio/ProjectEditPage';
 import { ProjectsPage } from './features/portfolio/ProjectsPage';
+import { SalesPage } from './features/sales/SalesPage';
 import { AppLayout } from './shared/layout/AppLayout';
 import { NotFoundPage } from './shared/layout/NotFoundPage';
 
@@ -26,6 +27,7 @@ export const routes: RouteObject[] = [
       { path: 'contractors/:id', element: <ContractorDetailPage /> },
       { path: 'contractors/:id/edit', element: <ContractorEditPage /> },
       { path: 'consents', element: <ConsentsDuePage /> },
+      { path: 'sales', element: <SalesPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

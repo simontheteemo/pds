@@ -10,6 +10,7 @@ import { usePermissions } from '../../shared/me';
 import { ProjectContractsSection } from '../contractors/ProjectContractsSection';
 import { ProjectRisksSection } from '../risks/ProjectRisksSection';
 import { ProjectConsentsSection } from '../consents/ProjectConsentsSection';
+import { ProjectSalesSection } from '../sales/ProjectSalesSection';
 import { useProject, useSetArchived } from './api';
 import { StatusBadge } from './StatusBadge';
 import { stageLabel, type ProjectDetails } from './types';
@@ -161,6 +162,7 @@ export function ProjectDetailPage() {
       <ProjectRisksSection projectId={p.id} projectArchived={p.isArchived} />
       <ProjectContractsSection projectId={p.id} projectArchived={p.isArchived} />
       <ProjectConsentsSection projectId={p.id} projectArchived={p.isArchived} />
+      <ProjectSalesSection projectId={p.id} projectArchived={p.isArchived} />
 
       <Text size="sm" c="dimmed">
         Created by {p.createdBy} on {formatDateTime(p.createdAt, config.culture, config.timeZone)} · Last updated by{' '}

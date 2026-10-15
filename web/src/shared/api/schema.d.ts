@@ -164,6 +164,118 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/contractors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListContractors"];
+        put?: never;
+        post: operations["CreateContractor"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/contractors/{contractorId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetContractor"];
+        put: operations["UpdateContractor"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/contractors/{contractorId}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["DeactivateContractor"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/contractors/{contractorId}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ActivateContractor"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/contractors/{contractorId}/contracts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListContractorContracts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/contractors/projects/{projectId}/contracts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListProjectContracts"];
+        put?: never;
+        post: operations["CreateContract"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/contractors/projects/{projectId}/contracts/{contractId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetContract"];
+        put: operations["UpdateContract"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/consents/projects/{projectId}/consents": {
         parameters: {
             query?: never;
@@ -276,6 +388,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/sales/projects/{projectId}/units": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListUnits"];
+        put?: never;
+        post: operations["CreateUnit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sales/projects/{projectId}/units/{unitId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetUnit"];
+        put: operations["UpdateUnit"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sales/projects/{projectId}/units/{unitId}/sale": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["UpdateSale"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sales/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListSalesSummaries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -308,6 +484,8 @@ export interface components {
             /** Format: date */
             completedOn: null | string;
         };
+        /** @enum {unknown} */
+        ComplianceStatus: "Current" | "ExpiringSoon" | "Expired" | "NotRecorded";
         ConditionDetails: {
             /** Format: uuid */
             id: string;
@@ -376,6 +554,109 @@ export interface components {
         ConsentStatus: "Preparing" | "Lodged" | "InfoRequested" | "Granted" | "Declined" | "Withdrawn";
         /** @enum {unknown} */
         ConsentType: "ResourceConsent" | "SubdivisionConsent" | "BuildingConsent" | "Section224c" | "CodeComplianceCertificate" | "Other";
+        ContractDetails: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            /** Format: uuid */
+            contractorId: string;
+            contractorName: string;
+            title: string;
+            reference: null | string;
+            form: components["schemas"]["ContractForm"];
+            /** Format: double */
+            valueAmount: null | number;
+            currency: string;
+            /** Format: date */
+            startDate: null | string;
+            /** Format: date */
+            endDate: null | string;
+            /** Format: double */
+            retentionPercent: null | number;
+            status: components["schemas"]["ContractStatus"];
+            notes: null | string;
+            /** Format: date-time */
+            createdAt: string;
+            createdBy: string;
+            /** Format: date-time */
+            updatedAt: string;
+            updatedBy: string;
+            /** Format: int64 */
+            version: number;
+        };
+        /** @enum {unknown} */
+        ContractForm: "NZS3910" | "NZS3916" | "NZS3917" | "NZIASCC" | "Consultancy" | "Other";
+        ContractListItem: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            projectCode: null | string;
+            projectName: null | string;
+            /** Format: uuid */
+            contractorId: string;
+            contractorName: string;
+            title: string;
+            reference: null | string;
+            form: components["schemas"]["ContractForm"];
+            /** Format: double */
+            valueAmount: null | number;
+            currency: string;
+            /** Format: date */
+            startDate: null | string;
+            /** Format: date */
+            endDate: null | string;
+            status: components["schemas"]["ContractStatus"];
+            /** Format: int64 */
+            version: number;
+        };
+        ContractorDetails: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            type: components["schemas"]["ContractorType"];
+            trade: null | string;
+            nzbn: null | string;
+            contactName: null | string;
+            email: null | string;
+            phone: null | string;
+            address: null | string;
+            /** Format: date */
+            publicLiabilityExpiry: null | string;
+            /** Format: date */
+            professionalIndemnityExpiry: null | string;
+            licenceNumber: null | string;
+            /** Format: date */
+            licenceExpiry: null | string;
+            notes: null | string;
+            compliance: components["schemas"]["ComplianceStatus"];
+            publicLiabilityStatus: components["schemas"]["ComplianceStatus"];
+            professionalIndemnityStatus: components["schemas"]["ComplianceStatus"];
+            licenceStatus: components["schemas"]["ComplianceStatus"];
+            isActive: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            createdBy: string;
+            /** Format: date-time */
+            updatedAt: string;
+            updatedBy: string;
+            /** Format: int64 */
+            version: number;
+        };
+        ContractorListItem: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            type: components["schemas"]["ContractorType"];
+            trade: null | string;
+            compliance: components["schemas"]["ComplianceStatus"];
+            isActive: boolean;
+        };
+        /** @enum {unknown} */
+        ContractorType: "Contractor" | "Subcontractor" | "Consultant" | "Supplier";
+        /** @enum {unknown} */
+        ContractStatus: "Draft" | "Active" | "PracticalCompletion" | "Complete" | "Terminated";
         CreateConditionRequest: {
             reference: null | string;
             description: string;
@@ -394,6 +675,41 @@ export interface components {
             grantedDate: null | string;
             /** Format: date */
             expiryDate: null | string;
+            notes: null | string;
+        };
+        CreateContractorRequest: {
+            name: string;
+            type: null | components["schemas"]["ContractorType"];
+            trade: null | string;
+            nzbn: null | string;
+            contactName: null | string;
+            email: null | string;
+            phone: null | string;
+            address: null | string;
+            /** Format: date */
+            publicLiabilityExpiry: null | string;
+            /** Format: date */
+            professionalIndemnityExpiry: null | string;
+            licenceNumber: null | string;
+            /** Format: date */
+            licenceExpiry: null | string;
+            notes: null | string;
+        };
+        CreateContractRequest: {
+            /** Format: uuid */
+            contractorId: null | string;
+            title: string;
+            reference: null | string;
+            form: null | components["schemas"]["ContractForm"];
+            /** Format: double */
+            valueAmount: null | number;
+            /** Format: date */
+            startDate: null | string;
+            /** Format: date */
+            endDate: null | string;
+            /** Format: double */
+            retentionPercent: null | number;
+            status: null | components["schemas"]["ContractStatus"];
             notes: null | string;
         };
         CreateProjectRequest: {
@@ -427,6 +743,23 @@ export interface components {
             owner: null | string;
             /** Format: date */
             dueDate: null | string;
+        };
+        CreateUnitRequest: {
+            identifier: string;
+            type: null | components["schemas"]["UnitType"];
+            /** Format: int32 */
+            bedrooms: null | number;
+            /** Format: int32 */
+            bathrooms: null | number;
+            /** Format: int32 */
+            carParks: null | number;
+            /** Format: double */
+            floorAreaSqm: null | number;
+            /** Format: double */
+            landAreaSqm: null | number;
+            /** Format: double */
+            listPriceAmount: null | number;
+            notes: null | string;
         };
         DueItem: {
             kind: components["schemas"]["DueItemKind"];
@@ -524,6 +857,18 @@ export interface components {
             currency: string;
             isArchived: boolean;
         };
+        ProjectSales: {
+            summary: components["schemas"]["SalesSummary"];
+            units: components["schemas"]["UnitDetails"][];
+        };
+        ProjectSalesSummary: {
+            /** Format: uuid */
+            projectId: string;
+            projectCode: string;
+            projectName: string;
+            projectArchived: boolean;
+            summary: components["schemas"]["SalesSummary"];
+        };
         /** @enum {unknown} */
         ProjectStage: "Acquisition" | "Feasibility" | "Design" | "Consenting" | "Construction" | "Sales" | "Completed";
         /** @enum {unknown} */
@@ -575,6 +920,35 @@ export interface components {
         };
         /** @enum {unknown} */
         RiskStatus: "Open" | "Mitigating" | "Closed";
+        SalesSummary: {
+            /** Format: int32 */
+            totalUnits: number;
+            /** Format: int32 */
+            available: number;
+            /** Format: int32 */
+            reserved: number;
+            /** Format: int32 */
+            conditional: number;
+            /** Format: int32 */
+            unconditional: number;
+            /** Format: int32 */
+            settled: number;
+            /** Format: int32 */
+            withdrawn: number;
+            /** Format: double */
+            listValue: number;
+            /** Format: double */
+            contractedValue: number;
+            /** Format: double */
+            settledValue: number;
+            currency: string;
+        };
+        /** @enum {unknown} */
+        SaleStatus: "Available" | "Reserved" | "Conditional" | "Unconditional" | "Settled" | "Withdrawn";
+        SetActiveRequest: {
+            /** Format: int64 */
+            version: number;
+        };
         SiteDto: {
             addressLine: string;
             suburb: null | string;
@@ -586,6 +960,53 @@ export interface components {
             /** Format: double */
             landAreaSqm: null | number;
         };
+        UnitDetails: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            identifier: string;
+            type: components["schemas"]["UnitType"];
+            /** Format: int32 */
+            bedrooms: null | number;
+            /** Format: int32 */
+            bathrooms: null | number;
+            /** Format: int32 */
+            carParks: null | number;
+            /** Format: double */
+            floorAreaSqm: null | number;
+            /** Format: double */
+            landAreaSqm: null | number;
+            /** Format: double */
+            listPriceAmount: null | number;
+            notes: null | string;
+            status: components["schemas"]["SaleStatus"];
+            buyerName: null | string;
+            buyerEmail: null | string;
+            buyerPhone: null | string;
+            buyerSolicitor: null | string;
+            /** Format: date */
+            agreementDate: null | string;
+            /** Format: double */
+            salePriceAmount: null | number;
+            /** Format: double */
+            depositAmount: null | number;
+            /** Format: date */
+            unconditionalDate: null | string;
+            /** Format: date */
+            settlementDate: null | string;
+            currency: string;
+            /** Format: date-time */
+            createdAt: string;
+            createdBy: string;
+            /** Format: date-time */
+            updatedAt: string;
+            updatedBy: string;
+            /** Format: int64 */
+            version: number;
+        };
+        /** @enum {unknown} */
+        UnitType: "Apartment" | "Townhouse" | "House" | "Lot" | "Commercial" | "Other";
         UpdateConditionRequest: {
             reference: null | string;
             description: string;
@@ -606,6 +1027,45 @@ export interface components {
             grantedDate: null | string;
             /** Format: date */
             expiryDate: null | string;
+            notes: null | string;
+            /** Format: int64 */
+            version: number;
+        };
+        UpdateContractorRequest: {
+            name: string;
+            type: null | components["schemas"]["ContractorType"];
+            trade: null | string;
+            nzbn: null | string;
+            contactName: null | string;
+            email: null | string;
+            phone: null | string;
+            address: null | string;
+            /** Format: date */
+            publicLiabilityExpiry: null | string;
+            /** Format: date */
+            professionalIndemnityExpiry: null | string;
+            licenceNumber: null | string;
+            /** Format: date */
+            licenceExpiry: null | string;
+            notes: null | string;
+            /** Format: int64 */
+            version: number;
+        };
+        UpdateContractRequest: {
+            /** Format: uuid */
+            contractorId: null | string;
+            title: string;
+            reference: null | string;
+            form: null | components["schemas"]["ContractForm"];
+            /** Format: double */
+            valueAmount: null | number;
+            /** Format: date */
+            startDate: null | string;
+            /** Format: date */
+            endDate: null | string;
+            /** Format: double */
+            retentionPercent: null | number;
+            status: null | components["schemas"]["ContractStatus"];
             notes: null | string;
             /** Format: int64 */
             version: number;
@@ -644,6 +1104,44 @@ export interface components {
             /** Format: date */
             dueDate: null | string;
             status: null | components["schemas"]["RiskStatus"];
+            /** Format: int64 */
+            version: number;
+        };
+        UpdateSaleRequest: {
+            status: null | components["schemas"]["SaleStatus"];
+            buyerName: null | string;
+            buyerEmail: null | string;
+            buyerPhone: null | string;
+            buyerSolicitor: null | string;
+            /** Format: date */
+            agreementDate: null | string;
+            /** Format: double */
+            salePriceAmount: null | number;
+            /** Format: double */
+            depositAmount: null | number;
+            /** Format: date */
+            unconditionalDate: null | string;
+            /** Format: date */
+            settlementDate: null | string;
+            /** Format: int64 */
+            version: number;
+        };
+        UpdateUnitRequest: {
+            identifier: string;
+            type: null | components["schemas"]["UnitType"];
+            /** Format: int32 */
+            bedrooms: null | number;
+            /** Format: int32 */
+            bathrooms: null | number;
+            /** Format: int32 */
+            carParks: null | number;
+            /** Format: double */
+            floorAreaSqm: null | number;
+            /** Format: double */
+            landAreaSqm: null | number;
+            /** Format: double */
+            listPriceAmount: null | number;
+            notes: null | string;
             /** Format: int64 */
             version: number;
         };
@@ -1138,6 +1636,400 @@ export interface operations {
             };
         };
     };
+    ListContractors: {
+        parameters: {
+            query?: {
+                search?: string;
+                type?: components["schemas"]["ContractorType"];
+                includeInactive?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContractorListItem"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+        };
+    };
+    CreateContractor: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateContractorRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContractorDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+        };
+    };
+    GetContractor: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contractorId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContractorDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UpdateContractor: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contractorId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateContractorRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContractorDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    DeactivateContractor: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contractorId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetActiveRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContractorDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ActivateContractor: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contractorId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetActiveRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContractorDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ListContractorContracts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contractorId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContractListItem"][];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ListProjectContracts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContractListItem"][];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CreateContract: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateContractRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContractDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GetContract: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                contractId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContractDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UpdateContract: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                contractId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateContractRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContractDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     ListConsents: {
         parameters: {
             query?: never;
@@ -1473,6 +2365,213 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DueItem"][];
+                };
+            };
+        };
+    };
+    ListUnits: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectSales"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CreateUnit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateUnitRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnitDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GetUnit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                unitId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnitDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UpdateUnit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                unitId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateUnitRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnitDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UpdateSale: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                unitId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateSaleRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnitDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ListSalesSummaries: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectSalesSummary"][];
                 };
             };
         };

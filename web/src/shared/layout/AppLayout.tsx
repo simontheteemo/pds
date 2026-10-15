@@ -55,6 +55,7 @@ export function AppLayout() {
         <NavLink component={RouterNavLink} to="/projects" label="Projects" onClick={close} />
         <NavLink component={RouterNavLink} to="/contractors" label="Contractors" onClick={close} />
         <NavLink component={RouterNavLink} to="/consents" label="Consents" onClick={close} />
+        <NavLink component={RouterNavLink} to="/sales" label="Sales" onClick={close} />
       </AppShell.Navbar>
       <AppShell.Main>
         {noGroup ? (

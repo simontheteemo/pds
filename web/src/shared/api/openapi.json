@@ -659,6 +659,524 @@
         }
       }
     },
+    "/api/contractors": {
+      "get": {
+        "tags": [
+          "Contractors"
+        ],
+        "operationId": "ListContractors",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/ContractorType"
+            }
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContractorListItem"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Contractors"
+        ],
+        "operationId": "CreateContractor",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateContractorRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractorDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contractors/{contractorId}": {
+      "get": {
+        "tags": [
+          "Contractors"
+        ],
+        "operationId": "GetContractor",
+        "parameters": [
+          {
+            "name": "contractorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractorDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Contractors"
+        ],
+        "operationId": "UpdateContractor",
+        "parameters": [
+          {
+            "name": "contractorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateContractorRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractorDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contractors/{contractorId}/deactivate": {
+      "post": {
+        "tags": [
+          "Contractors"
+        ],
+        "operationId": "DeactivateContractor",
+        "parameters": [
+          {
+            "name": "contractorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetActiveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractorDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contractors/{contractorId}/activate": {
+      "post": {
+        "tags": [
+          "Contractors"
+        ],
+        "operationId": "ActivateContractor",
+        "parameters": [
+          {
+            "name": "contractorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetActiveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractorDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contractors/{contractorId}/contracts": {
+      "get": {
+        "tags": [
+          "Contractors"
+        ],
+        "operationId": "ListContractorContracts",
+        "parameters": [
+          {
+            "name": "contractorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContractListItem"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/contractors/projects/{projectId}/contracts": {
+      "get": {
+        "tags": [
+          "Contracts"
+        ],
+        "operationId": "ListProjectContracts",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContractListItem"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Contracts"
+        ],
+        "operationId": "CreateContract",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateContractRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contractors/projects/{projectId}/contracts/{contractId}": {
+      "get": {
+        "tags": [
+          "Contracts"
+        ],
+        "operationId": "GetContract",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "contractId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Contracts"
+        ],
+        "operationId": "UpdateContract",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "contractId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateContractRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/consents/projects/{projectId}/consents": {
       "get": {
         "tags": [
@@ -1153,6 +1671,282 @@
           }
         }
       }
+    },
+    "/api/sales/projects/{projectId}/units": {
+      "get": {
+        "tags": [
+          "Sales"
+        ],
+        "operationId": "ListUnits",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectSales"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Sales"
+        ],
+        "operationId": "CreateUnit",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUnitRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sales/projects/{projectId}/units/{unitId}": {
+      "get": {
+        "tags": [
+          "Sales"
+        ],
+        "operationId": "GetUnit",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "unitId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Sales"
+        ],
+        "operationId": "UpdateUnit",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "unitId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUnitRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sales/projects/{projectId}/units/{unitId}/sale": {
+      "put": {
+        "tags": [
+          "Sales"
+        ],
+        "operationId": "UpdateSale",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "unitId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSaleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sales/summary": {
+      "get": {
+        "tags": [
+          "Sales"
+        ],
+        "operationId": "ListSalesSummaries",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectSalesSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1268,6 +2062,14 @@
             "format": "date"
           }
         }
+      },
+      "ComplianceStatus": {
+        "enum": [
+          "Current",
+          "ExpiringSoon",
+          "Expired",
+          "NotRecorded"
+        ]
       },
       "ConditionDetails": {
         "required": [
@@ -1516,6 +2318,414 @@
           "Other"
         ]
       },
+      "ContractDetails": {
+        "required": [
+          "id",
+          "projectId",
+          "contractorId",
+          "contractorName",
+          "title",
+          "reference",
+          "form",
+          "valueAmount",
+          "currency",
+          "startDate",
+          "endDate",
+          "retentionPercent",
+          "status",
+          "notes",
+          "createdAt",
+          "createdBy",
+          "updatedAt",
+          "updatedBy",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "contractorId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "contractorName": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "reference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "form": {
+            "$ref": "#/components/schemas/ContractForm"
+          },
+          "valueAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "endDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "retentionPercent": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ContractStatus"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedBy": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ContractForm": {
+        "enum": [
+          "NZS3910",
+          "NZS3916",
+          "NZS3917",
+          "NZIASCC",
+          "Consultancy",
+          "Other"
+        ]
+      },
+      "ContractListItem": {
+        "required": [
+          "id",
+          "projectId",
+          "projectCode",
+          "projectName",
+          "contractorId",
+          "contractorName",
+          "title",
+          "reference",
+          "form",
+          "valueAmount",
+          "currency",
+          "startDate",
+          "endDate",
+          "status",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "projectName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "contractorId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "contractorName": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "reference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "form": {
+            "$ref": "#/components/schemas/ContractForm"
+          },
+          "valueAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "endDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ContractStatus"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ContractorDetails": {
+        "required": [
+          "id",
+          "name",
+          "type",
+          "trade",
+          "nzbn",
+          "contactName",
+          "email",
+          "phone",
+          "address",
+          "publicLiabilityExpiry",
+          "professionalIndemnityExpiry",
+          "licenceNumber",
+          "licenceExpiry",
+          "notes",
+          "compliance",
+          "publicLiabilityStatus",
+          "professionalIndemnityStatus",
+          "licenceStatus",
+          "isActive",
+          "createdAt",
+          "createdBy",
+          "updatedAt",
+          "updatedBy",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ContractorType"
+          },
+          "trade": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "nzbn": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "contactName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "address": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "publicLiabilityExpiry": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "professionalIndemnityExpiry": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "licenceNumber": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "licenceExpiry": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "compliance": {
+            "$ref": "#/components/schemas/ComplianceStatus"
+          },
+          "publicLiabilityStatus": {
+            "$ref": "#/components/schemas/ComplianceStatus"
+          },
+          "professionalIndemnityStatus": {
+            "$ref": "#/components/schemas/ComplianceStatus"
+          },
+          "licenceStatus": {
+            "$ref": "#/components/schemas/ComplianceStatus"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedBy": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ContractorListItem": {
+        "required": [
+          "id",
+          "name",
+          "type",
+          "trade",
+          "compliance",
+          "isActive"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ContractorType"
+          },
+          "trade": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "compliance": {
+            "$ref": "#/components/schemas/ComplianceStatus"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ContractorType": {
+        "enum": [
+          "Contractor",
+          "Subcontractor",
+          "Consultant",
+          "Supplier"
+        ]
+      },
+      "ContractStatus": {
+        "enum": [
+          "Draft",
+          "Active",
+          "PracticalCompletion",
+          "Complete",
+          "Terminated"
+        ]
+      },
       "CreateConditionRequest": {
         "required": [
           "reference",
@@ -1611,6 +2821,195 @@
               "string"
             ],
             "format": "date"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "CreateContractorRequest": {
+        "required": [
+          "name",
+          "type",
+          "trade",
+          "nzbn",
+          "contactName",
+          "email",
+          "phone",
+          "address",
+          "publicLiabilityExpiry",
+          "professionalIndemnityExpiry",
+          "licenceNumber",
+          "licenceExpiry",
+          "notes"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ContractorType"
+              }
+            ]
+          },
+          "trade": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "nzbn": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "contactName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "address": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "publicLiabilityExpiry": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "professionalIndemnityExpiry": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "licenceNumber": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "licenceExpiry": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "CreateContractRequest": {
+        "required": [
+          "contractorId",
+          "title",
+          "reference",
+          "form",
+          "valueAmount",
+          "startDate",
+          "endDate",
+          "retentionPercent",
+          "status",
+          "notes"
+        ],
+        "type": "object",
+        "properties": {
+          "contractorId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "reference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "form": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ContractForm"
+              }
+            ]
+          },
+          "valueAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "startDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "endDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "retentionPercent": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "status": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ContractStatus"
+              }
+            ]
           },
           "notes": {
             "type": [
@@ -1779,6 +3178,83 @@
               "string"
             ],
             "format": "date"
+          }
+        }
+      },
+      "CreateUnitRequest": {
+        "required": [
+          "identifier",
+          "type",
+          "bedrooms",
+          "bathrooms",
+          "carParks",
+          "floorAreaSqm",
+          "landAreaSqm",
+          "listPriceAmount",
+          "notes"
+        ],
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string"
+          },
+          "type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/UnitType"
+              }
+            ]
+          },
+          "bedrooms": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "bathrooms": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "carParks": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "floorAreaSqm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "landAreaSqm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "listPriceAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -2152,6 +3628,52 @@
           }
         }
       },
+      "ProjectSales": {
+        "required": [
+          "summary",
+          "units"
+        ],
+        "type": "object",
+        "properties": {
+          "summary": {
+            "$ref": "#/components/schemas/SalesSummary"
+          },
+          "units": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnitDetails"
+            }
+          }
+        }
+      },
+      "ProjectSalesSummary": {
+        "required": [
+          "projectId",
+          "projectCode",
+          "projectName",
+          "projectArchived",
+          "summary"
+        ],
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectCode": {
+            "type": "string"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "projectArchived": {
+            "type": "boolean"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/SalesSummary"
+          }
+        }
+      },
       "ProjectStage": {
         "enum": [
           "Acquisition",
@@ -2347,6 +3869,89 @@
           "Closed"
         ]
       },
+      "SalesSummary": {
+        "required": [
+          "totalUnits",
+          "available",
+          "reserved",
+          "conditional",
+          "unconditional",
+          "settled",
+          "withdrawn",
+          "listValue",
+          "contractedValue",
+          "settledValue",
+          "currency"
+        ],
+        "type": "object",
+        "properties": {
+          "totalUnits": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "available": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "reserved": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "conditional": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "unconditional": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "settled": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "withdrawn": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "listValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "contractedValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "settledValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          }
+        }
+      },
+      "SaleStatus": {
+        "enum": [
+          "Available",
+          "Reserved",
+          "Conditional",
+          "Unconditional",
+          "Settled",
+          "Withdrawn"
+        ]
+      },
+      "SetActiveRequest": {
+        "required": [
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "SiteDto": {
         "required": [
           "addressLine",
@@ -2404,6 +4009,195 @@
             "format": "double"
           }
         }
+      },
+      "UnitDetails": {
+        "required": [
+          "id",
+          "projectId",
+          "identifier",
+          "type",
+          "bedrooms",
+          "bathrooms",
+          "carParks",
+          "floorAreaSqm",
+          "landAreaSqm",
+          "listPriceAmount",
+          "notes",
+          "status",
+          "buyerName",
+          "buyerEmail",
+          "buyerPhone",
+          "buyerSolicitor",
+          "agreementDate",
+          "salePriceAmount",
+          "depositAmount",
+          "unconditionalDate",
+          "settlementDate",
+          "currency",
+          "createdAt",
+          "createdBy",
+          "updatedAt",
+          "updatedBy",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "identifier": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/UnitType"
+          },
+          "bedrooms": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "bathrooms": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "carParks": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "floorAreaSqm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "landAreaSqm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "listPriceAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/SaleStatus"
+          },
+          "buyerName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buyerEmail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buyerPhone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buyerSolicitor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "agreementDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "salePriceAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "depositAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "unconditionalDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "settlementDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedBy": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "UnitType": {
+        "enum": [
+          "Apartment",
+          "Townhouse",
+          "House",
+          "Lot",
+          "Commercial",
+          "Other"
+        ]
       },
       "UpdateConditionRequest": {
         "required": [
@@ -2506,6 +4300,205 @@
               "string"
             ],
             "format": "date"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "UpdateContractorRequest": {
+        "required": [
+          "name",
+          "type",
+          "trade",
+          "nzbn",
+          "contactName",
+          "email",
+          "phone",
+          "address",
+          "publicLiabilityExpiry",
+          "professionalIndemnityExpiry",
+          "licenceNumber",
+          "licenceExpiry",
+          "notes",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ContractorType"
+              }
+            ]
+          },
+          "trade": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "nzbn": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "contactName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "address": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "publicLiabilityExpiry": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "professionalIndemnityExpiry": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "licenceNumber": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "licenceExpiry": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "UpdateContractRequest": {
+        "required": [
+          "contractorId",
+          "title",
+          "reference",
+          "form",
+          "valueAmount",
+          "startDate",
+          "endDate",
+          "retentionPercent",
+          "status",
+          "notes",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "contractorId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "reference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "form": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ContractForm"
+              }
+            ]
+          },
+          "valueAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "startDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "endDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "retentionPercent": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "status": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ContractStatus"
+              }
+            ]
           },
           "notes": {
             "type": [
@@ -2702,6 +4695,179 @@
           }
         }
       },
+      "UpdateSaleRequest": {
+        "required": [
+          "status",
+          "buyerName",
+          "buyerEmail",
+          "buyerPhone",
+          "buyerSolicitor",
+          "agreementDate",
+          "salePriceAmount",
+          "depositAmount",
+          "unconditionalDate",
+          "settlementDate",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/SaleStatus"
+              }
+            ]
+          },
+          "buyerName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buyerEmail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buyerPhone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buyerSolicitor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "agreementDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "salePriceAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "depositAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "unconditionalDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "settlementDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "UpdateUnitRequest": {
+        "required": [
+          "identifier",
+          "type",
+          "bedrooms",
+          "bathrooms",
+          "carParks",
+          "floorAreaSqm",
+          "landAreaSqm",
+          "listPriceAmount",
+          "notes",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string"
+          },
+          "type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/UnitType"
+              }
+            ]
+          },
+          "bedrooms": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "bathrooms": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "carParks": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "floorAreaSqm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "landAreaSqm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "listPriceAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "VersionRequest": {
         "required": [
           "version"
@@ -2727,7 +4893,16 @@
       "name": "Risks"
     },
     {
+      "name": "Contractors"
+    },
+    {
+      "name": "Contracts"
+    },
+    {
       "name": "Consents"
+    },
+    {
+      "name": "Sales"
     }
   ]
 }
