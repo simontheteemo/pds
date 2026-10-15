@@ -7,9 +7,11 @@
     <Project Path="src/PDS.Shared/PDS.Shared.csproj" />
   </Folder>
   <Folder Name="/src/Modules/">
+    <Project Path="src/Modules/PDS.Cashflow/PDS.Cashflow.csproj" />
     <Project Path="src/Modules/PDS.Consents/PDS.Consents.csproj" />
     <Project Path="src/Modules/PDS.Contractors/PDS.Contractors.csproj" />
     <Project Path="src/Modules/PDS.Costs/PDS.Costs.csproj" />
+    <Project Path="src/Modules/PDS.Documents/PDS.Documents.csproj" />
     <Project Path="src/Modules/PDS.Portfolio/PDS.Portfolio.csproj" />
     <Project Path="src/Modules/PDS.Reporting/PDS.Reporting.csproj" />
     <Project Path="src/Modules/PDS.Risks/PDS.Risks.csproj" />

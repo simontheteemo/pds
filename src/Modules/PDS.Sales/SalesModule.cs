@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using PDS.Reporting.Contracts;
+using PDS.Sales.Contracts;
 using PDS.Sales.Data;
 using PDS.Sales.Features;
 using PDS.Shared.Data;
@@ -21,6 +22,7 @@ public static class SalesModule
         services.AddSingleton(SalesTable.Definition);
         services.AddSingleton<UnitStore>();
         services.AddScoped<IExportDataset, UnitsExport>();
+        services.AddSingleton<ISalesQueries, SalesQueries>();
         services.AddValidatorsFromAssemblyContaining<CreateUnitValidator>(includeInternalTypes: true);
         return services;
     }

@@ -63,6 +63,7 @@ public sealed class AppStack : Stack
             ],
         });
         var siteUrl = $"https://{cdn.DistributionDomainName}";
+        var documents = new DocumentsBucket(this, "documents", settings, siteUrl);
 
         // Sign-in client for the SPA (authorization code + PKCE, no secret)
         var client = new UserPoolClient(this, "spa-client", new UserPoolClientProps
@@ -104,6 +105,7 @@ public sealed class AppStack : Stack
             environment["Branding__LogoUrl"] = logoUrl;
         foreach (var (logicalName, table) in tables)
             environment[$"Tables__{logicalName}"] = table.TableName;
+        environment["Documents__BucketName"] = documents.Bucket.BucketName;
 
         var api = new LambdaFunction(this, "api", new LambdaFunctionProps
         {
@@ -124,6 +126,7 @@ public sealed class AppStack : Stack
         });
         foreach (var table in tables.Values)
             table.GrantReadWriteData(api);
+        documents.GrantApi(api);
 
         // HTTP API: /api/config is public; everything else requires a Cognito ID token for this client
         var integration = new HttpLambdaIntegration("api-integration", api);
@@ -218,6 +221,7 @@ public sealed class AppStack : Stack
         });
 
         _ = new CfnOutput(this, "SiteUrl", new CfnOutputProps { Value = siteUrl });
+        _ = new CfnOutput(this, "DocumentsBucket", new CfnOutputProps { Value = documents.Bucket.BucketName });
         _ = new CfnOutput(this, "ApiUrl", new CfnOutputProps { Value = httpApi.ApiEndpoint });
         _ = new CfnOutput(this, "UserPoolId", new CfnOutputProps { Value = userPool.UserPoolId });
     }

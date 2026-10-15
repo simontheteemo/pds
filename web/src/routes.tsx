@@ -25,6 +25,7 @@ export const routes: RouteObject[] = [
       { path: 'projects/:id', element: <ProjectDetailPage /> },
       { path: 'projects/:id/edit', element: <ProjectEditPage /> },
       { path: 'projects/:id/costs', element: <CostReportPage /> },
+      { path: 'projects/:id/cashflow', lazy: async () => ({ Component: (await import('./features/cashflow/CashflowPage')).CashflowPage }) },
       { path: 'contractors', element: <ContractorsPage /> },
       { path: 'contractors/new', element: <ContractorCreatePage /> },
       { path: 'contractors/:id', element: <ContractorDetailPage /> },
