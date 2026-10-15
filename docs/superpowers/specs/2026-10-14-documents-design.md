@@ -191,7 +191,7 @@ Errors follow the ProblemDetails conventions. A 409 says "This document was chan
 - **Edit modal:** the same metadata fields, without the file.
 - **New version modal:** a file input only.
 - **Versions modal:** a table of v#, file name, size, uploaded (date · by), and Download.
-- **Errors:** a 400 maps onto fields, an unmapped key goes to a top alert, and a 409 shows a toast, closes the modal and refreshes. This is the risks/consents helper, copied into the feature as `documentMutationError.ts`, because the shared helper cleanup hasn't landed.
+- **Errors:** a 400 maps onto fields, an unmapped key goes to a top alert, and a 409 shows a toast, closes the modal and refreshes. This uses the shared `handleMutationError` from `web/src/shared/mutationError.ts`, which landed on main before this module's web tasks.
 
 ## 6. Out of scope (v1)
 
