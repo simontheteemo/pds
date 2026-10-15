@@ -1947,6 +1947,80 @@
           }
         }
       }
+    },
+    "/api/documents/settings": {
+      "get": {
+        "tags": [
+          "Documents"
+        ],
+        "operationId": "GetDocumentSettings",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentSettings"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/documents/projects/{projectId}/documents/uploads": {
+      "post": {
+        "tags": [
+          "Documents"
+        ],
+        "operationId": "RequestDocumentUpload",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestUploadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadTicket"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3258,6 +3332,32 @@
           }
         }
       },
+      "DocumentSettings": {
+        "required": [
+          "categories",
+          "maxFileSizeBytes",
+          "allowedExtensions"
+        ],
+        "type": "object",
+        "properties": {
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "maxFileSizeBytes": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "allowedExtensions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "DueItem": {
         "required": [
           "kind",
@@ -3713,6 +3813,22 @@
         "type": "object",
         "properties": {
           "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "RequestUploadRequest": {
+        "required": [
+          "fileName",
+          "sizeBytes"
+        ],
+        "type": "object",
+        "properties": {
+          "fileName": {
+            "type": "string"
+          },
+          "sizeBytes": {
             "type": "integer",
             "format": "int64"
           }
@@ -4868,6 +4984,31 @@
           }
         }
       },
+      "UploadTicket": {
+        "required": [
+          "uploadId",
+          "uploadUrl",
+          "contentType",
+          "expiresAt"
+        ],
+        "type": "object",
+        "properties": {
+          "uploadId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "uploadUrl": {
+            "type": "string"
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "VersionRequest": {
         "required": [
           "version"
@@ -4903,6 +5044,9 @@
     },
     {
       "name": "Sales"
+    },
+    {
+      "name": "Documents"
     }
   ]
 }

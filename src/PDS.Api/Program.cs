@@ -4,6 +4,7 @@ using PDS.Api;
 using PDS.Api.Security;
 using PDS.Consents;
 using PDS.Contractors;
+using PDS.Documents;
 using PDS.Portfolio;
 using PDS.Risks;
 using PDS.Sales;
@@ -45,6 +46,7 @@ builder.Services.AddRisksModule();
 builder.Services.AddContractorsModule();
 builder.Services.AddConsentsModule();
 builder.Services.AddSalesModule();
+builder.Services.AddDocumentsModule();
 
 var app = builder.Build();
 
@@ -72,6 +74,7 @@ app.MapRisksEndpoints();
 app.MapContractorsEndpoints();
 app.MapConsentsEndpoints();
 app.MapSalesEndpoints();
+app.MapDocumentsEndpoints();
 
 await app.RunAsync();
 

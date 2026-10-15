@@ -21,6 +21,7 @@
     <ProjectReference Include="../Modules/PDS.Contractors/PDS.Contractors.csproj" />
     <ProjectReference Include="../Modules/PDS.Consents/PDS.Consents.csproj" />
     <ProjectReference Include="../Modules/PDS.Sales/PDS.Sales.csproj" />
+    <ProjectReference Include="../Modules/PDS.Documents/PDS.Documents.csproj" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="PDS.Tests" />
