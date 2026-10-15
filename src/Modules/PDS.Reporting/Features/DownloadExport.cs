@@ -14,8 +14,9 @@ internal static class DownloadExport
 {
     public const string CsvContentType = "text/csv; charset=utf-8";
 
-    // API Gateway/Lambda buffered response limit is 6 MB including JSON-envelope escaping, so headroom is kept.
-    internal const int MaxExportBytes = 5_500_000;
+    // API Gateway/Lambda buffered response limit is 6 MB including the JSON envelope, where CSV quotes and
+    // newlines are escaped (\" and \n add a byte each), so keep ~1 MB of headroom.
+    internal const int MaxExportBytes = 5_000_000;
 
     public static void Map(RouteGroupBuilder group) =>
         group.MapGet("/{name}", Handle)
