@@ -1,12 +1,12 @@
 import { Button, Group, Modal, Select, Stack, Table, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useState } from 'react';
-import { ApiError } from '../../shared/api/client';
 import { useConfig } from '../../shared/config';
-import { formatDate, formatMoney } from '../../shared/format';
+import { formatDate, formatMoney, joinLabel } from '../../shared/format';
 import { usePermissions } from '../../shared/me';
 import { CostEntryFormModal, type CostEntry } from './CostEntryFormModal';
 import type { CostEntryKind } from './costEntryFormModel';
+import { showDeleteError } from './deleteErrorToast';
 import {
   actualCostTypeLabel,
   commitmentTypeLabel,
@@ -35,6 +35,9 @@ export function CostEntriesTab({ kind, report, rows, deleteEntry }: Props) {
   const { culture } = useConfig();
   const { canWrite, canAdminister } = usePermissions();
   const [lineFilter, setLineFilter] = useState<string | null>(null);
+  // A filter on a line that no longer exists (e.g. deleted) is treated as "all lines".
+  const effectiveFilter = lineFilter && report.lines.some(({ line }) => line.id === lineFilter) ? lineFilter : null;
+  if (lineFilter !== effectiveFilter) setLineFilter(effectiveFilter);
   const [editing, setEditing] = useState<CostEntry | 'new' | undefined>(undefined);
   const [deleting, setDeleting] = useState<CostEntry | undefined>(undefined);
   const isActual = kind === 'actual';
@@ -46,7 +49,7 @@ export function CostEntriesTab({ kind, report, rows, deleteEntry }: Props) {
   const labels: Record<string, string> = isActual ? actualCostTypeLabel : commitmentTypeLabel;
   const typeLabel = (type: string): string => labels[type] ?? type;
 
-  const filtered = lineFilter ? rows.filter((r) => r.entry.budgetLineId === lineFilter) : rows;
+  const filtered = effectiveFilter ? rows.filter((r) => r.entry.budgetLineId === effectiveFilter) : rows;
   const total = Math.round(filtered.reduce((sum, r) => sum + r.entry.amount, 0) * 100) / 100;
   const colCount = (isActual ? 8 : 7) + (showActions ? 1 : 0);
   const amountCell = (n: number, th = false) => {
@@ -68,17 +71,7 @@ export function CostEntriesTab({ kind, report, rows, deleteEntry }: Props) {
           setDeleting(undefined);
         },
         onError: (error) => {
-          const conflict = error instanceof ApiError && error.status === 409;
-          notifications.show({
-            color: conflict ? 'yellow' : 'red',
-            title: conflict ? 'This item was changed by someone else' : `Could not delete the ${noun}`,
-            message:
-              error instanceof ApiError && error.status === 400 && error.problem?.errors
-                ? Object.values(error.problem.errors).flat().join(' ')
-                : conflict
-                  ? 'The cost report now shows the latest version. Open it again to make your changes.'
-                  : error.message,
-          });
+          showDeleteError(error, noun);
           setDeleting(undefined);
         },
       },
@@ -92,7 +85,7 @@ export function CostEntriesTab({ kind, report, rows, deleteEntry }: Props) {
           label="Budget line"
           placeholder="All lines"
           clearable
-          value={lineFilter}
+          value={effectiveFilter}
           onChange={setLineFilter}
           data={report.lines.map(({ line }) => ({ value: line.id, label: line.name }))}
         />
@@ -100,7 +93,16 @@ export function CostEntriesTab({ kind, report, rows, deleteEntry }: Props) {
       </Group>
 
       {filtered.length === 0 ? (
-        <Text c="dimmed">{isActual ? 'No actuals recorded.' : 'No commitments recorded.'}</Text>
+        rows.length > 0 ? (
+          <Group gap="xs">
+            <Text c="dimmed">No {isActual ? 'actuals' : 'commitments'} on this budget line.</Text>
+            <Button size="compact-sm" variant="subtle" onClick={() => setLineFilter(null)}>
+              Show all lines
+            </Button>
+          </Group>
+        ) : (
+          <Text c="dimmed">{isActual ? 'No actuals recorded.' : 'No commitments recorded.'}</Text>
+        )
       ) : (
         <Table.ScrollContainer minWidth={900}>
           <Table highlightOnHover>
@@ -129,7 +131,7 @@ export function CostEntriesTab({ kind, report, rows, deleteEntry }: Props) {
                     <Table.Td>{e.description}</Table.Td>
                     <Table.Td>{e.reference ?? '—'}</Table.Td>
                     <Table.Td>
-                      {row.contractTitle ? `${row.contractorName ?? ''} — ${row.contractTitle}` : '—'}
+                      {joinLabel(row.contractorName, row.contractTitle) || '—'}
                     </Table.Td>
                     {amountCell(e.amount)}
                     {showActions && (
@@ -169,7 +171,7 @@ export function CostEntriesTab({ kind, report, rows, deleteEntry }: Props) {
         lines={report.lines}
         contracts={report.contracts}
         entry={editing}
-        defaultLineId={lineFilter}
+        defaultLineId={effectiveFilter}
         onClose={() => setEditing(undefined)}
       />
 

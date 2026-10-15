@@ -3,7 +3,7 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useState } from 'react';
 import { useConfig } from '../../shared/config';
-import { numberInputParts } from '../../shared/format';
+import { joinLabel, numberInputParts } from '../../shared/format';
 import { zodValidate } from '../../shared/validation';
 import { useCreateActualCost, useCreateCommitment, useUpdateActualCost, useUpdateCommitment } from './api';
 import {
@@ -140,7 +140,7 @@ function CostEntryFormModalInner({
             clearable
             searchable
             placeholder="None"
-            data={contracts.map((c) => ({ value: c.id, label: `${c.contractorName} — ${c.title}` }))}
+            data={contracts.map((c) => ({ value: c.id, label: joinLabel(c.contractorName, c.title) }))}
             {...form.getInputProps('contractId')}
             onChange={onContractChange}
           />

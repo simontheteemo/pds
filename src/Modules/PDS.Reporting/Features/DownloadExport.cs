@@ -14,12 +14,17 @@ internal static class DownloadExport
 {
     public const string CsvContentType = "text/csv; charset=utf-8";
 
+    // API Gateway/Lambda buffered response limit is 6 MB including the JSON envelope, where CSV quotes and
+    // newlines are escaped (\" and \n add a byte each), so keep ~1 MB of headroom.
+    internal const int MaxExportBytes = 5_000_000;
+
     public static void Map(RouteGroupBuilder group) =>
         group.MapGet("/{name}", Handle)
             .WithName("DownloadExport")
-            .Produces(StatusCodes.Status200OK, typeof(string), "text/csv");
+            .Produces(StatusCodes.Status200OK, typeof(string), "text/csv")
+            .ProducesProblem(StatusCodes.Status413PayloadTooLarge);
 
-    internal static async Task<Results<FileContentHttpResult, NotFound>> Handle(
+    internal static async Task<Results<FileContentHttpResult, NotFound, ProblemHttpResult>> Handle(
         string name, ExportCatalog catalog, ICurrentUser user, TimeProvider clock, IOptions<LocaleOptions> locale,
         ILoggerFactory loggers, HttpContext http, CancellationToken ct)
     {
@@ -28,6 +33,17 @@ internal static class DownloadExport
 
         var table = await dataset.LoadAsync(ct);
         var bytes = CsvWriter.Write(table);
+        if (bytes.Length > MaxExportBytes)
+        {
+            loggers.CreateLogger("PDS.Reporting.Export").LogWarning(
+                "Export {Dataset} refused as too large for {UserName}: {Bytes} bytes, {Rows} rows",
+                dataset.Name, user.Name, bytes.Length, table.Rows.Count);
+            return TypedResults.Problem(
+                title: "This export is too large to download.",
+                detail: "The file would be larger than the download limit. Contact an administrator to get this data.",
+                statusCode: StatusCodes.Status413PayloadTooLarge);
+        }
+
         loggers.CreateLogger("PDS.Reporting.Export").LogInformation(
             "Export {Dataset} downloaded by {UserName}: {Rows} rows", dataset.Name, user.Name, table.Rows.Count);
 

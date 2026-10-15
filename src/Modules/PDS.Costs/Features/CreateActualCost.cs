@@ -38,6 +38,6 @@ internal static class CreateActualCost
 
         var entry = ActualCost.Create(pid, request.ToFields(locale.Value.Currency), new AuditStamp(clock.GetUtcNow(), user.Name));
         await store.CreateActualAsync(entry, ct);
-        return TypedResults.Created($"/api/costs/projects/{projectId}/actuals/{entry.Id.Value}", ActualCostDetails.From(entry));
+        return TypedResults.Created($"/api/costs/projects/{projectId}", ActualCostDetails.From(entry));
     }
 }

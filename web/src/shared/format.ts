@@ -1,5 +1,13 @@
 const DASH = '—';
 
+/** Joins the non-empty (trimmed) parts with ' — ', so a missing part never leaves a dangling separator. */
+export function joinLabel(...parts: (string | null | undefined)[]): string {
+  return parts
+    .map((part) => part?.trim())
+    .filter(Boolean)
+    .join(' — ');
+}
+
 /** Date-only values (yyyy-MM-dd) are formatted as calendar dates, independent of the browser's time zone. */
 export function formatDate(iso: string | null | undefined, culture: string): string {
   if (!iso) return DASH;

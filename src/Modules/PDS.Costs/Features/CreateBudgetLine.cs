@@ -38,6 +38,6 @@ internal static class CreateBudgetLine
 
         var line = BudgetLine.Create(pid, request.ToFields(locale.Value.Currency), new AuditStamp(clock.GetUtcNow(), user.Name));
         await store.CreateLineAsync(line, ct);
-        return TypedResults.Created($"/api/costs/projects/{projectId}/lines/{line.Id.Value}", BudgetLineDetails.From(line));
+        return TypedResults.Created($"/api/costs/projects/{projectId}", BudgetLineDetails.From(line));
     }
 }

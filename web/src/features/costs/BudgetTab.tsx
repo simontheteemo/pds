@@ -1,12 +1,12 @@
 import { Badge, Button, Group, Modal, Stack, Table, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useState } from 'react';
-import { ApiError } from '../../shared/api/client';
 import { useConfig } from '../../shared/config';
 import { formatMoney } from '../../shared/format';
 import { usePermissions } from '../../shared/me';
 import { useAddStandardLines, useDeleteBudgetLine } from './api';
 import { BudgetLineFormModal } from './BudgetLineFormModal';
+import { showDeleteError } from './deleteErrorToast';
 import type { CostFigures, CostReportLine, ProjectCostReport } from './types';
 
 export function BudgetTab({ report }: { report: ProjectCostReport }) {
@@ -47,17 +47,7 @@ export function BudgetTab({ report }: { report: ProjectCostReport }) {
           setDeleting(undefined);
         },
         onError: (error) => {
-          const conflict = error instanceof ApiError && error.status === 409;
-          notifications.show({
-            color: conflict ? 'yellow' : 'red',
-            title: conflict ? 'This item was changed by someone else' : 'Could not delete the budget line',
-            message:
-              error instanceof ApiError && error.status === 400 && error.problem?.errors
-                ? Object.values(error.problem.errors).flat().join(' ')
-                : conflict
-                  ? 'The cost report now shows the latest version. Open it again to make your changes.'
-                  : error.message,
-          });
+          showDeleteError(error, 'budget line');
           setDeleting(undefined);
         },
       },

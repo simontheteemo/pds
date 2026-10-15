@@ -3,7 +3,7 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useState } from 'react';
 import { useConfig } from '../../shared/config';
-import { numberInputParts } from '../../shared/format';
+import { joinLabel, numberInputParts } from '../../shared/format';
 import { zodValidate } from '../../shared/validation';
 import { useContractors, useCreateContract, useProjectContract, useUpdateContract } from './api';
 import { ComplianceBadge } from './ComplianceBadge';
@@ -55,7 +55,7 @@ function ContractFormBody({
     validate: zodValidate<ContractFormValues>(contractSchema),
   });
 
-  const contractorOptions = (contractors.data ?? []).map((c) => ({ value: c.id, label: c.trade ? `${c.name} — ${c.trade}` : c.name }));
+  const contractorOptions = (contractors.data ?? []).map((c) => ({ value: c.id, label: joinLabel(c.name, c.trade) }));
   // When editing, the contractor may be inactive and absent from the list; keep it selectable.
   if (existing && !contractorOptions.some((o) => o.value === existing.contractorId)) {
     contractorOptions.push({ value: existing.contractorId, label: existing.contractorName });

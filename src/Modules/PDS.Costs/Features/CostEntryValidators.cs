@@ -16,8 +16,8 @@ internal abstract class CommitmentInputValidator<T> : AbstractValidator<T> where
         RuleFor(x => x.Date).NotNull().WithMessage("Date is required.");
         RuleFor(x => x.Amount).NotNull().WithMessage("Amount is required.");
         RuleFor(x => x.Amount!.Value).Cascade(CascadeMode.Stop)
-            .PrecisionScale(18, 2, ignoreTrailingZeros: true).WithMessage("Use at most 2 decimal places.")
             .Must(a => Math.Abs(a) <= MoneyRules.MaxAbs).WithMessage("Amount is too large.")
+            .PrecisionScale(18, 2, ignoreTrailingZeros: true).WithMessage("Use at most 2 decimal places.")
             .OverridePropertyName(nameof(ICommitmentInput.Amount))
             .When(x => x.Amount is not null);
         RuleFor(x => x.Amount!.Value)
@@ -42,8 +42,8 @@ internal abstract class ActualCostInputValidator<T> : AbstractValidator<T> where
         RuleFor(x => x.Date).NotNull().WithMessage("Date is required.");
         RuleFor(x => x.Amount).NotNull().WithMessage("Amount is required.");
         RuleFor(x => x.Amount!.Value).Cascade(CascadeMode.Stop)
-            .PrecisionScale(18, 2, ignoreTrailingZeros: true).WithMessage("Use at most 2 decimal places.")
             .Must(a => Math.Abs(a) <= MoneyRules.MaxAbs).WithMessage("Amount is too large.")
+            .PrecisionScale(18, 2, ignoreTrailingZeros: true).WithMessage("Use at most 2 decimal places.")
             .NotEqual(0m).WithMessage("Amount can't be zero.")
             .OverridePropertyName(nameof(IActualCostInput.Amount))
             .When(x => x.Amount is not null);
