@@ -2260,6 +2260,46 @@
         }
       }
     },
+    "/api/consents/reminders/preview": {
+      "post": {
+        "tags": [
+          "Consents"
+        ],
+        "operationId": "PreviewConsentReminders",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReminderPreview"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/consents/reminders/send": {
+      "post": {
+        "tags": [
+          "Consents"
+        ],
+        "operationId": "SendConsentReminders",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReminderSendResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/sales/projects/{projectId}/units": {
       "get": {
         "tags": [
@@ -5947,6 +5987,81 @@
           "OnHold",
           "Cancelled"
         ]
+      },
+      "ReminderPreview": {
+        "required": [
+          "today",
+          "itemCount",
+          "overdueCount",
+          "dueSoonCount",
+          "subject",
+          "body",
+          "deliveryConfigured"
+        ],
+        "type": "object",
+        "properties": {
+          "today": {
+            "type": "string",
+            "format": "date"
+          },
+          "itemCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "overdueCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "dueSoonCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "subject": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "body": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "deliveryConfigured": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ReminderSendOutcome": {
+        "enum": [
+          "Sent",
+          "NothingDue",
+          "NotConfigured"
+        ]
+      },
+      "ReminderSendResult": {
+        "required": [
+          "outcome",
+          "itemCount",
+          "messageId"
+        ],
+        "type": "object",
+        "properties": {
+          "outcome": {
+            "$ref": "#/components/schemas/ReminderSendOutcome"
+          },
+          "itemCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "messageId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
       },
       "ReopenConditionRequest": {
         "required": [
