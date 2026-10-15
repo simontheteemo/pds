@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using PDS.Costs.Contracts;
 using PDS.Costs.Data;
 using PDS.Costs.Features;
 using PDS.Shared.Data;
@@ -19,6 +20,7 @@ public static class CostsModule
     {
         services.AddSingleton(CostsTable.Definition);
         services.AddSingleton<CostStore>();
+        services.AddSingleton<ICostQueries, CostQueries>();
         services.AddOptions<CostsOptions>().BindConfiguration(CostsOptions.Section);
         services.AddValidatorsFromAssemblyContaining<CreateBudgetLineValidator>(includeInternalTypes: true);
         return services;
