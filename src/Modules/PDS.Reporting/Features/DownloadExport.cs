@@ -29,7 +29,7 @@ internal static class DownloadExport
         var table = await dataset.LoadAsync(ct);
         var bytes = CsvWriter.Write(table);
         loggers.CreateLogger("PDS.Reporting.Export").LogInformation(
-            "Export {Dataset} downloaded by {ExportUser}: {Rows} rows", dataset.Name, user.Name, table.Rows.Count);
+            "Export {Dataset} downloaded by {UserName}: {Rows} rows", dataset.Name, user.Name, table.Rows.Count);
 
         var today = LocalDate.Today(clock, locale.Value);
         http.Response.Headers.CacheControl = "no-store";

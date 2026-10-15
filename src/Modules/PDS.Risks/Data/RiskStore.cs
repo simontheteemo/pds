@@ -45,7 +45,6 @@ internal sealed class RiskStore(IAmazonDynamoDB dynamo, TableNames names)
         return risks;
     }
 
-
     /// <summary>Every risk in every project (full scan; for exports).</summary>
     public async Task<IReadOnlyList<Risk>> ScanAllAsync(CancellationToken ct)
     {

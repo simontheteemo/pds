@@ -2,7 +2,8 @@ namespace PDS.Reporting.Contracts;
 
 /// <summary>
 /// A portfolio-wide table a module exports from its own data. Register with
-/// <c>services.AddSingleton&lt;IExportDataset, MyDataset&gt;()</c> in the module's Add method.
+/// <c>services.AddScoped&lt;IExportDataset, MyDataset&gt;()</c> in the module's Add method
+/// (datasets may depend on scoped services such as <c>IPortfolioQueries</c>).
 /// </summary>
 public interface IExportDataset
 {

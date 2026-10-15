@@ -44,7 +44,6 @@ internal sealed class ContractStore(IAmazonDynamoDB dynamo, TableNames names)
             },
         }, ct);
 
-
     /// <summary>Every contract in every project (full scan; for exports).</summary>
     public async Task<IReadOnlyList<Contract>> ScanAllAsync(CancellationToken ct)
     {

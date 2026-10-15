@@ -38,6 +38,7 @@ export async function downloadExport(api: Api, name: string): Promise<void> {
     a.click();
     a.remove();
   } finally {
-    setTimeout(() => URL.revokeObjectURL(url), 0);
+    // Revoking immediately can cancel the download in Firefox/Safari.
+    setTimeout(() => URL.revokeObjectURL(url), 40_000);
   }
 }

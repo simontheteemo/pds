@@ -33,6 +33,7 @@ v1 adds a **Reports** page with one CSV download per dataset. Each download cove
 | — | Amounts are exported as plain decimals, with a `currency` column (the deployment currency from `LocaleOptions`, or the stored money currency where the row has one). Cost amounts exclude GST, matching the cost report |
 | — | Buyer **email and phone are not exported** (personal data that reporting doesn't need). Buyer name and solicitor are exported, because settlement reporting needs them |
 | — | Spreadsheet formula-injection guard: a **text** value starting with `=`, `+`, `-`, `@`, tab or CR is prefixed with `'`. Numbers are never altered |
+| — | Datasets and the catalog are scoped DI services (IPortfolioQueries is scoped); a bad dataset name surfaces on the first export request |
 | No new tests (standing directive) | Verify by build, type-check, lint, synth, and manual API checks against DynamoDB Local |
 
 ### Success criteria
@@ -51,7 +52,7 @@ PDS.Reporting  (new module, no tables)
 
 PDS.Portfolio / Risks / Contractors / Costs / Consents / Sales
 └── Features/Export*.cs  internal sealed class …ExportDataset : IExportDataset   (reads its own store)
-    registered in Add<Module>Module(): services.AddSingleton<IExportDataset, …>()
+    registered in Add<Module>Module(): services.AddScoped<IExportDataset, …>()
 ```
 
 - **Dependency direction:** data module → `PDS.Reporting.Contracts`. Reporting never references a data module, so it can't read another module's table, and later modules (Documents, Cashflow) add a dataset by registering one class.
@@ -77,7 +78,7 @@ public sealed class ExportTable
 }
 ```
 
-- `ExportCatalog` (singleton) checks at construction that every name matches `^[a-z][a-z0-9-]*$` and is unique, and throws on startup otherwise. It lists datasets ordered by `Title`.
+- `ExportCatalog` (scoped, built per request from `IEnumerable<IExportDataset>`) checks when it is first built (the first `/api/reporting` request, not at startup) that every name matches `^[a-z][a-z0-9-]*$` and is unique, and throws otherwise. It lists datasets ordered by `Title`.
 - `CsvWriter` (internal, static) turns an `ExportTable` into UTF-8 bytes with a BOM. It uses a header row and CRLF line endings, and quotes a field when it contains `,`, `"`, CR or LF (doubling inner quotes). It formats values by type:
   - `null` → empty
   - `string` → injection guard, then quote if needed
@@ -133,7 +134,7 @@ Base path `/api/reporting/exports`. The whole group requires `CanExport`.
 
 - **Logging:** each download logs `Information` with `Dataset`, `Rows` and `UserName` (via `ICurrentUser`). That gives an audit trail of who took which data.
 - **Policy:** `ReportingPolicies.CanExport = "CanExport"` is registered in `AddReportingModule()` with `services.AddAuthorizationBuilder().AddPolicy(...)` = `RequireRole(Roles.Manager, Roles.Admin)`. That keeps `PDS.Shared` and `PDS.Api/Security` untouched.
-- **Size:** responses are buffered. Lambda's 6 MB response limit caps a dataset at roughly 20k rows, far above v1 volumes (see §8).
+- **Size:** responses are buffered. Lambda's 6 MB response limit caps a dataset at roughly 15–20k rows, far above v1 volumes (see §8).
 
 ## 5. Frontend
 
@@ -153,13 +154,15 @@ Base path `/api/reporting/exports`. The whole group requires `CanExport`.
 | Unknown dataset name | 404 ProblemDetails |
 | Viewer / no group | 403 (policy); the UI doesn't call the API for Viewers |
 | A dataset throws (e.g. DynamoDB error) | 500 ProblemDetails with a `correlationId`; the UI shows the notification |
-| Duplicate or invalid dataset name registered | The app fails at startup (`ExportCatalog` constructor) |
+| Duplicate or invalid dataset name registered | Every `/api/reporting/*` request fails with 500 (`ExportCatalog` constructor throws when first built) |
 
 ## 7. Deferred: Option B (scheduled S3 export + Athena)
 
 When the client picks a BI tool, or the data outgrows Excel, the next step is:
 1. An EventBridge Scheduler rule (daily) invokes the **existing API Lambda** or a small sibling Lambda from the same assembly. It enumerates the same `IExportDataset` registry and writes `s3://<deployment>-exports/<name>/dt=<yyyy-MM-dd>/<name>.csv`.
 2. A Glue database, with one table per dataset (OpenCSVSerDe, `skip.header.line.count=1`, partition projection on `dt`), and an Athena workgroup with a per-query bytes-scanned limit and its own results bucket with a lifecycle rule.
+
+The CSV formula-injection guard (`'` prefix) is for spreadsheet consumers; the S3/Athena writer should skip it so Athena sees the raw values.
 
 This costs cents per month at these volumes. Nothing in v1 needs to change: dataset names become S3 prefixes and table names, and column names are already `snake_case` and type-stable.
 
@@ -172,7 +175,7 @@ It was deferred because:
 
 | # | Risk | Mitigation / trigger |
 |---|---|---|
-| 1 | A dataset exceeds Lambda's 6 MB response limit (≈ 20k rows) | Not expected for a single tenant. If it happens, the download fails with a 500. The fix is Option B, or writing to S3 and returning a presigned URL |
+| 1 | A dataset exceeds Lambda's 6 MB response limit (≈ 15–20k rows; the Lambda payload JSON-escapes text bodies, so the effective limit is somewhat below 6 MB) | Not expected for a single tenant. If it happens, the download fails with a 500. The fix is Option B, or writing to S3 and returning a presigned URL |
 | 2 | Full-table scans on each download | Acceptable at these volumes (ADR-0002). Only Managers and Admins can trigger them. Revisit with Option B if usage grows |
 | 3 | Column names are a public contract once BI tools consume them | Treat renames as breaking; add columns only at the end |
 | 4 | Viewers might legitimately need exports (e.g. a lender's QS) | One-line change to the `CanExport` policy |
