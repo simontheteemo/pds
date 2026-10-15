@@ -24,11 +24,45 @@ export class ApiError extends Error {
   }
 }
 
+export const REQUEST_TIMEOUT_MS = 30_000;
+
+/**
+ * fetch with a timeout. The timeout covers time-to-headers only (it is cleared once
+ * response headers arrive), not body streaming. Caller-supplied abort signals (on
+ * request.signal) still abort the request and surface as the original AbortError.
+ */
+async function fetchWithTimeout(request: Request): Promise<Response> {
+  const controller = new AbortController();
+  let timedOut = false;
+  const onCallerAbort = () => controller.abort();
+  if (request.signal.aborted) controller.abort();
+  else request.signal.addEventListener('abort', onCallerAbort, { once: true });
+  const timer = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, REQUEST_TIMEOUT_MS);
+  try {
+    return await globalThis.fetch(new Request(request, { signal: controller.signal }));
+  } catch (error) {
+    if (timedOut) {
+      throw new ApiError(408, {
+        title: 'The server took too long to respond',
+        detail: 'Check your connection and try again.',
+        status: 408,
+      });
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+    request.signal.removeEventListener('abort', onCallerAbort);
+  }
+}
+
 export function createApi(
   baseUrl: string,
   options: { getToken: () => string | undefined; onUnauthorized?: () => void },
 ): Api {
-  const client = createClient<paths>({ baseUrl });
+  const client = createClient<paths>({ baseUrl, fetch: fetchWithTimeout });
   const auth: Middleware = {
     onRequest({ request }) {
       const token = options.getToken();
