@@ -8,6 +8,7 @@ import { formatDate, formatDateTime, formatMoney } from '../../shared/format';
 import { NotFoundPage } from '../../shared/layout/NotFoundPage';
 import { usePermissions } from '../../shared/me';
 import { useContractor, useContractorContracts, useSetContractorActive } from './api';
+import { ActiveBadge } from './ActiveBadge';
 import { ComplianceBadge } from './ComplianceBadge';
 import {
   contractFormLabel,
@@ -167,7 +168,7 @@ export function ContractorDetailPage() {
           <Group gap="xs">
             <Badge variant="outline">{contractorTypeLabel[c.type]}</Badge>
             <ComplianceBadge status={c.compliance} />
-            {!c.isActive && <Badge color="gray">Inactive</Badge>}
+            <ActiveBadge active={c.isActive} />
           </Group>
         </Stack>
         <ContractorActions contractor={c} />

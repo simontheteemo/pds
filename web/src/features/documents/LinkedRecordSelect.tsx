@@ -54,7 +54,7 @@ function useOptions(projectId: string) {
     })),
     contracts: (contracts.data ?? []).map<Option>((c) => ({
       value: `Contract:${c.id}`,
-      label: `${c.title} · ${c.contractorName}`,
+      label: [c.title, c.contractorName].filter(Boolean).join(' · '),
     })),
     risks: (risks.data ?? []).map<Option>((r) => ({ value: `Risk:${r.id}`, label: r.title })),
   };

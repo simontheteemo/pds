@@ -3,7 +3,7 @@ import { notifications } from '@mantine/notifications';
 import { useState } from 'react';
 import { ApiError } from '../../shared/api/client';
 import { useConfig } from '../../shared/config';
-import { formatDate, formatMoney } from '../../shared/format';
+import { formatDate, formatMoney, joinLabel } from '../../shared/format';
 import { usePermissions } from '../../shared/me';
 import { CostEntryFormModal, type CostEntry } from './CostEntryFormModal';
 import type { CostEntryKind } from './costEntryFormModel';
@@ -129,7 +129,7 @@ export function CostEntriesTab({ kind, report, rows, deleteEntry }: Props) {
                     <Table.Td>{e.description}</Table.Td>
                     <Table.Td>{e.reference ?? '—'}</Table.Td>
                     <Table.Td>
-                      {row.contractTitle ? `${row.contractorName ?? ''} — ${row.contractTitle}` : '—'}
+                      {row.contractTitle ? joinLabel(row.contractorName, row.contractTitle) : '—'}
                     </Table.Td>
                     {amountCell(e.amount)}
                     {showActions && (

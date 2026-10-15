@@ -12,7 +12,7 @@ internal abstract class ContractorInputValidator<T> : AbstractValidator<T> where
             .MaximumLength(ContractorRules.NameMaxLength);
         RuleFor(x => x.Type).NotNull().WithMessage("Choose a contractor type.").IsInEnum();
         RuleFor(x => x.Trade).MaximumLength(ContractorRules.TradeMaxLength);
-        RuleFor(x => x.Nzbn).Matches("^[0-9]{13}$").WithMessage("NZBN is 13 digits.")
+        RuleFor(x => x.Nzbn).Must(v => ContractorRules.NzbnPattern().IsMatch(v!.Trim())).WithMessage("NZBN is 13 digits.")
             .When(x => !string.IsNullOrWhiteSpace(x.Nzbn));
         RuleFor(x => x.ContactName).MaximumLength(ContractorRules.ContactMaxLength);
         RuleFor(x => x.Email).Cascade(CascadeMode.Stop)

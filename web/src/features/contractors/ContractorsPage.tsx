@@ -1,9 +1,10 @@
-import { Alert, Anchor, Badge, Button, Group, Loader, Select, Stack, Switch, Table, Text, TextInput, Title } from '@mantine/core';
+import { Alert, Anchor, Button, Group, Loader, Select, Stack, Switch, Table, Text, TextInput, Title } from '@mantine/core';
 import { useDebouncedValue } from '@mantine/hooks';
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { usePermissions } from '../../shared/me';
 import { useContractors } from './api';
+import { ActiveBadge } from './ActiveBadge';
 import { ComplianceBadge } from './ComplianceBadge';
 import { contractorTypeLabel, contractorTypes, type ContractorType } from './types';
 
@@ -88,15 +89,7 @@ export function ContractorsPage() {
                     <ComplianceBadge status={contractor.compliance} />
                   </Table.Td>
                   <Table.Td>
-                    {contractor.isActive ? (
-                      <Badge color="green" variant="outline">
-                        Active
-                      </Badge>
-                    ) : (
-                      <Badge color="gray" variant="outline">
-                        Inactive
-                      </Badge>
-                    )}
+                    <ActiveBadge active={contractor.isActive} />
                   </Table.Td>
                 </Table.Tr>
               ))}
