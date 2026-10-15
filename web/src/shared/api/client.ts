@@ -34,15 +34,15 @@ export const REQUEST_TIMEOUT_MS = 30_000;
 async function fetchWithTimeout(request: Request): Promise<Response> {
   const controller = new AbortController();
   let timedOut = false;
-  const onCallerAbort = () => controller.abort();
-  if (request.signal.aborted) controller.abort();
+  const onCallerAbort = () => controller.abort(request.signal.reason);
+  if (request.signal.aborted) controller.abort(request.signal.reason);
   else request.signal.addEventListener('abort', onCallerAbort, { once: true });
   const timer = setTimeout(() => {
     timedOut = true;
     controller.abort();
   }, REQUEST_TIMEOUT_MS);
   try {
-    return await globalThis.fetch(new Request(request, { signal: controller.signal }));
+    return await globalThis.fetch(request, { signal: controller.signal });
   } catch (error) {
     if (timedOut) {
       throw new ApiError(408, {
