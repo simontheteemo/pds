@@ -37,15 +37,25 @@ internal static class AddStandardLines
         var stamp = new AuditStamp(clock.GetUtcNow(), user.Name);
         var zero = new Money(0m, locale.Value.Currency);
 
-        var added = new List<BudgetLineDetails>();
-        foreach (var name in options.Value.EffectiveStandardLines)
+        // Build everything first so bad configuration can never leave a partial write.
+        var toAdd = new List<BudgetLine>();
+        foreach (var configured in options.Value.EffectiveStandardLines)
         {
+            var name = configured?.Trim();
+            if (string.IsNullOrEmpty(name) || name.Length > BudgetLineRules.NameMaxLength)
+                continue;
             if (!existing.Add(BudgetLineRules.NameKey(name)))
                 continue;
-            var line = BudgetLine.Create(pid, new BudgetLineFields(name, sortOrder, zero, null, null), stamp);
+            var order = Math.Min(sortOrder, BudgetLineRules.MaxSortOrder);
+            toAdd.Add(BudgetLine.Create(pid, new BudgetLineFields(name, order, zero, null, null), stamp));
+            sortOrder += 10;
+        }
+
+        var added = new List<BudgetLineDetails>();
+        foreach (var line in toAdd)
+        {
             await store.CreateLineAsync(line, ct);
             added.Add(BudgetLineDetails.From(line));
-            sortOrder += 10;
         }
 
         return TypedResults.Ok(added);

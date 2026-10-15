@@ -27,7 +27,7 @@ export function BudgetTab({ report }: { report: ProjectCostReport }) {
       onSuccess: (added) =>
         notifications.show({
           color: 'green',
-          message: added.length > 0 ? `Added ${added.length} lines` : 'All standard lines already exist',
+          message: added.length > 0 ? `Added ${added.length} ${added.length === 1 ? 'line' : 'lines'}` : 'All standard lines already exist',
         }),
       onError: (error) =>
         notifications.show({

@@ -63,6 +63,7 @@ export function useUpdateProject(id: string) {
 export function useSetArchived(id: string) {
   const api = useApi();
   const store = useStoreProject();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ archived, version }: { archived: boolean; version: number }) =>
       unwrap<ProjectDetails>(
@@ -70,6 +71,9 @@ export function useSetArchived(id: string) {
           ? api.POST('/api/portfolio/projects/{id}/archive', { params: { path: { id } }, body: { version } })
           : api.POST('/api/portfolio/projects/{id}/restore', { params: { path: { id } }, body: { version } }),
       ),
-    onSuccess: store,
+    onSuccess: (project) => {
+      store(project);
+      void queryClient.invalidateQueries({ queryKey: ['cost-report', id] });
+    },
   });
 }

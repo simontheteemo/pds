@@ -47,7 +47,7 @@ export function CostEntriesTab({ kind, report, rows, deleteEntry }: Props) {
   const typeLabel = (type: string): string => labels[type] ?? type;
 
   const filtered = lineFilter ? rows.filter((r) => r.entry.budgetLineId === lineFilter) : rows;
-  const total = filtered.reduce((sum, r) => sum + r.entry.amount, 0);
+  const total = Math.round(filtered.reduce((sum, r) => sum + r.entry.amount, 0) * 100) / 100;
   const colCount = (isActual ? 8 : 7) + (showActions ? 1 : 0);
   const amountCell = (n: number, th = false) => {
     const Cell = th ? Table.Th : Table.Td;

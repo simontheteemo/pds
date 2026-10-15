@@ -54,8 +54,8 @@ export function costEntrySchema(kind: CostEntryKind) {
       type: z.string().nullable().refine((v) => v !== null && types.includes(v), 'Type is required'),
       contractId: z.string().nullable(),
       payee: z.string().max(200, 'Use 200 characters or fewer'),
-      description: z.string().trim().min(1, 'Description is required').max(500, 'Use 500 characters or fewer'),
-      reference: z.string().max(100, 'Use 100 characters or fewer'),
+      description: z.string().trim().min(1, 'Description is required').max(200, 'Use 200 characters or fewer'),
+      reference: z.string().max(50, 'Use 50 characters or fewer'),
       date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date is required'),
       amount: z
         .union([z.number(), z.literal('')])
