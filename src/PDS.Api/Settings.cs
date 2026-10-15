@@ -18,7 +18,7 @@ internal static class SettingsServiceCollectionExtensions
     public static IServiceCollection AddPdsSettings(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddOptions<BrandingOptions>().Bind(configuration.GetSection(BrandingOptions.Section));
-        services.AddOptions<LocaleOptions>().Bind(configuration.GetSection(LocaleOptions.Section));
+        services.AddLocaleOptions(configuration);
         return services;
     }
 }
