@@ -8,6 +8,7 @@ export function useProjectCashflow(projectId: string) {
   const api = useApi();
   return useQuery({
     queryKey: cashflowKey(projectId),
+    staleTime: 0,
     queryFn: () =>
       unwrap<ProjectCashflow>(api.GET('/api/cashflow/projects/{projectId}', { params: { path: { projectId } } })),
   });

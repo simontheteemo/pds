@@ -5,6 +5,7 @@ import { useConfig } from '../../shared/config';
 import { formatDate } from '../../shared/format';
 import { NotFoundPage } from '../../shared/layout/NotFoundPage';
 import { useProjectCashflow } from './api';
+import { isCashflowEmpty } from './types';
 import { CashflowChart } from './CashflowChart';
 import { CashflowFiguresStrip } from './CashflowFiguresStrip';
 import { CashflowTable } from './CashflowTable';
@@ -27,11 +28,7 @@ export function CashflowPage() {
   if (!query.data) return <Loader />;
 
   const c = query.data;
-  const empty =
-    c.totals.outflow === 0 &&
-    c.totals.inflow === 0 &&
-    c.totals.unscheduledCost === 0 &&
-    c.unscheduledSales.length === 0;
+  const empty = isCashflowEmpty(c);
 
   return (
     <Stack>
@@ -67,7 +64,7 @@ export function CashflowPage() {
       )}
       {c.unscheduledSales.length > 0 && (
         <Alert color="yellow">
-          {c.unscheduledSales.length} contracted sale(s) have no settlement date:{' '}
+          {c.unscheduledSales.length === 1 ? '1 contracted sale has' : `${c.unscheduledSales.length} contracted sales have`} no settlement date:{' '}
           {c.unscheduledSales.map((s) => s.unitIdentifier).join(', ')}
         </Alert>
       )}

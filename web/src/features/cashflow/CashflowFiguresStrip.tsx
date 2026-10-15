@@ -21,7 +21,7 @@ export function CashflowFiguresStrip({ totals, currency }: { totals: CashflowTot
   const money = (n: number) => formatMoney(n, currency, culture);
   const peak =
     totals.peakFunding === null || totals.peakFundingMonth === null
-      ? 'None'
+      ? 'No funding gap forecast'
       : `${money(totals.peakFunding)} in ${monthLabel(totals.peakFundingMonth, culture)}`;
   return (
     <Group gap="xl">

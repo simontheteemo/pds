@@ -181,7 +181,7 @@ Totals: `costActual`, `costForecast`, `outflow`, `salesSettled`, `salesForecast`
   - **Table:** Month, Cost (actual), Cost (forecast), Sales (settled), Sales (forecast), Net, Cumulative.
     - The current month row is highlighted.
     - Negative cumulative values are shown in red.
-- **Empty state:** if there are no costs, no sales and no schedule, show "Nothing to forecast yet: add budget lines in the cost report or contracted sales", with links.
+- **Empty state:** if there are no costs and no sales (no outflow, no inflow, nothing unscheduled), show "Nothing to forecast yet: add budget lines in the cost report or contracted sales", with links.
 - Money uses `formatMoney` from `shared/format`.
 
 ## 6. Out of scope (v1)

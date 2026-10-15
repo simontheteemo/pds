@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import { useConfig } from '../../shared/config';
 import { formatMoney } from '../../shared/format';
 import { useProjectCashflow } from './api';
-import { monthLabel } from './types';
+import { isCashflowEmpty, monthLabel } from './types';
 
 export function ProjectCashflowCard({ projectId }: { projectId: string }) {
   const { culture } = useConfig();
@@ -15,12 +15,7 @@ export function ProjectCashflowCard({ projectId }: { projectId: string }) {
   );
 
   const c = query.data;
-  const empty =
-    c &&
-    c.totals.outflow === 0 &&
-    c.totals.inflow === 0 &&
-    c.totals.unscheduledCost === 0 &&
-    c.unscheduledSales.length === 0;
+  const empty = c && isCashflowEmpty(c);
 
   return (
     <Card withBorder>
