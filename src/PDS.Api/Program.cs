@@ -6,6 +6,7 @@ using PDS.Cashflow;
 using PDS.Consents;
 using PDS.Contractors;
 using PDS.Costs;
+using PDS.Documents;
 using PDS.Portfolio;
 using PDS.Risks;
 using PDS.Sales;
@@ -48,6 +49,7 @@ builder.Services.AddContractorsModule();
 builder.Services.AddCostsModule();
 builder.Services.AddConsentsModule();
 builder.Services.AddSalesModule();
+builder.Services.AddDocumentsModule();
 builder.Services.AddCashflowModule();
 
 var app = builder.Build();
@@ -77,6 +79,7 @@ app.MapContractorsEndpoints();
 app.MapCostsEndpoints();
 app.MapConsentsEndpoints();
 app.MapSalesEndpoints();
+app.MapDocumentsEndpoints();
 app.MapCashflowEndpoints();
 
 await app.RunAsync();

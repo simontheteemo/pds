@@ -13,6 +13,7 @@ import { ProjectCostsCard } from '../costs/ProjectCostsCard';
 import { ProjectCashflowCard } from '../cashflow/ProjectCashflowCard';
 import { ProjectConsentsSection } from '../consents/ProjectConsentsSection';
 import { ProjectSalesSection } from '../sales/ProjectSalesSection';
+import { ProjectDocumentsSection } from '../documents/ProjectDocumentsSection';
 import { useProject, useSetArchived } from './api';
 import { StatusBadge } from './StatusBadge';
 import { stageLabel, type ProjectDetails } from './types';
@@ -167,6 +168,7 @@ export function ProjectDetailPage() {
       <ProjectCashflowCard projectId={p.id} />
       <ProjectConsentsSection projectId={p.id} projectArchived={p.isArchived} />
       <ProjectSalesSection projectId={p.id} projectArchived={p.isArchived} />
+      <ProjectDocumentsSection projectId={p.id} projectArchived={p.isArchived} />
 
       <Text size="sm" c="dimmed">
         Created by {p.createdBy} on {formatDateTime(p.createdAt, config.culture, config.timeZone)} · Last updated by{' '}
