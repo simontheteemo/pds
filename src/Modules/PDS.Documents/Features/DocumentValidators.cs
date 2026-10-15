@@ -41,7 +41,11 @@ internal sealed class CreateDocumentValidator : DocumentMetadataValidator<Create
     public CreateDocumentValidator(IOptions<DocumentsOptions> options) : base(options)
     {
         RuleFor(x => x.UploadId).NotEmpty().WithMessage("Upload the file first.");
-        RuleFor(x => x.FileName).Must(n => FileTypes.ContentTypeFor(n) is not null)
+        RuleFor(x => x.FileName).Cascade(CascadeMode.Stop)
+            .Must(n => FileTypes.CleanFileName(n).Length > 0).WithMessage("Choose a file.")
+            .Must(n => FileTypes.CleanFileName(n).Length <= DocumentRules.FileNameMaxLength)
+            .WithMessage($"Use a file name of {DocumentRules.FileNameMaxLength} characters or fewer.")
+            .Must(n => FileTypes.ContentTypeFor(n) is not null)
             .WithMessage(_ => $"This file type isn't allowed. Allowed: {FileTypes.AllowedList}.");
     }
 }
@@ -57,7 +61,11 @@ internal sealed class AddVersionValidator : AbstractValidator<AddVersionRequest>
     public AddVersionValidator()
     {
         RuleFor(x => x.UploadId).NotEmpty().WithMessage("Upload the file first.");
-        RuleFor(x => x.FileName).Must(n => FileTypes.ContentTypeFor(n) is not null)
+        RuleFor(x => x.FileName).Cascade(CascadeMode.Stop)
+            .Must(n => FileTypes.CleanFileName(n).Length > 0).WithMessage("Choose a file.")
+            .Must(n => FileTypes.CleanFileName(n).Length <= DocumentRules.FileNameMaxLength)
+            .WithMessage($"Use a file name of {DocumentRules.FileNameMaxLength} characters or fewer.")
+            .Must(n => FileTypes.ContentTypeFor(n) is not null)
             .WithMessage(_ => $"This file type isn't allowed. Allowed: {FileTypes.AllowedList}.");
         RuleFor(x => x.Version).GreaterThan(0);
     }
