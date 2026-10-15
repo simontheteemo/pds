@@ -3,6 +3,7 @@ using Amazon.Lambda.AspNetCoreServer.Hosting;
 using PDS.Api;
 using PDS.Api.Security;
 using PDS.Contractors;
+using PDS.Consents;
 using PDS.Portfolio;
 using PDS.Risks;
 using PDS.Shared.Data;
@@ -41,6 +42,7 @@ builder.Services.AddDynamo();
 builder.Services.AddPortfolioModule();
 builder.Services.AddRisksModule();
 builder.Services.AddContractorsModule();
+builder.Services.AddConsentsModule();
 
 var app = builder.Build();
 
@@ -66,6 +68,7 @@ app.MapHostEndpoints();
 app.MapPortfolioEndpoints();
 app.MapRisksEndpoints();
 app.MapContractorsEndpoints();
+app.MapConsentsEndpoints();
 
 await app.RunAsync();
 

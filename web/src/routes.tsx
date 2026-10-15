@@ -3,6 +3,7 @@ import { ContractorCreatePage } from './features/contractors/ContractorCreatePag
 import { ContractorDetailPage } from './features/contractors/ContractorDetailPage';
 import { ContractorEditPage } from './features/contractors/ContractorEditPage';
 import { ContractorsPage } from './features/contractors/ContractorsPage';
+import { ConsentsDuePage } from './features/consents/ConsentsDuePage';
 import { ProjectCreatePage } from './features/portfolio/ProjectCreatePage';
 import { ProjectDetailPage } from './features/portfolio/ProjectDetailPage';
 import { ProjectEditPage } from './features/portfolio/ProjectEditPage';
@@ -24,6 +25,7 @@ export const routes: RouteObject[] = [
       { path: 'contractors/new', element: <ContractorCreatePage /> },
       { path: 'contractors/:id', element: <ContractorDetailPage /> },
       { path: 'contractors/:id/edit', element: <ContractorEditPage /> },
+      { path: 'consents', element: <ConsentsDuePage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
