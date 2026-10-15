@@ -2,10 +2,12 @@ using System.Text.Json.Serialization;
 using Amazon.Lambda.AspNetCoreServer.Hosting;
 using PDS.Api;
 using PDS.Api.Security;
+using PDS.Consents;
 using PDS.Contractors;
 using PDS.Costs;
 using PDS.Portfolio;
 using PDS.Risks;
+using PDS.Sales;
 using PDS.Shared.Data;
 using PDS.Shared.Security;
 using Serilog;
@@ -43,6 +45,8 @@ builder.Services.AddPortfolioModule();
 builder.Services.AddRisksModule();
 builder.Services.AddContractorsModule();
 builder.Services.AddCostsModule();
+builder.Services.AddConsentsModule();
+builder.Services.AddSalesModule();
 
 var app = builder.Build();
 
@@ -69,6 +73,8 @@ app.MapPortfolioEndpoints();
 app.MapRisksEndpoints();
 app.MapContractorsEndpoints();
 app.MapCostsEndpoints();
+app.MapConsentsEndpoints();
+app.MapSalesEndpoints();
 
 await app.RunAsync();
 

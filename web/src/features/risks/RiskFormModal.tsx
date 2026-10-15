@@ -4,7 +4,7 @@ import { notifications } from '@mantine/notifications';
 import { useState } from 'react';
 import { zodValidate } from '../../shared/validation';
 import { useCreateRisk, useUpdateRisk } from './api';
-import { handleRiskMutationError } from './riskMutationError';
+import { handleMutationError } from '../../shared/mutationError';
 import { emptyRiskValues, fromRisk, riskSchema, toRiskInput, type RiskFormValues } from './riskFormModel';
 import { RiskBandBadge } from './RiskBandBadge';
 import { bandFor, categories, categoryLabel, impactLabels, likelihoodLabels, type RiskDetails } from './types';
@@ -49,7 +49,8 @@ function RiskFormModalInner({ projectId, risk, onClose }: Props & { risk: RiskDe
       notifications.show({ color: 'green', message: 'Risk saved' });
       onClose();
     } catch (error) {
-      handleRiskMutationError(error, {
+      handleMutationError(error, {
+        entity: 'risk',
         form,
         setTopError,
         onClose,

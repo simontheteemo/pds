@@ -15,7 +15,7 @@ import {
   type CostEntryFormValues,
   type CostEntryKind,
 } from './costEntryFormModel';
-import { handleCostMutationError } from './costMutationError';
+import { handleMutationError } from '../../shared/mutationError';
 import {
   actualCostTypeLabel,
   actualCostTypes,
@@ -88,7 +88,8 @@ function CostEntryFormModalInner({
       notifications.show({ color: 'green', message: `${kind === 'commitment' ? 'Commitment' : 'Actual'} saved` });
       onClose();
     } catch (error) {
-      handleCostMutationError(error, {
+      handleMutationError(error, {
+        entity: noun,
         form,
         setTopError,
         onClose,

@@ -1764,6 +1764,777 @@
           }
         }
       }
+    },
+    "/api/consents/projects/{projectId}/consents": {
+      "get": {
+        "tags": [
+          "Consents"
+        ],
+        "operationId": "ListConsents",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConsentDetails"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Consents"
+        ],
+        "operationId": "CreateConsent",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConsentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/consents/projects/{projectId}/consents/{consentId}": {
+      "get": {
+        "tags": [
+          "Consents"
+        ],
+        "operationId": "GetConsent",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "consentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Consents"
+        ],
+        "operationId": "UpdateConsent",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "consentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateConsentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/consents/projects/{projectId}/consents/{consentId}/conditions": {
+      "post": {
+        "tags": [
+          "Consents"
+        ],
+        "operationId": "AddCondition",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "consentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConditionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConditionDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/consents/projects/{projectId}/consents/{consentId}/conditions/{conditionId}": {
+      "put": {
+        "tags": [
+          "Consents"
+        ],
+        "operationId": "UpdateCondition",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "consentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "conditionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateConditionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConditionDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/consents/projects/{projectId}/consents/{consentId}/conditions/{conditionId}/complete": {
+      "post": {
+        "tags": [
+          "Consents"
+        ],
+        "operationId": "CompleteCondition",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "consentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "conditionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteConditionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConditionDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/consents/projects/{projectId}/consents/{consentId}/conditions/{conditionId}/reopen": {
+      "post": {
+        "tags": [
+          "Consents"
+        ],
+        "operationId": "ReopenCondition",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "consentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "conditionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReopenConditionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConditionDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/consents/due": {
+      "get": {
+        "tags": [
+          "Consents"
+        ],
+        "operationId": "ListDueConsentItems",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DueItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sales/projects/{projectId}/units": {
+      "get": {
+        "tags": [
+          "Sales"
+        ],
+        "operationId": "ListUnits",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectSales"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Sales"
+        ],
+        "operationId": "CreateUnit",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUnitRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sales/projects/{projectId}/units/{unitId}": {
+      "get": {
+        "tags": [
+          "Sales"
+        ],
+        "operationId": "GetUnit",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "unitId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Sales"
+        ],
+        "operationId": "UpdateUnit",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "unitId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUnitRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sales/projects/{projectId}/units/{unitId}/sale": {
+      "put": {
+        "tags": [
+          "Sales"
+        ],
+        "operationId": "UpdateSale",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "unitId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSaleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnitDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sales/summary": {
+      "get": {
+        "tags": [
+          "Sales"
+        ],
+        "operationId": "ListSalesSummaries",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectSalesSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2117,12 +2888,279 @@
           "Order"
         ]
       },
+      "CompleteConditionRequest": {
+        "required": [
+          "version",
+          "completedOn"
+        ],
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "completedOn": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          }
+        }
+      },
       "ComplianceStatus": {
         "enum": [
           "Current",
           "ExpiringSoon",
           "Expired",
           "NotRecorded"
+        ]
+      },
+      "ConditionDetails": {
+        "required": [
+          "id",
+          "projectId",
+          "consentId",
+          "reference",
+          "description",
+          "dueDate",
+          "dueState",
+          "completedOn",
+          "completedAt",
+          "completedBy",
+          "createdAt",
+          "createdBy",
+          "updatedAt",
+          "updatedBy",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "consentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "dueDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "dueState": {
+            "$ref": "#/components/schemas/DueState"
+          },
+          "completedOn": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "completedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "completedBy": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedBy": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ConsentDetails": {
+        "required": [
+          "id",
+          "projectId",
+          "type",
+          "title",
+          "authority",
+          "reference",
+          "status",
+          "lodgedDate",
+          "grantedDate",
+          "expiryDate",
+          "notes",
+          "isActive",
+          "expiryState",
+          "attention",
+          "conditionCount",
+          "openConditionCount",
+          "overdueConditionCount",
+          "dueSoonConditionCount",
+          "conditions",
+          "createdAt",
+          "createdBy",
+          "updatedAt",
+          "updatedBy",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ConsentType"
+          },
+          "title": {
+            "type": "string"
+          },
+          "authority": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "reference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/ConsentStatus"
+          },
+          "lodgedDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "grantedDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "expiryDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "expiryState": {
+            "$ref": "#/components/schemas/DueState"
+          },
+          "attention": {
+            "$ref": "#/components/schemas/DueState"
+          },
+          "conditionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "openConditionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "overdueConditionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "dueSoonConditionCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "conditions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConditionDetails"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedBy": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "ConsentStatus": {
+        "enum": [
+          "Preparing",
+          "Lodged",
+          "InfoRequested",
+          "Granted",
+          "Declined",
+          "Withdrawn"
+        ]
+      },
+      "ConsentType": {
+        "enum": [
+          "ResourceConsent",
+          "SubdivisionConsent",
+          "BuildingConsent",
+          "Section224c",
+          "CodeComplianceCertificate",
+          "Other"
         ]
       },
       "ContractDetails": {
@@ -2881,6 +3919,110 @@
           }
         }
       },
+      "CreateConditionRequest": {
+        "required": [
+          "reference",
+          "description",
+          "dueDate"
+        ],
+        "type": "object",
+        "properties": {
+          "reference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "dueDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          }
+        }
+      },
+      "CreateConsentRequest": {
+        "required": [
+          "type",
+          "title",
+          "authority",
+          "reference",
+          "status",
+          "lodgedDate",
+          "grantedDate",
+          "expiryDate",
+          "notes"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ConsentType"
+              }
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "authority": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "reference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ConsentStatus"
+              }
+            ]
+          },
+          "lodgedDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "grantedDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "expiryDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "CreateContractorRequest": {
         "required": [
           "name",
@@ -3232,6 +4374,170 @@
           }
         }
       },
+      "CreateUnitRequest": {
+        "required": [
+          "identifier",
+          "type",
+          "bedrooms",
+          "bathrooms",
+          "carParks",
+          "floorAreaSqm",
+          "landAreaSqm",
+          "listPriceAmount",
+          "notes"
+        ],
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string"
+          },
+          "type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/UnitType"
+              }
+            ]
+          },
+          "bedrooms": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "bathrooms": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "carParks": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "floorAreaSqm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "landAreaSqm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "listPriceAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "DueItem": {
+        "required": [
+          "kind",
+          "projectId",
+          "projectCode",
+          "projectName",
+          "consentId",
+          "consentType",
+          "consentTitle",
+          "consentReference",
+          "conditionId",
+          "conditionReference",
+          "description",
+          "date",
+          "state"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/DueItemKind"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectCode": {
+            "type": "string"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "consentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "consentType": {
+            "$ref": "#/components/schemas/ConsentType"
+          },
+          "consentTitle": {
+            "type": "string"
+          },
+          "consentReference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "conditionId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "conditionReference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "state": {
+            "$ref": "#/components/schemas/DueState"
+          }
+        }
+      },
+      "DueItemKind": {
+        "enum": [
+          "Condition",
+          "Expiry"
+        ]
+      },
+      "DueState": {
+        "enum": [
+          "None",
+          "Upcoming",
+          "DueSoon",
+          "Overdue",
+          "Done"
+        ]
+      },
       "HttpValidationProblemDetails": {
         "type": "object",
         "properties": {
@@ -3575,6 +4881,52 @@
           }
         }
       },
+      "ProjectSales": {
+        "required": [
+          "summary",
+          "units"
+        ],
+        "type": "object",
+        "properties": {
+          "summary": {
+            "$ref": "#/components/schemas/SalesSummary"
+          },
+          "units": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnitDetails"
+            }
+          }
+        }
+      },
+      "ProjectSalesSummary": {
+        "required": [
+          "projectId",
+          "projectCode",
+          "projectName",
+          "projectArchived",
+          "summary"
+        ],
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectCode": {
+            "type": "string"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "projectArchived": {
+            "type": "boolean"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/SalesSummary"
+          }
+        }
+      },
       "ProjectStage": {
         "enum": [
           "Acquisition",
@@ -3594,6 +4946,18 @@
           "OnHold",
           "Cancelled"
         ]
+      },
+      "ReopenConditionRequest": {
+        "required": [
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
       },
       "ReopenRiskRequest": {
         "required": [
@@ -3758,6 +5122,77 @@
           "Closed"
         ]
       },
+      "SalesSummary": {
+        "required": [
+          "totalUnits",
+          "available",
+          "reserved",
+          "conditional",
+          "unconditional",
+          "settled",
+          "withdrawn",
+          "listValue",
+          "contractedValue",
+          "settledValue",
+          "currency"
+        ],
+        "type": "object",
+        "properties": {
+          "totalUnits": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "available": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "reserved": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "conditional": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "unconditional": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "settled": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "withdrawn": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "listValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "contractedValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "settledValue": {
+            "type": "number",
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          }
+        }
+      },
+      "SaleStatus": {
+        "enum": [
+          "Available",
+          "Reserved",
+          "Conditional",
+          "Unconditional",
+          "Settled",
+          "Withdrawn"
+        ]
+      },
       "SetActiveRequest": {
         "required": [
           "version"
@@ -3827,6 +5262,195 @@
             "format": "double"
           }
         }
+      },
+      "UnitDetails": {
+        "required": [
+          "id",
+          "projectId",
+          "identifier",
+          "type",
+          "bedrooms",
+          "bathrooms",
+          "carParks",
+          "floorAreaSqm",
+          "landAreaSqm",
+          "listPriceAmount",
+          "notes",
+          "status",
+          "buyerName",
+          "buyerEmail",
+          "buyerPhone",
+          "buyerSolicitor",
+          "agreementDate",
+          "salePriceAmount",
+          "depositAmount",
+          "unconditionalDate",
+          "settlementDate",
+          "currency",
+          "createdAt",
+          "createdBy",
+          "updatedAt",
+          "updatedBy",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "identifier": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/UnitType"
+          },
+          "bedrooms": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "bathrooms": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "carParks": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "floorAreaSqm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "landAreaSqm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "listPriceAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/SaleStatus"
+          },
+          "buyerName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buyerEmail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buyerPhone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buyerSolicitor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "agreementDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "salePriceAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "depositAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "unconditionalDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "settlementDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedBy": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "UnitType": {
+        "enum": [
+          "Apartment",
+          "Townhouse",
+          "House",
+          "Lot",
+          "Commercial",
+          "Other"
+        ]
       },
       "UpdateActualCostRequest": {
         "required": [
@@ -4024,6 +5648,120 @@
               "number"
             ],
             "format": "double"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "UpdateConditionRequest": {
+        "required": [
+          "reference",
+          "description",
+          "dueDate",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "reference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "dueDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "UpdateConsentRequest": {
+        "required": [
+          "type",
+          "title",
+          "authority",
+          "reference",
+          "status",
+          "lodgedDate",
+          "grantedDate",
+          "expiryDate",
+          "notes",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ConsentType"
+              }
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "authority": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "reference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ConsentStatus"
+              }
+            ]
+          },
+          "lodgedDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "grantedDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "expiryDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
           },
           "notes": {
             "type": [
@@ -4419,6 +6157,179 @@
           }
         }
       },
+      "UpdateSaleRequest": {
+        "required": [
+          "status",
+          "buyerName",
+          "buyerEmail",
+          "buyerPhone",
+          "buyerSolicitor",
+          "agreementDate",
+          "salePriceAmount",
+          "depositAmount",
+          "unconditionalDate",
+          "settlementDate",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/SaleStatus"
+              }
+            ]
+          },
+          "buyerName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buyerEmail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buyerPhone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "buyerSolicitor": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "agreementDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "salePriceAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "depositAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "unconditionalDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "settlementDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "UpdateUnitRequest": {
+        "required": [
+          "identifier",
+          "type",
+          "bedrooms",
+          "bathrooms",
+          "carParks",
+          "floorAreaSqm",
+          "landAreaSqm",
+          "listPriceAmount",
+          "notes",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "type": "string"
+          },
+          "type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/UnitType"
+              }
+            ]
+          },
+          "bedrooms": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "bathrooms": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "carParks": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "floorAreaSqm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "landAreaSqm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "listPriceAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "VersionRequest": {
         "required": [
           "version"
@@ -4451,6 +6362,12 @@
     },
     {
       "name": "Costs"
+    },
+    {
+      "name": "Consents"
+    },
+    {
+      "name": "Sales"
     }
   ]
 }

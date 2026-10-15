@@ -13,7 +13,7 @@ import {
   toBudgetLineInput,
   type BudgetLineFormValues,
 } from './budgetLineFormModel';
-import { handleCostMutationError } from './costMutationError';
+import { handleMutationError } from '../../shared/mutationError';
 import type { CostReportLine } from './types';
 
 type Props = {
@@ -50,7 +50,8 @@ function BudgetLineFormModalInner({ projectId, lines, line, onClose }: Props & {
       notifications.show({ color: 'green', message: 'Budget line saved' });
       onClose();
     } catch (error) {
-      handleCostMutationError(error, {
+      handleMutationError(error, {
+        entity: 'budget line',
         form,
         setTopError,
         onClose,
