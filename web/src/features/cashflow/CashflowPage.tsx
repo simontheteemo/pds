@@ -5,6 +5,7 @@ import { useConfig } from '../../shared/config';
 import { formatDate } from '../../shared/format';
 import { NotFoundPage } from '../../shared/layout/NotFoundPage';
 import { useProjectCashflow } from './api';
+import { CashflowChart } from './CashflowChart';
 import { CashflowFiguresStrip } from './CashflowFiguresStrip';
 import { CashflowTable } from './CashflowTable';
 
@@ -86,7 +87,7 @@ export function CashflowPage() {
       ) : (
         <>
           <CashflowFiguresStrip totals={c.totals} currency={c.currency} />
-          {/* chart: Task 4 */}
+          <CashflowChart months={c.months} currency={c.currency} />
           <CashflowTable months={c.months} totals={c.totals} asOf={c.asOf} currency={c.currency} />
         </>
       )}
