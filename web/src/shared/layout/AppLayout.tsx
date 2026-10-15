@@ -53,6 +53,7 @@ export function AppLayout() {
       </AppShell.Header>
       <AppShell.Navbar p="xs">
         <NavLink component={RouterNavLink} to="/projects" label="Projects" onClick={close} />
+        <NavLink component={RouterNavLink} to="/contractors" label="Contractors" onClick={close} />
       </AppShell.Navbar>
       <AppShell.Main>
         {noGroup ? (
