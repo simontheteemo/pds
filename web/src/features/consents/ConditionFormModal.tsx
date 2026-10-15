@@ -11,7 +11,7 @@ import {
   toConditionInput,
   type ConditionFormValues,
 } from './conditionFormModel';
-import { handleConsentMutationError } from './consentMutationError';
+import { handleMutationError } from '../../shared/mutationError';
 import type { ConditionDetails } from './types';
 
 type Props = {
@@ -54,7 +54,7 @@ function ConditionFormModalInner({
       notifications.show({ color: 'green', message: 'Condition saved' });
       onClose();
     } catch (error) {
-      handleConsentMutationError(error, {
+      handleMutationError(error, {
         form,
         setTopError,
         onClose,

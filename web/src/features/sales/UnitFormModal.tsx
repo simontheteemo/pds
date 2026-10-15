@@ -6,7 +6,7 @@ import { useConfig } from '../../shared/config';
 import { numberInputParts } from '../../shared/format';
 import { zodValidate } from '../../shared/validation';
 import { useCreateUnit, useUpdateUnit } from './api';
-import { handleSalesMutationError } from './salesMutationError';
+import { handleMutationError } from '../../shared/mutationError';
 import { emptyUnitValues, fromUnit, toUnitInput, unitSchema, type UnitFormValues } from './unitFormModel';
 import { unitTypeLabel, unitTypes, type UnitDetails } from './types';
 
@@ -44,7 +44,8 @@ function UnitFormModalInner({ projectId, unit, onClose }: Props & { unit: UnitDe
       notifications.show({ color: 'green', message: 'Unit saved' });
       onClose();
     } catch (error) {
-      handleSalesMutationError(error, {
+      handleMutationError(error, {
+        entity: 'unit',
         form,
         setTopError,
         onClose,

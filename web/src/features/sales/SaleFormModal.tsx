@@ -7,7 +7,7 @@ import { numberInputParts } from '../../shared/format';
 import { zodValidate } from '../../shared/validation';
 import { useUpdateSale } from './api';
 import { fromUnit, saleSchema, toSaleInput, type SaleFormValues } from './saleFormModel';
-import { handleSalesMutationError } from './salesMutationError';
+import { handleMutationError } from '../../shared/mutationError';
 import {
   hasSale,
   requiresAgreement,
@@ -50,7 +50,8 @@ function SaleFormModalInner({ projectId, unit, onClose }: Props & { unit: UnitDe
       notifications.show({ color: 'green', message: 'Sale updated' });
       onClose();
     } catch (error) {
-      handleSalesMutationError(error, {
+      handleMutationError(error, {
+        entity: 'unit',
         form,
         setTopError,
         onClose,
