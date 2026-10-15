@@ -7,7 +7,7 @@ import { numberInputParts } from '../../shared/format';
 import { zodValidate } from '../../shared/validation';
 import { useContractors, useCreateContract, useProjectContract, useUpdateContract } from './api';
 import { ComplianceBadge } from './ComplianceBadge';
-import { handleContractMutationError } from './contractMutationError';
+import { handleMutationError } from '../../shared/mutationError';
 import {
   contractSchema,
   emptyContractValues,
@@ -77,7 +77,8 @@ function ContractFormBody({
       notifications.show({ color: 'green', message: 'Contract saved' });
       onClose();
     } catch (error) {
-      handleContractMutationError(error, {
+      handleMutationError(error, {
+        entity: 'contract',
         form,
         setTopError,
         onClose,

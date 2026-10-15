@@ -1,15 +1,15 @@
 import type { UseFormReturnType } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { ApiError } from '../../shared/api/client';
-import { serverFieldErrors } from '../../shared/validation';
+import { ApiError } from './api/client';
+import { serverFieldErrors } from './validation';
 
 /**
- * Shared 400/409/generic handling for the unit and sale modals: a 400 maps field errors onto the form's
+ * Shared 400/409/generic handling for entity form modals: a 400 maps field errors onto the form's
  * fields and surfaces a top alert for any erroring key that isn't one of the caller's field names (since there's
  * no such field to show it on), a 409 shows a "changed by someone else" toast and closes the modal, and anything
  * else is a generic toast.
  */
-export function handleSalesMutationError(
+export function handleMutationError(
   error: unknown,
   opts: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -18,9 +18,11 @@ export function handleSalesMutationError(
     onClose: () => void;
     failureTitle: string;
     fieldNames: string[];
+    /** Singular noun for the 409 toast, e.g. "risk" -> "This risk was changed by someone else". */
+    entity: string;
   },
 ): void {
-  const { form, setTopError, onClose, failureTitle, fieldNames } = opts;
+  const { form, setTopError, onClose, failureTitle, fieldNames, entity } = opts;
   if (error instanceof ApiError && error.status === 400 && error.problem?.errors) {
     const fieldErrors = serverFieldErrors(error.problem);
     const mappedErrors: Record<string, string> = {};
@@ -37,7 +39,7 @@ export function handleSalesMutationError(
   } else if (error instanceof ApiError && error.status === 409) {
     notifications.show({
       color: 'yellow',
-      title: 'This unit was changed by someone else',
+      title: `This ${entity} was changed by someone else`,
       message: 'The list now shows the latest version. Open it again to make your changes.',
     });
     onClose();
