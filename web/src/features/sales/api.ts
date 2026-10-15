@@ -11,6 +11,7 @@ function useRefreshSales(projectId: string) {
     Promise.all([
       queryClient.invalidateQueries({ queryKey: salesKey(projectId) }),
       queryClient.invalidateQueries({ queryKey: salesSummaryKey }),
+      queryClient.invalidateQueries({ queryKey: ['cashflow', projectId] }),
     ]);
 }
 
