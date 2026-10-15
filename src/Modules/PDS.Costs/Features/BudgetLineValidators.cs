@@ -16,14 +16,14 @@ internal abstract class BudgetLineInputValidator<T> : AbstractValidator<T> where
         RuleFor(x => x.BudgetAmount).NotNull().WithMessage("Budget is required.");
         RuleFor(x => x.BudgetAmount!.Value).Cascade(CascadeMode.Stop)
             .GreaterThanOrEqualTo(0).WithMessage("Budget can't be negative.")
-            .PrecisionScale(18, 2, ignoreTrailingZeros: true).WithMessage("Use at most 2 decimal places.")
             .LessThanOrEqualTo(MoneyRules.MaxAbs).WithMessage("Budget is too large.")
+            .PrecisionScale(18, 2, ignoreTrailingZeros: true).WithMessage("Use at most 2 decimal places.")
             .OverridePropertyName(nameof(IBudgetLineInput.BudgetAmount))
             .When(x => x.BudgetAmount is not null);
         RuleFor(x => x.ForecastRemainingAmount!.Value).Cascade(CascadeMode.Stop)
             .GreaterThanOrEqualTo(0).WithMessage("Forecast can't be negative.")
-            .PrecisionScale(18, 2, ignoreTrailingZeros: true).WithMessage("Use at most 2 decimal places.")
             .LessThanOrEqualTo(MoneyRules.MaxAbs).WithMessage("Forecast is too large.")
+            .PrecisionScale(18, 2, ignoreTrailingZeros: true).WithMessage("Use at most 2 decimal places.")
             .OverridePropertyName(nameof(IBudgetLineInput.ForecastRemainingAmount))
             .When(x => x.ForecastRemainingAmount is not null);
         RuleFor(x => x.Notes).MaximumLength(BudgetLineRules.NotesMaxLength);

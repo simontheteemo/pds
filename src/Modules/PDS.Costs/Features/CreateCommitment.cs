@@ -38,6 +38,6 @@ internal static class CreateCommitment
 
         var entry = Commitment.Create(pid, request.ToFields(locale.Value.Currency), new AuditStamp(clock.GetUtcNow(), user.Name));
         await store.CreateCommitmentAsync(entry, ct);
-        return TypedResults.Created($"/api/costs/projects/{projectId}/commitments/{entry.Id.Value}", CommitmentDetails.From(entry));
+        return TypedResults.Created($"/api/costs/projects/{projectId}", CommitmentDetails.From(entry));
     }
 }
