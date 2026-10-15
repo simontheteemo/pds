@@ -33,6 +33,12 @@ public static class CostsModule
         AddStandardLines.Map(costs);
         UpdateBudgetLine.Map(costs);
         DeleteBudgetLine.Map(costs);
+        CreateCommitment.Map(costs);
+        UpdateCommitment.Map(costs);
+        DeleteCommitment.Map(costs);
+        CreateActualCost.Map(costs);
+        UpdateActualCost.Map(costs);
+        DeleteActualCost.Map(costs);
         return app;
     }
 }

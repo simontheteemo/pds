@@ -34,6 +34,10 @@ internal static class DeleteBudgetLine
         if (line is null)
             return TypedResults.NotFound();
 
+        var data = await store.LoadProjectAsync(pid, ct);
+        if (data.Commitments.Any(c => c.Fields.BudgetLineId == id) || data.Actuals.Any(a => a.Fields.BudgetLineId == id))
+            return CostsProblems.LineInUse();
+
         if (line.Version != version.Value || !await store.DeleteLineAsync(pid, id, version.Value, ct))
             return CostsProblems.VersionConflict("budget line");
         return TypedResults.NoContent();
