@@ -28,21 +28,58 @@ internal sealed class CostStore(IAmazonDynamoDB dynamo, TableNames names)
                 ExclusiveStartKey = start,
             }, ct);
             foreach (var item in response.Items ?? [])
-            {
-                var sk = Attr.GetString(item, TableKeys.SortKey);
-                if (sk.StartsWith(CostKeys.LinePrefix, StringComparison.Ordinal))
-                    lines.Add(BudgetLineItemMapper.FromItem(item));
-                else if (sk.StartsWith(CostKeys.CommitmentPrefix, StringComparison.Ordinal))
-                    commitments.Add(CommitmentItemMapper.FromItem(item));
-                else if (sk.StartsWith(CostKeys.ActualPrefix, StringComparison.Ordinal))
-                    actuals.Add(ActualCostItemMapper.FromItem(item));
-            }
+                Dispatch(item, lines, commitments, actuals);
 
             start = response.LastEvaluatedKey is { Count: > 0 } next ? next : null;
         }
         while (start is not null);
 
         return new ProjectCostData(lines, commitments, actuals);
+    }
+
+    /// <summary>Every cost item in every project, grouped by project (full scan; for exports).</summary>
+    public async Task<IReadOnlyDictionary<ProjectId, ProjectCostData>> ScanAllAsync(CancellationToken ct)
+    {
+        var lines = new List<BudgetLine>();
+        var commitments = new List<Commitment>();
+        var actuals = new List<ActualCost>();
+        Dictionary<string, AttributeValue>? start = null;
+        do
+        {
+            var response = await dynamo.ScanAsync(new ScanRequest
+            {
+                TableName = Table,
+                ConsistentRead = true,
+                ExclusiveStartKey = start,
+            }, ct);
+            foreach (var item in response.Items ?? [])
+                Dispatch(item, lines, commitments, actuals);
+
+            start = response.LastEvaluatedKey is { Count: > 0 } next ? next : null;
+        }
+        while (start is not null);
+
+        var linesBy = lines.ToLookup(l => l.ProjectId);
+        var commitmentsBy = commitments.ToLookup(c => c.ProjectId);
+        var actualsBy = actuals.ToLookup(a => a.ProjectId);
+        return linesBy.Select(g => g.Key)
+            .Union(commitmentsBy.Select(g => g.Key))
+            .Union(actualsBy.Select(g => g.Key))
+            .ToDictionary(
+                id => id,
+                id => new ProjectCostData(linesBy[id].ToList(), commitmentsBy[id].ToList(), actualsBy[id].ToList()));
+    }
+
+    private static void Dispatch(
+        Dictionary<string, AttributeValue> item, List<BudgetLine> lines, List<Commitment> commitments, List<ActualCost> actuals)
+    {
+        var sk = Attr.GetString(item, TableKeys.SortKey);
+        if (sk.StartsWith(CostKeys.LinePrefix, StringComparison.Ordinal))
+            lines.Add(BudgetLineItemMapper.FromItem(item));
+        else if (sk.StartsWith(CostKeys.CommitmentPrefix, StringComparison.Ordinal))
+            commitments.Add(CommitmentItemMapper.FromItem(item));
+        else if (sk.StartsWith(CostKeys.ActualPrefix, StringComparison.Ordinal))
+            actuals.Add(ActualCostItemMapper.FromItem(item));
     }
 
     public async Task<BudgetLine?> GetLineAsync(ProjectId projectId, BudgetLineId lineId, CancellationToken ct)

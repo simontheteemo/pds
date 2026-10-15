@@ -11,5 +11,7 @@
     <ProjectReference Include="../PDS.Portfolio/PDS.Portfolio.csproj" />
     <!-- Only PDS.Contractors.Contracts types may be used (module rule). -->
     <ProjectReference Include="../PDS.Contractors/PDS.Contractors.csproj" />
+    <!-- Only PDS.Reporting.Contracts types may be used (module rule). -->
+    <ProjectReference Include="../PDS.Reporting/PDS.Reporting.csproj" />
   </ItemGroup>
 </Project>

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using PDS.Consents.Data;
 using PDS.Consents.Features;
+using PDS.Reporting.Contracts;
 using PDS.Shared.Data;
 using PDS.Shared.Security;
 
@@ -19,6 +20,8 @@ public static class ConsentsModule
     {
         services.AddSingleton(ConsentsTable.Definition);
         services.AddSingleton<ConsentStore>();
+        services.AddScoped<IExportDataset, ConsentsExport>();
+        services.AddScoped<IExportDataset, ConsentConditionsExport>();
         services.AddValidatorsFromAssemblyContaining<CreateConsentValidator>(includeInternalTypes: true);
         return services;
     }
