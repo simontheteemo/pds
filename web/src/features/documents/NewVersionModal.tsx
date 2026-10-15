@@ -14,13 +14,23 @@ type Props = {
   onClose: () => void;
 };
 
-function NewVersionForm({ projectId, document, settings, onClose }: Props & { document: DocumentDetails }) {
+function NewVersionForm({
+  projectId,
+  document,
+  settings,
+  onClose,
+  onSubmittingChange,
+}: Props & { document: DocumentDetails; onSubmittingChange: (submitting: boolean) => void }) {
   const config = useConfig();
   const addVersion = useAddVersion(projectId);
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [topError, setTopError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const [submitting, setSubmittingState] = useState(false);
+  const setSubmitting = (value: boolean) => {
+    setSubmittingState(value);
+    onSubmittingChange(value);
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -81,14 +91,18 @@ function NewVersionForm({ projectId, document, settings, onClose }: Props & { do
 
 export function NewVersionModal(props: Props) {
   const { document } = props;
+  const [submitting, setSubmitting] = useState(false);
   return (
     <Modal
       opened={document !== undefined}
       onClose={props.onClose}
       title={document ? `New version of “${document.title}”` : ''}
       size="lg"
+      closeOnClickOutside={!submitting}
+      closeOnEscape={!submitting}
+      withCloseButton={!submitting}
     >
-      {document && <NewVersionForm key={document.id} {...props} document={document} />}
+      {document && <NewVersionForm key={document.id} {...props} document={document} onSubmittingChange={setSubmitting} />}
     </Modal>
   );
 }
