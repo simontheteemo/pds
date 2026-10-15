@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import { zodValidate } from '../../shared/validation';
 import { useCloseRisk } from './api';
-import { handleRiskMutationError } from './riskMutationError';
+import { handleMutationError } from '../../shared/mutationError';
 import type { RiskDetails } from './types';
 
 const closeSchema = z.object({
@@ -38,7 +38,8 @@ function CloseRiskModalInner({ projectId, risk, onClose }: { projectId: string; 
       notifications.show({ color: 'green', message: 'Risk closed' });
       onClose();
     } catch (error) {
-      handleRiskMutationError(error, {
+      handleMutationError(error, {
+        entity: 'risk',
         form,
         setTopError,
         onClose,

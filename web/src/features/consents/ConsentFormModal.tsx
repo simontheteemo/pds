@@ -4,7 +4,7 @@ import { notifications } from '@mantine/notifications';
 import { useState } from 'react';
 import { zodValidate } from '../../shared/validation';
 import { useCreateConsent, useUpdateConsent } from './api';
-import { handleConsentMutationError } from './consentMutationError';
+import { handleMutationError } from '../../shared/mutationError';
 import {
   consentSchema,
   emptyConsentValues,
@@ -56,7 +56,7 @@ function ConsentFormModalInner({ projectId, consent, onClose }: Props & { consen
       notifications.show({ color: 'green', message: 'Consent saved' });
       onClose();
     } catch (error) {
-      handleConsentMutationError(error, {
+      handleMutationError(error, {
         form,
         setTopError,
         onClose,

@@ -6,7 +6,7 @@ import { useConfig } from '../../shared/config';
 import { zodValidate } from '../../shared/validation';
 import { useCompleteCondition } from './api';
 import { completeSchema, localToday } from './conditionFormModel';
-import { handleConsentMutationError } from './consentMutationError';
+import { handleMutationError } from '../../shared/mutationError';
 import type { ConditionDetails } from './types';
 
 type CompleteFormValues = { completedOn: string };
@@ -47,7 +47,7 @@ function CompleteConditionModalInner({
       notifications.show({ color: 'green', message: 'Condition completed' });
       onClose();
     } catch (error) {
-      handleConsentMutationError(error, {
+      handleMutationError(error, {
         form,
         setTopError,
         onClose,
