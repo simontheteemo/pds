@@ -23,7 +23,10 @@ internal sealed class DocumentStore(IAmazonDynamoDB dynamo, TableNames names)
         Group(await QueryAsync(projectId, DocumentItemMapper.SortKey(documentId), ct)).FirstOrDefault();
 
     /// <summary>Puts the document, its version 1 and the upload claim atomically.</summary>
-    /// <returns>False when another document already claimed <paramref name="uploadId"/>.</returns>
+    /// <returns>
+    /// False when the upload claim was not won: another document already claimed <paramref name="uploadId"/>
+    /// (ConditionalCheckFailed) or a concurrent transaction on the claim conflicted (TransactionConflict).
+    /// </returns>
     public async Task<bool> CreateAsync(Document document, Guid uploadId, CancellationToken ct)
     {
         const int claimIndex = 2;
@@ -49,7 +52,8 @@ internal sealed class DocumentStore(IAmazonDynamoDB dynamo, TableNames names)
             return true;
         }
         catch (TransactionCanceledException ex)
-            when (ex.CancellationReasons is { Count: > claimIndex } reasons && reasons[claimIndex].Code == "ConditionalCheckFailed")
+            when (ex.CancellationReasons is { Count: > claimIndex } reasons
+                && reasons[claimIndex].Code is "ConditionalCheckFailed" or "TransactionConflict")
         {
             return false;
         }

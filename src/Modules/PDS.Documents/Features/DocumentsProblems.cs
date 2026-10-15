@@ -23,6 +23,10 @@ internal static class DocumentsProblems
     public static ValidationProblem TypeMismatch() =>
         Problems.Field("fileName", "The uploaded file doesn't match its file name. Upload it again.");
 
+    public static ProblemHttpResult UploadInProgress() => Problems.Conflict(
+        "This upload is already being saved.",
+        "Refresh the document list to check whether it was saved, then try again if it's missing.");
+
     public static ProblemHttpResult VersionConflict() => Problems.Conflict(
         "This document was changed by someone else.",
         "Reload to see the latest changes, then apply your edits again.");

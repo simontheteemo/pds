@@ -12,6 +12,7 @@ namespace PDS.Documents.Data;
 internal static class UploadClaimItemMapper
 {
     public const string ItemType = "UploadClaim";
+    private const string DocumentIdAttr = "documentId";
 
     public static Dictionary<string, AttributeValue> Key(ProjectId projectId, Guid uploadId) => new()
     {
@@ -23,10 +24,10 @@ internal static class UploadClaimItemMapper
     {
         var item = Key(projectId, uploadId);
         item[DocumentItemMapper.ItemTypeAttr] = Attr.S(ItemType);
-        item["documentId"] = Attr.S(documentId.Value.ToString());
+        item[DocumentIdAttr] = Attr.S(documentId.Value.ToString());
         return item;
     }
 
     public static DocumentId DocumentIdOf(IReadOnlyDictionary<string, AttributeValue> item) =>
-        new(Guid.Parse(Attr.GetString(item, "documentId")));
+        new(Guid.Parse(Attr.GetString(item, DocumentIdAttr)));
 }
