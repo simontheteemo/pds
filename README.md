@@ -104,7 +104,7 @@ Manual checks the script can't do:
 
 1. Open the `SiteUrl`, sign in with the temporary password from the invitation email, and create a project.
 2. Download a Reporting CSV in the browser and open it in Excel: accents and macrons should display correctly and the columns should split.
-3. In the browser, upload a file to a project's Documents tab, then download it again. This exercises the S3 CORS rules, which the script can't.
+3. In the browser, upload a file to a project's Documents section, then download it again. This exercises the S3 CORS rules, which the script can't.
 
 ### Adding a user
 
