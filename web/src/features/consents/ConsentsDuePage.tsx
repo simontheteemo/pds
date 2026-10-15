@@ -1,24 +1,37 @@
-import { Alert, Anchor, Loader, Stack, Table, Text, Title } from '@mantine/core';
+import { Alert, Anchor, Button, Group, Loader, Stack, Table, Text, Title } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { Link } from 'react-router';
 import { useConfig } from '../../shared/config';
 import { formatDate } from '../../shared/format';
+import { usePermissions } from '../../shared/me';
 import { useDueItems } from './api';
 import { DueStateBadge } from './DueStateBadge';
+import { ReminderPreviewModal } from './ReminderPreviewModal';
 import { consentTypeLabel, dueStateLabel, expiryStateLabel } from './types';
 
 export function ConsentsDuePage() {
   const config = useConfig();
   const due = useDueItems();
   const items = due.data;
+  const { canAdminister } = usePermissions();
+  const [opened, { open, close }] = useDisclosure(false);
 
   return (
     <Stack>
-      <div>
-        <Title order={2}>Consents due</Title>
-        <Text c="dimmed">
-          Overdue and due within 30 days (consent expiries within 90 days) across active projects.
-        </Text>
-      </div>
+      <Group justify="space-between" align="flex-start">
+        <div>
+          <Title order={2}>Consents due</Title>
+          <Text c="dimmed">
+            Overdue and due within 30 days (consent expiries within 90 days) across active projects.
+          </Text>
+        </div>
+        {canAdminister && (
+          <Button variant="default" onClick={open}>
+            Preview reminder email
+          </Button>
+        )}
+      </Group>
+      {canAdminister && <ReminderPreviewModal opened={opened} onClose={close} />}
 
       {due.error ? (
         <Alert color="red" title="Could not load due consents">

@@ -8,6 +8,7 @@ import type {
   ConsentInput,
   ConsentUpdateInput,
   DueItem,
+  ReminderPreview,
 } from './types';
 
 const consentsKey = (projectId: string) => ['consents', projectId];
@@ -153,5 +154,12 @@ export function useReopenCondition(projectId: string) {
         }),
       ),
     onSettled: refresh,
+  });
+}
+
+export function usePreviewReminders() {
+  const api = useApi();
+  return useMutation({
+    mutationFn: () => unwrap<ReminderPreview>(api.POST('/api/consents/reminders/preview')),
   });
 }

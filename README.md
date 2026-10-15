@@ -7,6 +7,20 @@ Web system for managing a property development portfolio. It's single-tenant: on
 - Decisions: `docs/adr/`
 - Stack: `docs/tech-stack.md`
 
+## Modules
+
+One project per module under `src/Modules/`, one feature folder under `web/src/features/`. Each has its own spec.
+
+- **Portfolio**: projects, stage, status and budget. [Foundation spec](docs/superpowers/specs/2026-09-29-foundation-design.md)
+- **Risks**: per-project risk registry with ratings. [Spec](docs/superpowers/specs/2026-09-30-risk-registry-design.md)
+- **Contractors**: contractors and their contracts. [Spec](docs/superpowers/specs/2026-09-30-contractors-design.md)
+- **Costs**: cost lines, commitments and actuals with running totals. [Spec](docs/superpowers/specs/2026-10-14-costs-design.md)
+- **Consents**: consents and their conditions, plus a "due" view. [Spec](docs/superpowers/specs/2026-10-14-consents-design.md)
+- **Sales**: sales units and sale details, with a pipeline summary. [Spec](docs/superpowers/specs/2026-10-14-sales-design.md)
+- **Documents**: versioned files per project, uploaded straight to S3 with presigned URLs. [Spec](docs/superpowers/specs/2026-10-14-documents-design.md)
+- **Cashflow**: a forecast calculated from costs and sales; it stores nothing. [Spec](docs/superpowers/specs/2026-10-14-cashflow-design.md)
+- **Reporting**: CSV exports of module data (UTF-8 with BOM, for Excel). [Spec](docs/superpowers/specs/2026-10-14-reporting-design.md)
+
 ## Local development
 
 Prerequisites: .NET 10 SDK, Node.js ≥ 22.12, Docker.
@@ -17,7 +31,15 @@ dotnet run --project src/PDS.Api       # API on http://localhost:5080, signed in
 cd web && npm install && npm run dev   # SPA on http://localhost:5173 (proxies /api to :5080)
 ```
 
-To try another role locally, change `Auth:DevUser:Roles` in `src/PDS.Api/appsettings.Development.json`.
+To try another role locally, change `Auth:DevUser:Roles` in `src/PDS.Api/appsettings.Development.json`. Dev auth signs every request in as that user, so no token is needed.
+
+Per-module local settings, all already set in `appsettings.Development.json`:
+
+- **Tables**: `Dynamo:CreateTablesOnStartup` creates every module's tables in DynamoDB Local on first run.
+- **Documents**: `Documents:Storage=Local` replaces S3 with files on disk plus signed stand-ins for the presigned PUT/GET URLs (`/api/documents/local-files/...`). Files go to `<temp>/pds-documents`; set `Documents:LocalPath` to change that. The API refuses to start with `Local` outside the `Development` environment, so a deployed Lambda always uses S3 (`Documents__BucketName` is set by CDK).
+- **Reporting, Cashflow, Sales, Consents, Costs, Risks, Contractors**: nothing to configure.
+
+The shared `Locale` settings (currency, culture, time zone) live in `appsettings.json`. The API fails at startup if `Locale:TimeZone` is not a valid time zone.
 
 ## Tests
 
@@ -25,7 +47,9 @@ To try another role locally, change `Auth:DevUser:Roles` in `src/PDS.Api/appsett
 dotnet test                  # unit and integration (needs Docker)
 ```
 
-Frontend tests are not set up yet.
+```bash
+cd web && npm test           # frontend unit tests (vitest)
+```
 
 ## API contract
 
@@ -38,7 +62,7 @@ Each client environment is its own AWS account. `dev` and `prod` are separate ac
 ### First deployment of an environment (once per account)
 
 1. **Pick the region.** Use `ap-southeast-6` (Auckland) only if Lambda (`dotnet10` runtime), API Gateway HTTP APIs, DynamoDB, Cognito, CloudFront and Budgets are all available there; otherwise use `ap-southeast-2` (Sydney).
-2. **Create the deployment file.** Copy `infra/deployments/example-dev.json` to `infra/deployments/<name>.json` (for example `seine-dev`). Set `account`, `region`, `isProduction`, a globally unique `cognitoDomainPrefix`, `alarmEmail`, `monthlyBudgetUsd`, branding and `gitHub` (`repository` = `org/repo`, `environment` = `dev` or `prod`). Commit it.
+2. **Create the deployment file.** Copy `infra/deployments/example-dev.json` to `infra/deployments/<name>.json` (for example `seine-dev`). Set `account`, `region`, `isProduction`, a globally unique `cognitoDomainPrefix`, `alarmEmail`, `monthlyBudgetUsd`, branding, `gitHub` (`repository` = `org/repo`, `environment` = `dev` or `prod`) and optionally `consentReminders` (see below). Commit it.
 3. **Build the artifacts** that synthesis needs:
    ```bash
    dotnet publish src/PDS.Api -c Release -r linux-arm64 --self-contained false -p:PublishReadyToRun=true -o artifacts/api
@@ -59,7 +83,46 @@ Each client environment is its own AWS account. `dev` and `prod` are separate ac
      --user-attributes Name=email,Value=admin@example.com Name=email_verified,Value=true Name=name,Value="First Admin"
    aws cognito-idp admin-add-user-to-group --user-pool-id <pool> --username admin@example.com --group-name Admin
    ```
-8. **Check it works.** Open the `SiteUrl` output, sign in with the temporary password from the invitation email, and create a project.
+8. **Check it works.** Run the smoke check, then do the manual checks below.
+
+### After the first deploy (and after any deploy)
+
+```bash
+scripts/smoke-check.sh <SiteUrl> [<ApiUrl>]                     # ApiUrl defaults to apiBaseUrl in /config.json
+PDS_TOKEN=<id token> scripts/smoke-check.sh <SiteUrl>           # adds the signed-in checks
+PDS_TOKEN=<id token> SMOKE_DOCUMENTS=1 SMOKE_PROJECT_ID=<id> scripts/smoke-check.sh <SiteUrl>   # adds an upload round trip
+```
+
+Needs bash, curl and jq. It prints one PASS/FAIL/SKIP line per check and exits non-zero if anything failed.
+
+- **Without a token**: the SPA loads, `/config.json` is served, `GET /api/config` returns 200 (proves the Lambda started, so `Locale:TimeZone` and the other settings resolved), and a protected endpoint returns 401.
+- **With `PDS_TOKEN`** (a Cognito ID token, not the access token, for an Admin or Manager user): `/api/me`, one list endpoint per module, and a Reporting CSV that starts with a UTF-8 BOM. Get a token by signing in to the SPA and copying `id_token` from the `oidc.user:...` entry in the browser's session storage. The token is never printed.
+- **With `SMOKE_DOCUMENTS=1`**: requests an upload URL, PUTs a tiny `.txt` to S3, confirms it, downloads it and compares the bytes, then deletes it if the token is an Admin's. This writes a document to `SMOKE_PROJECT_ID`, so it is opt-in. If it fails at the PUT with a CORS error from a browser, check the bucket's CORS rules.
+- **Against local dev** (`dotnet run --project src/PDS.Api --urls http://localhost:5090`, plus `npm run dev` for the SPA): `scripts/smoke-check.sh http://localhost:5173 http://localhost:5090`. Dev auth accepts every request, so the "401 without a token" check is reported as SKIP. Without the SPA running, the site checks fail; that is expected.
+
+Manual checks the script can't do:
+
+1. Open the `SiteUrl`, sign in with the temporary password from the invitation email, and create a project.
+2. Download a Reporting CSV in the browser and open it in Excel: accents and macrons should display correctly and the columns should split.
+3. In the browser, upload a file to a project's Documents section, then download it again. This exercises the S3 CORS rules, which the script can't.
+
+### Consent reminder emails
+
+Set `consentReminders` in the deployment file to email a weekday digest of due consent items:
+
+```json
+"consentReminders": { "enabled": true, "schedule": "cron(0 7 ? * MON-FRI *)", "timeZone": null, "emails": ["consents@example.com"] }
+```
+
+- `enabled`: when absent or `false`, nothing is created.
+- `schedule`: an EventBridge Scheduler `cron(...)` or `rate(...)` expression. Default `cron(0 7 ? * MON-FRI *)`.
+- `timeZone`: IANA name. Default is `locale.timeZone`.
+- `emails`: recipients, subscribed to an SNS topic named `<name>-consent-reminders`. Each recipient must click the confirmation link in the AWS subscription email before they receive digests.
+
+- "Today" in the digest always uses `locale.timeZone` (Locale:TimeZone), even when `consentReminders.timeZone` differs.
+- Every email carries SNS's unsubscribe link; an unsubscribed address must be re-subscribed (re-deploy or the SNS console).
+
+A Scheduler rule invokes the API function directly (as a system Admin principal) on `POST /api/consents/reminders/send`. Admins can see the digest content beforehand with `POST /api/consents/reminders/preview`, and trigger a send on demand with `POST /api/consents/reminders/send`. A failed send logs `ConsentReminderSendFailed`, which raises an alarm sent to `alarmEmail`. After the first deploy you can confirm the filter with "Test pattern" in the CloudWatch console.
 
 ### Adding a user
 
