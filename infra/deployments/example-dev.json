@@ -8,5 +8,6 @@
   "monthlyBudgetUsd": 25,
   "branding": { "productName": "Property Development System", "logoUrl": null, "primaryColor": "teal" },
   "locale": { "currency": "NZD", "culture": "en-NZ", "timeZone": "Pacific/Auckland" },
-  "gitHub": { "repository": "your-org/pds", "environment": "dev" }
+  "gitHub": { "repository": "your-org/pds", "environment": "dev" },
+  "consentReminders": { "enabled": true, "schedule": "cron(0 7 ? * MON-FRI *)", "timeZone": null, "emails": ["consents@example.com"] }
 }

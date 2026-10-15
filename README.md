@@ -38,7 +38,7 @@ Each client environment is its own AWS account. `dev` and `prod` are separate ac
 ### First deployment of an environment (once per account)
 
 1. **Pick the region.** Use `ap-southeast-6` (Auckland) only if Lambda (`dotnet10` runtime), API Gateway HTTP APIs, DynamoDB, Cognito, CloudFront and Budgets are all available there; otherwise use `ap-southeast-2` (Sydney).
-2. **Create the deployment file.** Copy `infra/deployments/example-dev.json` to `infra/deployments/<name>.json` (for example `seine-dev`). Set `account`, `region`, `isProduction`, a globally unique `cognitoDomainPrefix`, `alarmEmail`, `monthlyBudgetUsd`, branding and `gitHub` (`repository` = `org/repo`, `environment` = `dev` or `prod`). Commit it.
+2. **Create the deployment file.** Copy `infra/deployments/example-dev.json` to `infra/deployments/<name>.json` (for example `seine-dev`). Set `account`, `region`, `isProduction`, a globally unique `cognitoDomainPrefix`, `alarmEmail`, `monthlyBudgetUsd`, branding, `gitHub` (`repository` = `org/repo`, `environment` = `dev` or `prod`) and optionally `consentReminders` (see below). Commit it.
 3. **Build the artifacts** that synthesis needs:
    ```bash
    dotnet publish src/PDS.Api -c Release -r linux-arm64 --self-contained false -p:PublishReadyToRun=true -o artifacts/api
@@ -60,6 +60,21 @@ Each client environment is its own AWS account. `dev` and `prod` are separate ac
    aws cognito-idp admin-add-user-to-group --user-pool-id <pool> --username admin@example.com --group-name Admin
    ```
 8. **Check it works.** Open the `SiteUrl` output, sign in with the temporary password from the invitation email, and create a project.
+
+### Consent reminder emails
+
+Set `consentReminders` in the deployment file to email a weekday digest of due consent items:
+
+```json
+"consentReminders": { "enabled": true, "schedule": "cron(0 7 ? * MON-FRI *)", "timeZone": null, "emails": ["consents@example.com"] }
+```
+
+- `enabled`: when absent or `false`, nothing is created.
+- `schedule`: an EventBridge Scheduler `cron(...)` or `rate(...)` expression. Default `cron(0 7 ? * MON-FRI *)`.
+- `timeZone`: IANA name. Default is `locale.timeZone`.
+- `emails`: recipients, subscribed to an SNS topic named `<name>-consent-reminders`. Each recipient must click the confirmation link in the AWS subscription email before they receive digests.
+
+A Scheduler rule invokes the API function directly (as a system Admin principal) on `POST /api/consents/reminders/send`. Admins can see the digest content beforehand with `POST /api/consents/reminders/preview`, and trigger a send on demand with `POST /api/consents/reminders/send`. A failed send logs `ConsentReminderSendFailed`, which raises an alarm sent to `alarmEmail`.
 
 ### Adding a user
 

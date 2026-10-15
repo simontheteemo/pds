@@ -107,6 +107,12 @@ public sealed class AppStack : Stack
             environment[$"Tables__{logicalName}"] = table.TableName;
         environment["Documents__BucketName"] = documents.Bucket.BucketName;
 
+        var apiLogs = new LogGroup(this, "api-logs", new LogGroupProps
+        {
+            LogGroupName = $"/aws/lambda/{settings.Name}-api",
+            Retention = RetentionDays.THREE_MONTHS,
+            RemovalPolicy = RemovalPolicy.DESTROY,
+        });
         var api = new LambdaFunction(this, "api", new LambdaFunctionProps
         {
             FunctionName = $"{settings.Name}-api",
@@ -117,12 +123,7 @@ public sealed class AppStack : Stack
             MemorySize = 1024,
             Timeout = Duration.Seconds(30),
             Environment = environment,
-            LogGroup = new LogGroup(this, "api-logs", new LogGroupProps
-            {
-                LogGroupName = $"/aws/lambda/{settings.Name}-api",
-                Retention = RetentionDays.THREE_MONTHS,
-                RemovalPolicy = RemovalPolicy.DESTROY,
-            }),
+            LogGroup = apiLogs,
         });
         foreach (var table in tables.Values)
             table.GrantReadWriteData(api);
@@ -176,6 +177,8 @@ public sealed class AppStack : Stack
         if (settings.AlarmEmail is { } email)
             alarms.AddSubscription(new EmailSubscription(email));
         var notify = new SnsAction(alarms);
+        if (settings.ConsentReminders is { Enabled: true } reminders)
+            _ = new ConsentReminders(this, "consent-reminders", settings, reminders, api, apiLogs, alarms, siteUrl);
         var fiveMinutes = new MetricOptions { Period = Duration.Minutes(5), Statistic = "Sum" };
 
         void AddAlarm(string alarmId, IMetric metric, string description) =>
