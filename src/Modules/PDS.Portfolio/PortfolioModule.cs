@@ -21,7 +21,7 @@ public static class PortfolioModule
     {
         services.AddSingleton(PortfolioTable.Definition);
         services.AddSingleton<ProjectStore>();
-        services.AddSingleton<IExportDataset, ProjectsExport>();
+        services.AddScoped<IExportDataset, ProjectsExport>();
         services.AddScoped<IPortfolioQueries, PortfolioQueries>();
         services.AddValidatorsFromAssemblyContaining<CreateProjectValidator>(includeInternalTypes: true);
         return services;

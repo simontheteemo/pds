@@ -17,7 +17,7 @@ public static class ReportingModule
 {
     public static IServiceCollection AddReportingModule(this IServiceCollection services)
     {
-        services.AddSingleton<ExportCatalog>();
+        services.AddScoped<ExportCatalog>();
         services.AddAuthorizationBuilder()
             .AddPolicy(ReportingPolicies.CanExport, p => p.RequireRole(Roles.Manager, Roles.Admin));
         return services;

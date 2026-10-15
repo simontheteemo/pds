@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using PDS.Reporting.Contracts;
 using PDS.Risks.Data;
 using PDS.Risks.Features;
 using PDS.Shared.Data;
@@ -19,6 +20,7 @@ public static class RisksModule
     {
         services.AddSingleton(RisksTable.Definition);
         services.AddSingleton<RiskStore>();
+        services.AddScoped<IExportDataset, RisksExport>();
         services.AddValidatorsFromAssemblyContaining<CreateRiskValidator>(includeInternalTypes: true);
         return services;
     }

@@ -44,6 +44,29 @@ internal sealed class ContractStore(IAmazonDynamoDB dynamo, TableNames names)
             },
         }, ct);
 
+
+    /// <summary>Every contract in every project (full scan; for exports).</summary>
+    public async Task<IReadOnlyList<Contract>> ScanAllAsync(CancellationToken ct)
+    {
+        var items = new List<Contract>();
+        Dictionary<string, AttributeValue>? start = null;
+        do
+        {
+            var response = await dynamo.ScanAsync(new ScanRequest
+            {
+                TableName = Table,
+                FilterExpression = "begins_with(sk, :prefix)",
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue> { [":prefix"] = Attr.S(ContractItemMapper.ContractPrefix) },
+                ConsistentRead = true,
+                ExclusiveStartKey = start,
+            }, ct);
+            items.AddRange((response.Items ?? []).Select(ContractItemMapper.FromItem));
+            start = response.LastEvaluatedKey is { Count: > 0 } next ? next : null;
+        }
+        while (start is not null);
+        return items;
+    }
+
     public Task CreateAsync(Contract contract, CancellationToken ct) =>
         dynamo.PutItemAsync(new PutItemRequest
         {

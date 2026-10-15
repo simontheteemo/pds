@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PDS.Contractors.Contracts;
 using PDS.Contractors.Data;
 using PDS.Contractors.Features;
+using PDS.Reporting.Contracts;
 using PDS.Shared.Data;
 using PDS.Shared.Security;
 
@@ -22,6 +23,7 @@ public static class ContractorsModule
         services.AddSingleton<ContractorStore>();
         services.AddSingleton<ContractStore>();
         services.AddSingleton<IContractQueries, ContractQueries>();
+        services.AddScoped<IExportDataset, ContractsExport>();
         services.AddValidatorsFromAssemblyContaining<CreateContractorValidator>(includeInternalTypes: true);
         return services;
     }

@@ -3,7 +3,7 @@ using PDS.Reporting.Contracts;
 
 namespace PDS.Reporting.Features;
 
-/// <summary>Every registered dataset, validated once at startup.</summary>
+/// <summary>Every registered dataset, validated when built (scoped, because datasets may use scoped services).</summary>
 internal sealed partial class ExportCatalog
 {
     private readonly Dictionary<string, IExportDataset> byName;
