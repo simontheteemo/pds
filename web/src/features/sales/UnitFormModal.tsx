@@ -57,10 +57,11 @@ function UnitFormModalInner({ projectId, unit, onClose }: Props & { unit: UnitDe
     }
   });
 
-  const roomProps = { allowDecimal: false, min: 0, max: 20 } as const;
+  const roomProps = { allowDecimal: false, allowNegative: false, min: 0, max: 20 } as const;
   const areaProps = {
     suffix: ' m²',
     min: 0,
+    allowNegative: false,
     decimalScale: 2,
     thousandSeparator: groupSeparator,
     decimalSeparator,
@@ -92,6 +93,7 @@ function UnitFormModalInner({ projectId, unit, onClose }: Props & { unit: UnitDe
             label={`List price (${currency})`}
             prefix={currencySymbol}
             min={0}
+            allowNegative={false}
             decimalScale={2}
             thousandSeparator={groupSeparator}
             decimalSeparator={decimalSeparator}

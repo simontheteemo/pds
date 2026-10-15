@@ -66,6 +66,7 @@ function SaleFormModalInner({ projectId, unit, onClose }: Props & { unit: UnitDe
   const moneyProps = {
     prefix: currencySymbol,
     min: 0,
+    allowNegative: false,
     decimalScale: 2,
     thousandSeparator: groupSeparator,
     decimalSeparator,
