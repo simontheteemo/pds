@@ -6,6 +6,7 @@ using PDS.Consents;
 using PDS.Contractors;
 using PDS.Costs;
 using PDS.Portfolio;
+using PDS.Reporting;
 using PDS.Risks;
 using PDS.Sales;
 using PDS.Shared.Data;
@@ -47,6 +48,7 @@ builder.Services.AddContractorsModule();
 builder.Services.AddCostsModule();
 builder.Services.AddConsentsModule();
 builder.Services.AddSalesModule();
+builder.Services.AddReportingModule();
 
 var app = builder.Build();
 
@@ -75,6 +77,7 @@ app.MapContractorsEndpoints();
 app.MapCostsEndpoints();
 app.MapConsentsEndpoints();
 app.MapSalesEndpoints();
+app.MapReportingEndpoints();
 
 await app.RunAsync();
 
