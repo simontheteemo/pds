@@ -27,7 +27,7 @@ Give each project a **monthly cashflow forecast**: money out (costs) and money i
 | Portfolio view optional; decide | **Not built in v1.** Costs has no all-projects query, so a portfolio view would cost N report loads, and nobody has asked for it. The calculator takes per-project inputs, so a later roll-up can sum projects |
 | — | Range of months: from the earliest of (first actual, first sale month, schedule start, current month) to the latest of (last actual, last sale month, completion, current month). Months with no movement inside the range are included as zero rows, so the chart has a continuous axis |
 | — | "Current month" is the month of `LocalDate.Today` in `Locale:TimeZone`, the shared helper on main |
-| — | GST: costs exclude GST (the Costs spec). The Sales spec doesn't say, so sale prices are used as entered. The page notes "Costs exclude GST; sale prices as entered in Sales." No GST adjustment is made |
+| — | GST: costs exclude GST (the Costs spec). Sale prices are **assumed to be recorded GST-inclusive**, which is common for NZ residential sales (coordinator ruling). Nothing is converted. The page states the basis prominently in an info Alert: "GST basis: costs exclude GST; sale prices are assumed GST-inclusive as recorded in Sales. No GST adjustment is made." |
 | — | Read-only: CanRead only. Archived projects still show their cashflow |
 | No new tests (standing directive) | Verify by format, build, typecheck, lint and synth, plus manual API checks against DynamoDB Local with seeded costs and sales |
 
@@ -169,7 +169,7 @@ Totals: `costActual`, `costForecast`, `outflow`, `salesSettled`, `salesForecast`
   - An "Open cashflow" link.
 - **Cashflow page** (`/projects/:id/cashflow`, lazy-loaded):
   - **Header:** a breadcrumb back to the project (`code · name`), the title "Cashflow", and "As of {asOf}".
-  - **Note:** "Costs exclude GST; sale prices as entered in Sales. Remaining cost is spread evenly to the project's completion date."
+  - **GST basis** (a blue info Alert at the top of the page, always shown): "GST basis: costs exclude GST; sale prices are assumed GST-inclusive as recorded in Sales. No GST adjustment is made." Beneath it, a dimmed note: "Remaining cost is spread evenly to the project's completion date."
   - **Figures strip:** Total out, Total in, Net, Peak funding (with its month), Unscheduled cost, Unscheduled sales (each hidden when 0).
   - **Warnings** (yellow Alert):
     - `unscheduledCost > 0` → "Set the project's planned completion date to phase the remaining cost", with a link to the project edit page.
@@ -198,7 +198,7 @@ Totals: `costActual`, `costForecast`, `outflow`, `salesSettled`, `salesForecast`
 |---|---|---|
 | 1 | Straight-line phasing misrepresents front- or back-loaded spend (land early, construction S-curve) | A documented, simplest-defensible rule in one function (`CostPhasing`). Per-line profiles are the next step if the user wants them |
 | 2 | Conditional sales may fall over, so the forecast inflow is optimistic | Statuses are visible per unit, the Sales register shows them, and a later version can split Conditional into its own series |
-| 3 | GST basis mismatch between costs (ex GST) and sale prices (unspecified) | Stated on the page. It needs a decision from the client on the Sales GST basis |
+| 3 | GST basis mismatch between costs (ex GST) and sale prices (assumed GST-inclusive) | Stated prominently on the page, with no conversion. To be confirmed with the client |
 | 4 | Branch base: `feat/costs` doesn't contain Sales or the shared `LocalDate` | Implementation starts by rebasing `feat/cashflow` onto main after Costs merges (plan precondition) |
 | 5 | Adding a member to `IPortfolioQueries`, and the new queries in Costs and Sales, touch other modules | Each is additive (new files plus one DI line plus one interface member). They're called out in the PR |
 | 6 | Bundle size from recharts | The page is lazy-loaded. The plan records the main and lazy chunk sizes from `vite build` |
