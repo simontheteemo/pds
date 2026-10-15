@@ -2536,6 +2536,62 @@
         }
       }
     },
+    "/api/reporting/exports": {
+      "get": {
+        "tags": [
+          "Reporting"
+        ],
+        "operationId": "ListExports",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExportDatasetInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reporting/exports/{name}": {
+      "get": {
+        "tags": [
+          "Reporting"
+        ],
+        "operationId": "DownloadExport",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found"
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/documents/settings": {
       "get": {
         "tags": [
@@ -5389,6 +5445,25 @@
           "Done"
         ]
       },
+      "ExportDatasetInfo": {
+        "required": [
+          "name",
+          "title",
+          "description"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
       "HttpValidationProblemDetails": {
         "type": "object",
         "properties": {
@@ -7442,6 +7517,9 @@
     },
     {
       "name": "Sales"
+    },
+    {
+      "name": "Reporting"
     },
     {
       "name": "Documents"

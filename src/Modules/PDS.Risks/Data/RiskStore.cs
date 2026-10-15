@@ -45,6 +45,28 @@ internal sealed class RiskStore(IAmazonDynamoDB dynamo, TableNames names)
         return risks;
     }
 
+    /// <summary>Every risk in every project (full scan; for exports).</summary>
+    public async Task<IReadOnlyList<Risk>> ScanAllAsync(CancellationToken ct)
+    {
+        var items = new List<Risk>();
+        Dictionary<string, AttributeValue>? start = null;
+        do
+        {
+            var response = await dynamo.ScanAsync(new ScanRequest
+            {
+                TableName = Table,
+                FilterExpression = "begins_with(sk, :prefix)",
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue> { [":prefix"] = Attr.S(RiskItemMapper.RiskPrefix) },
+                ConsistentRead = true,
+                ExclusiveStartKey = start,
+            }, ct);
+            items.AddRange((response.Items ?? []).Select(RiskItemMapper.FromItem));
+            start = response.LastEvaluatedKey is { Count: > 0 } next ? next : null;
+        }
+        while (start is not null);
+        return items;
+    }
+
     public Task CreateAsync(Risk risk, CancellationToken ct) =>
         dynamo.PutItemAsync(new PutItemRequest
         {

@@ -9,5 +9,7 @@
     <ProjectReference Include="../../PDS.Shared/PDS.Shared.csproj" />
     <!-- Only PDS.Portfolio.Contracts types may be used (module rule). -->
     <ProjectReference Include="../PDS.Portfolio/PDS.Portfolio.csproj" />
+    <!-- Only PDS.Reporting.Contracts types may be used (module rule). -->
+    <ProjectReference Include="../PDS.Reporting/PDS.Reporting.csproj" />
   </ItemGroup>
 </Project>

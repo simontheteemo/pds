@@ -8,6 +8,7 @@ using PDS.Contractors;
 using PDS.Costs;
 using PDS.Documents;
 using PDS.Portfolio;
+using PDS.Reporting;
 using PDS.Risks;
 using PDS.Sales;
 using PDS.Shared.Data;
@@ -49,6 +50,7 @@ builder.Services.AddContractorsModule();
 builder.Services.AddCostsModule();
 builder.Services.AddConsentsModule();
 builder.Services.AddSalesModule();
+builder.Services.AddReportingModule();
 builder.Services.AddDocumentsModule();
 builder.Services.AddCashflowModule();
 
@@ -79,6 +81,7 @@ app.MapContractorsEndpoints();
 app.MapCostsEndpoints();
 app.MapConsentsEndpoints();
 app.MapSalesEndpoints();
+app.MapReportingEndpoints();
 app.MapDocumentsEndpoints();
 app.MapCashflowEndpoints();
 

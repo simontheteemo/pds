@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PDS.Portfolio.Contracts;
 using PDS.Portfolio.Data;
 using PDS.Portfolio.Features;
+using PDS.Reporting.Contracts;
 using PDS.Shared.Data;
 using PDS.Shared.Security;
 
@@ -20,6 +21,7 @@ public static class PortfolioModule
     {
         services.AddSingleton(PortfolioTable.Definition);
         services.AddSingleton<ProjectStore>();
+        services.AddScoped<IExportDataset, ProjectsExport>();
         services.AddScoped<IPortfolioQueries, PortfolioQueries>();
         services.AddValidatorsFromAssemblyContaining<CreateProjectValidator>(includeInternalTypes: true);
         return services;
