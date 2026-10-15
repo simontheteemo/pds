@@ -38,8 +38,8 @@ public sealed partial record DeploymentSettings(
             throw new InvalidOperationException($"Deployment name '{settings.Name}' must be lower-case letters, digits and hyphens.");
         if (settings.ConsentReminders is { Enabled: true } r)
         {
-            if ((r.Emails ?? []).Any(e => string.IsNullOrWhiteSpace(e) || !e.Contains('@')))
-                throw new InvalidOperationException("consentReminders.emails must contain valid email addresses.");
+            if ((r.Emails ?? []).FirstOrDefault(e => string.IsNullOrWhiteSpace(e) || !e.Contains('@')) is { } bad)
+                throw new InvalidOperationException($"consentReminders.emails contains an invalid address: '{bad}'.");
             if (r.Schedule is { } schedule && !schedule.StartsWith("cron(", StringComparison.Ordinal) && !schedule.StartsWith("rate(", StringComparison.Ordinal))
                 throw new InvalidOperationException("consentReminders.schedule must be a cron(...) or rate(...) expression.");
         }

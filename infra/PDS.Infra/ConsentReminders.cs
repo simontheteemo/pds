@@ -96,7 +96,7 @@ public sealed class ConsentReminders : Construct
         var failures = new MetricFilter(this, "failures", new MetricFilterProps
         {
             LogGroup = apiLogs,
-            FilterPattern = FilterPattern.StringValue("$.EventId.Name", "=", "ConsentReminderSendFailed"),
+            FilterPattern = FilterPattern.AllTerms("ConsentReminderSendFailed"),
             MetricNamespace = $"PDS/{settings.Name}",
             MetricName = "ConsentReminderFailures",
             MetricValue = "1",

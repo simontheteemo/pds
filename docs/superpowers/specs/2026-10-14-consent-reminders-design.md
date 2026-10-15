@@ -23,7 +23,7 @@ Consents v1 shipped a "Consents due" page, but people have to remember to open i
 | Local trigger that prints instead of sending, e.g. `POST /api/consents/reminders/preview` (Admin) | `POST /api/consents/reminders/preview` (CanAdminister) returns the digest subject and body without sending. Also an Admin-only "Preview reminder email" button on the Consents due page (trivial: one button + modal) |
 | — | `POST /api/consents/reminders/send` (CanAdminister) builds and publishes. It is the scheduler's target and also lets an Admin send on demand. Without a configured topic (local dev, or reminders disabled) it returns `NotConfigured` and sends nothing |
 | — | The scheduled event authenticates as a fixed system principal (`sub = system:consent-reminders`, `cognito:groups = [Admin]`) placed in `requestContext.authorizer.jwt.claims`. See §2.1 for why this is safe |
-| — | Failures alarm: the send logs a named error event (`ConsentReminderSendFailed`); a CloudWatch Logs metric filter on the API log group feeds an alarm on the existing alarms topic. Needed because an HTTP 500 is a *successful* Lambda invocation, so `api-function-errors` would never fire |
+| — | Failures alarm: the send logs a named error event (`ConsentReminderSendFailed`); a CloudWatch Logs metric filter on the API log group (a term match on `ConsentReminderSendFailed`, not a JSON selector, so it works whether or not Lambda prefixes or wraps the JSON line) feeds an alarm on the existing alarms topic. Needed because an HTTP 500 is a *successful* Lambda invocation, so `api-function-errors` would never fire |
 | v1 §3.2: "revisit with a sparse due-date GSI when the digest arrives" | **Keep the Scan.** One extra Scan per weekday is negligible at the expected volume (hundreds of consents) |
 | v1 §6 sketch: public `IConsentsDigest` in `Contracts/` | Not needed: the digest lives inside the Consents module and is reached over HTTP, so nothing outside the module calls it |
 | New package | `AWSSDK.SimpleNotificationService` (official AWS SDK, same family and major version as the DynamoDB and S3 clients already used). The only way to publish to SNS without hand-signing requests |
@@ -85,7 +85,7 @@ The host is unchanged: `AddConsentsModule()` binds its own options from `IConfig
   - the topic and subscriptions, plus `topic.GrantPublish(api)`
   - the env vars `ConsentReminders__TopicArn` and `ConsentReminders__AppUrl` (the site URL), added via `api.AddEnvironment`
   - `Schedule` (`Amazon.CDK.AWS.Scheduler`) with `ScheduleExpression.Expression(schedule, TimeZone.Of(tz))` and a `LambdaInvoke` target whose input is `ScheduleTargetInput.FromObject(<HTTP API v2 event>)`
-  - a `MetricFilter` on the API log group matching `{ $.EventId.Name = "ConsentReminderSendFailed" }`, metric `PDS/<name>` `ConsentReminderFailures`, and an alarm (≥ 1 in 5 min, missing = not breaching) that notifies the alarms topic
+  - a `MetricFilter` on the API log group doing a term match on `ConsentReminderSendFailed` (not a JSON selector; it works whether or not Lambda prefixes or wraps the JSON line), metric `PDS/<name>` `ConsentReminderFailures`, and an alarm (≥ 1 in 5 min, missing = not breaching) that notifies the alarms topic
 - AppStack edits: hoist the API `LogGroup` into a local variable, and add one `if (...) _ = new ConsentReminders(...)` line after the alarms topic.
 - `example-dev.json` gains `"consentReminders": { "enabled": true, "schedule": "cron(0 7 ? * MON-FRI *)", "emails": ["consents@example.com"] }`.
 
