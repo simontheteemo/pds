@@ -7,6 +7,7 @@ type ConditionsPath = paths['/api/consents/projects/{projectId}/consents/{consen
 type ConditionPath =
   paths['/api/consents/projects/{projectId}/consents/{consentId}/conditions/{conditionId}'];
 type DuePath = paths['/api/consents/due'];
+type ReminderPreviewPath = paths['/api/consents/reminders/preview'];
 
 export type ConsentDetails = DeepRequired<
   ConsentsPath['get']['responses'][200]['content']['application/json']
@@ -17,6 +18,8 @@ export type ConsentUpdateInput = ConsentPath['put']['requestBody']['content']['a
 export type ConditionInput = ConditionsPath['post']['requestBody']['content']['application/json'];
 export type ConditionUpdateInput = ConditionPath['put']['requestBody']['content']['application/json'];
 export type DueItem = DeepRequired<DuePath['get']['responses'][200]['content']['application/json']>[number];
+export type ReminderPreview =
+  ReminderPreviewPath['post']['responses'][200]['content']['application/json'];
 
 export const consentTypes = [
   'ResourceConsent',

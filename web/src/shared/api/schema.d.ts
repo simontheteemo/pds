@@ -516,6 +516,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/consents/reminders/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["PreviewConsentReminders"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/consents/reminders/send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["SendConsentReminders"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/sales/projects/{projectId}/units": {
         parameters: {
             query?: never;
@@ -1464,6 +1496,27 @@ export interface components {
         ProjectStage: "Acquisition" | "Feasibility" | "Design" | "Consenting" | "Construction" | "Sales" | "Completed";
         /** @enum {unknown} */
         ProjectStatus: "OnTrack" | "AtRisk" | "Delayed" | "OnHold" | "Cancelled";
+        ReminderPreview: {
+            /** Format: date */
+            today: string;
+            /** Format: int32 */
+            itemCount: number;
+            /** Format: int32 */
+            overdueCount: number;
+            /** Format: int32 */
+            dueSoonCount: number;
+            subject: null | string;
+            body: null | string;
+            deliveryConfigured: boolean;
+        };
+        /** @enum {unknown} */
+        ReminderSendOutcome: "Sent" | "NothingDue" | "NotConfigured";
+        ReminderSendResult: {
+            outcome: components["schemas"]["ReminderSendOutcome"];
+            /** Format: int32 */
+            itemCount: number;
+            messageId: null | string;
+        };
         ReopenConditionRequest: {
             /** Format: int64 */
             version: number;
@@ -3481,6 +3534,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DueItem"][];
+                };
+            };
+        };
+    };
+    PreviewConsentReminders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReminderPreview"];
+                };
+            };
+        };
+    };
+    SendConsentReminders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReminderSendResult"];
                 };
             };
         };
