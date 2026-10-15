@@ -19,8 +19,13 @@ export function ReportsPage() {
     } catch (err) {
       notifications.show({
         color: 'red',
-        title: 'Download failed',
-        message: err instanceof ApiError ? (err.problem?.title ?? err.message) : 'Something went wrong.',
+        title: err instanceof ApiError && err.status === 413 ? (err.problem?.title ?? 'Download failed') : 'Download failed',
+        message:
+          err instanceof ApiError
+            ? err.status === 413
+              ? (err.problem?.detail ?? err.message)
+              : (err.problem?.detail ?? err.problem?.title ?? err.message)
+            : 'Something went wrong.',
       });
     } finally {
       setBusy(null);
@@ -33,7 +38,8 @@ export function ReportsPage() {
         <Title order={2}>Reports</Title>
         <Text c="dimmed">
           Each download is a CSV file covering every project, including archived ones. It opens in Excel. Amounts
-          are in the deployment currency and exclude GST.
+          are in the deployment currency. Costs exclude GST; sale prices are as recorded in Sales (assumed
+          GST-inclusive).
         </Text>
       </div>
 

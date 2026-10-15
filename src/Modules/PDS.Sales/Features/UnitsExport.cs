@@ -13,7 +13,7 @@ internal sealed class UnitsExport(UnitStore store, IPortfolioQueries portfolio, 
 
     public string Title => "Units and sales";
 
-    public string Description => "Every unit or lot with its listing details and current sale: status, buyer, price and key dates.";
+    public string Description => "Every unit or lot with its listing details and current sale: status, buyer, price (as recorded, assumed GST-inclusive) and key dates.";
 
     public async Task<ExportTable> LoadAsync(CancellationToken ct)
     {
