@@ -10,4 +10,10 @@ public interface IPortfolioQueries
 
     /// <summary>The project's dates, or null when the project does not exist.</summary>
     Task<ProjectSchedule?> GetSchedule(ProjectId id, CancellationToken ct);
+
+    /// <summary>The project's milestones in programme order; empty when none or the project doesn't exist.</summary>
+    Task<IReadOnlyList<MilestoneSummary>> GetMilestones(ProjectId id, CancellationToken ct);
+
+    /// <summary>Every incomplete milestone on non-archived projects, ordered by due date (forecast, else planned; undated last).</summary>
+    Task<IReadOnlyList<MilestoneSummary>> GetOpenMilestones(CancellationToken ct);
 }

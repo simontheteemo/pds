@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
+using PDS.Portfolio.Contracts;
 using PDS.Portfolio.Data;
 using PDS.Portfolio.Domain;
 using PDS.Shared;
@@ -26,7 +27,8 @@ internal sealed record ProjectListItem(
     DateOnly? PlannedCompletion,
     decimal? BudgetAmount,
     string Currency,
-    bool IsArchived);
+    bool IsArchived,
+    NextMilestoneDto? NextMilestone);
 
 internal static class ListProjects
 {
@@ -37,7 +39,8 @@ internal static class ListProjects
         group.MapGet("/projects", Handle).WithName("ListProjects");
 
     internal static async Task<Results<Ok<PagedResult<ProjectListItem>>, ValidationProblem>> Handle(
-        [AsParameters] ListProjectsQuery query, ProjectStore store, IOptions<LocaleOptions> locale, HttpContext http, CancellationToken ct)
+        [AsParameters] ListProjectsQuery query, ProjectStore store, MilestoneStore milestoneStore, TimeProvider clock,
+        IOptions<LocaleOptions> locale, HttpContext http, CancellationToken ct)
     {
         if (IsInvalidEnumQuery(query.Stage, http.Request.Query["stage"]))
             return Problems.Field("stage", "Choose a valid stage.");
@@ -45,7 +48,10 @@ internal static class ListProjects
             return Problems.Field("status", "Choose a valid status.");
 
         var projects = await store.ListAllAsync(ct);
-        return TypedResults.Ok(Apply(projects, query, locale.Value.Currency));
+        var milestones = (await milestoneStore.ListAllAsync(ct))
+            .GroupBy(m => m.ProjectId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+        return TypedResults.Ok(Apply(projects, query, locale.Value.Currency, milestones, LocalDate.Today(clock, locale.Value)));
     }
 
     private static bool IsInvalidEnumQuery<TEnum>(TEnum? value, StringValues raw) where TEnum : struct, Enum
@@ -57,7 +63,8 @@ internal static class ListProjects
         return text.Length > 0 && text.All(char.IsAsciiDigit);
     }
 
-    internal static PagedResult<ProjectListItem> Apply(IEnumerable<Project> projects, ListProjectsQuery query, string currency)
+    internal static PagedResult<ProjectListItem> Apply(IEnumerable<Project> projects, ListProjectsQuery query, string currency,
+        IReadOnlyDictionary<ProjectId, List<Milestone>>? milestones = null, DateOnly today = default)
     {
         var page = Math.Max(1, query.Page ?? 1);
         var pageSize = Math.Clamp(query.PageSize ?? DefaultPageSize, 1, MaxPageSize);
@@ -74,7 +81,7 @@ internal static class ListProjects
         var skip = (long)(page - 1) * pageSize;
         IReadOnlyList<ProjectListItem> items = skip >= matches.Count
             ? []
-            : matches.Skip((int)skip).Take(pageSize).Select(p => ToListItem(p, currency)).ToList();
+            : matches.Skip((int)skip).Take(pageSize).Select(p => ToListItem(p, currency, milestones, today)).ToList();
 
         return new PagedResult<ProjectListItem>(items, page, pageSize, matches.Count);
     }
@@ -83,7 +90,9 @@ internal static class ListProjects
         new[] { project.Fields.Code, project.Fields.Name, project.Fields.Site.Suburb, project.Fields.Site.City }
             .Any(value => value?.Contains(term, StringComparison.OrdinalIgnoreCase) == true);
 
-    private static ProjectListItem ToListItem(Project p, string currency) => new(
+    private static ProjectListItem ToListItem(
+        Project p, string currency, IReadOnlyDictionary<ProjectId, List<Milestone>>? milestones, DateOnly today) => new(
         p.Id.Value, p.Fields.Code, p.Fields.Name, p.Fields.Stage, p.Fields.Status, p.Fields.Site.Suburb, p.Fields.Site.City,
-        p.Fields.PlannedCompletion, p.Fields.Budget?.Amount, p.Fields.Budget?.Currency ?? currency, p.IsArchived);
+        p.Fields.PlannedCompletion, p.Fields.Budget?.Amount, p.Fields.Budget?.Currency ?? currency, p.IsArchived,
+        milestones is not null && milestones.TryGetValue(p.Id, out var own) ? NextMilestone.For(own, today) : null);
 }

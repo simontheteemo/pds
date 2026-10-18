@@ -24,6 +24,7 @@ public static class PortfolioModule
         services.AddSingleton<MilestoneStore>();
         services.AddOptions<PortfolioOptions>().BindConfiguration(PortfolioOptions.Section);
         services.AddScoped<IExportDataset, ProjectsExport>();
+        services.AddScoped<IExportDataset, MilestonesExport>();
         services.AddScoped<IPortfolioQueries, PortfolioQueries>();
         services.AddValidatorsFromAssemblyContaining<CreateProjectValidator>(includeInternalTypes: true);
         return services;
@@ -33,6 +34,7 @@ public static class PortfolioModule
     {
         var group = app.MapGroup("/api/portfolio").WithTags("Portfolio").RequireAuthorization(Policies.CanRead);
         ListProjects.Map(group);
+        GetPortfolioSummary.Map(group);
         CreateProject.Map(group);
         GetProject.Map(group);
         UpdateProject.Map(group);

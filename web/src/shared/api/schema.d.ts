@@ -52,6 +52,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/portfolio/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetPortfolioSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/portfolio/projects/{id}": {
         parameters: {
             query?: never;
@@ -1496,6 +1512,14 @@ export interface components {
         };
         /** @enum {unknown} */
         MilestoneStatus: "NotStarted" | "OnTrack" | "AtRisk" | "Overdue" | "Complete";
+        NextMilestoneDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** Format: date */
+            date: null | string;
+            status: components["schemas"]["MilestoneStatus"];
+        };
         PagedResultOfProjectListItem: {
             items: components["schemas"]["ProjectListItem"][];
             /** Format: int32 */
@@ -1504,6 +1528,18 @@ export interface components {
             pageSize: number;
             /** Format: int32 */
             totalCount: number;
+        };
+        PortfolioSummary: {
+            /** Format: int32 */
+            activeProjects: number;
+            byStage: components["schemas"]["StageCount"][];
+            /** Format: double */
+            totalBudget: number;
+            currency: string;
+            /** Format: int32 */
+            projectsSlipping: number;
+            /** Format: int32 */
+            overdueMilestones: number;
         };
         ProblemDetails: {
             type?: null | string;
@@ -1589,6 +1625,7 @@ export interface components {
             budgetAmount: null | number;
             currency: string;
             isArchived: boolean;
+            nextMilestone: null | components["schemas"]["NextMilestoneDto"];
         };
         ProjectSales: {
             summary: components["schemas"]["SalesSummary"];
@@ -1718,6 +1755,11 @@ export interface components {
             titleReference: null | string;
             /** Format: double */
             landAreaSqm: null | number;
+        };
+        StageCount: {
+            stage: components["schemas"]["ProjectStage"];
+            /** Format: int32 */
+            count: number;
         };
         UnitDetails: {
             /** Format: uuid */
@@ -2119,6 +2161,26 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+        };
+    };
+    GetPortfolioSummary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortfolioSummary"];
                 };
             };
         };

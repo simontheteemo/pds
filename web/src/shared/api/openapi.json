@@ -159,6 +159,26 @@
         }
       }
     },
+    "/api/portfolio/summary": {
+      "get": {
+        "tags": [
+          "Portfolio"
+        ],
+        "operationId": "GetPortfolioSummary",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortfolioSummary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/portfolio/projects/{id}": {
       "get": {
         "tags": [
@@ -6068,6 +6088,34 @@
           "Complete"
         ]
       },
+      "NextMilestoneDto": {
+        "required": [
+          "id",
+          "name",
+          "date",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "date": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "status": {
+            "$ref": "#/components/schemas/MilestoneStatus"
+          }
+        }
+      },
       "PagedResultOfProjectListItem": {
         "required": [
           "items",
@@ -6092,6 +6140,44 @@
             "format": "int32"
           },
           "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PortfolioSummary": {
+        "required": [
+          "activeProjects",
+          "byStage",
+          "totalBudget",
+          "currency",
+          "projectsSlipping",
+          "overdueMilestones"
+        ],
+        "type": "object",
+        "properties": {
+          "activeProjects": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "byStage": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StageCount"
+            }
+          },
+          "totalBudget": {
+            "type": "number",
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "projectsSlipping": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "overdueMilestones": {
             "type": "integer",
             "format": "int32"
           }
@@ -6389,7 +6475,8 @@
           "plannedCompletion",
           "budgetAmount",
           "currency",
-          "isArchived"
+          "isArchived",
+          "nextMilestone"
         ],
         "type": "object",
         "properties": {
@@ -6437,6 +6524,16 @@
           },
           "isArchived": {
             "type": "boolean"
+          },
+          "nextMilestone": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/NextMilestoneDto"
+              }
+            ]
           }
         }
       },
@@ -6910,6 +7007,22 @@
               "number"
             ],
             "format": "double"
+          }
+        }
+      },
+      "StageCount": {
+        "required": [
+          "stage",
+          "count"
+        ],
+        "type": "object",
+        "properties": {
+          "stage": {
+            "$ref": "#/components/schemas/ProjectStage"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
