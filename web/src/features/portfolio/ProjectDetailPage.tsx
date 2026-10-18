@@ -1,33 +1,15 @@
-import { Alert, Badge, Button, Card, Group, Loader, SimpleGrid, Stack, Table, Text, Title } from '@mantine/core';
+import { Alert, Badge, Button, Group, Loader, Stack, Text, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import type { ReactNode } from 'react';
 import { Link, useParams } from 'react-router';
 import { ApiError } from '../../shared/api/client';
 import { useConfig } from '../../shared/config';
-import { formatDate, formatDateTime, formatMoney } from '../../shared/format';
+import { formatDateTime } from '../../shared/format';
 import { NotFoundPage } from '../../shared/layout/NotFoundPage';
 import { usePermissions } from '../../shared/me';
-import { ProjectContractsSection } from '../contractors/ProjectContractsSection';
-import { ProjectRisksSection } from '../risks/ProjectRisksSection';
-import { ProjectCostsCard } from '../costs/ProjectCostsCard';
-import { ProjectCashflowCard } from '../cashflow/ProjectCashflowCard';
-import { ProjectConsentsSection } from '../consents/ProjectConsentsSection';
-import { ProjectSalesSection } from '../sales/ProjectSalesSection';
-import { ProjectDocumentsSection } from '../documents/ProjectDocumentsSection';
 import { useProject, useSetArchived } from './api';
 import { StatusBadge } from './StatusBadge';
 import { stageLabel, type ProjectDetails } from './types';
-
-function Field({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div>
-      <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
-        {label}
-      </Text>
-      <Text>{children || '—'}</Text>
-    </div>
-  );
-}
+import { ProjectWorkspaceTabs } from './workspace/ProjectWorkspaceTabs';
 
 export function ProjectActions({ project }: { project: ProjectDetails }) {
   const { canWrite, canAdminister } = usePermissions();
@@ -102,73 +84,7 @@ export function ProjectDetailPage() {
         <ProjectActions project={p} />
       </Group>
 
-      <SimpleGrid cols={{ base: 1, md: 2 }}>
-        <Card withBorder>
-          <Title order={4} mb="sm">
-            Site
-          </Title>
-          <SimpleGrid cols={2}>
-            <Field label="Address">{p.site.addressLine}</Field>
-            <Field label="Suburb">{p.site.suburb}</Field>
-            <Field label="City">{p.site.city}</Field>
-            <Field label="Region">{p.site.region}</Field>
-            <Field label="Legal description">{p.site.legalDescription}</Field>
-            <Field label="Title reference">{p.site.titleReference}</Field>
-            <Field label="Land area">
-              {p.site.landAreaSqm === null ? null : `${p.site.landAreaSqm.toLocaleString(config.culture)} m²`}
-            </Field>
-            <Field label="Postcode">{p.site.postcode}</Field>
-          </SimpleGrid>
-        </Card>
-
-        <Card withBorder>
-          <Title order={4} mb="sm">
-            Timeline and budget
-          </Title>
-          <Table>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th />
-                <Table.Th>Start</Table.Th>
-                <Table.Th>Completion</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              <Table.Tr>
-                <Table.Th>Planned</Table.Th>
-                <Table.Td>{formatDate(p.plannedStart, config.culture)}</Table.Td>
-                <Table.Td>{formatDate(p.plannedCompletion, config.culture)}</Table.Td>
-              </Table.Tr>
-              <Table.Tr>
-                <Table.Th>Actual</Table.Th>
-                <Table.Td>{formatDate(p.actualStart, config.culture)}</Table.Td>
-                <Table.Td>{formatDate(p.actualCompletion, config.culture)}</Table.Td>
-              </Table.Tr>
-            </Table.Tbody>
-          </Table>
-          <SimpleGrid cols={2} mt="md">
-            <Field label="Budget">{formatMoney(p.budgetAmount, p.currency, config.culture)}</Field>
-            <Field label="Project manager">{p.projectManager}</Field>
-          </SimpleGrid>
-        </Card>
-      </SimpleGrid>
-
-      {p.description && (
-        <Card withBorder>
-          <Title order={4} mb="sm">
-            Description
-          </Title>
-          <Text style={{ whiteSpace: 'pre-wrap' }}>{p.description}</Text>
-        </Card>
-      )}
-
-      <ProjectRisksSection projectId={p.id} projectArchived={p.isArchived} />
-      <ProjectContractsSection projectId={p.id} projectArchived={p.isArchived} />
-      <ProjectCostsCard projectId={p.id} />
-      <ProjectCashflowCard projectId={p.id} />
-      <ProjectConsentsSection projectId={p.id} projectArchived={p.isArchived} />
-      <ProjectSalesSection projectId={p.id} projectArchived={p.isArchived} />
-      <ProjectDocumentsSection projectId={p.id} projectArchived={p.isArchived} />
+      <ProjectWorkspaceTabs project={p} />
 
       <Text size="sm" c="dimmed">
         Created by {p.createdBy} on {formatDateTime(p.createdAt, config.culture, config.timeZone)} · Last updated by{' '}
