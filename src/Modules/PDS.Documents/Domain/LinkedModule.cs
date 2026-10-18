@@ -6,4 +6,5 @@ internal enum LinkedModule
     Consent,
     Contract,
     Risk,
+    Invoice,
 }
