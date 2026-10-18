@@ -682,6 +682,29 @@
         }
       }
     },
+    "/api/risks/high": {
+      "get": {
+        "tags": [
+          "Risks"
+        ],
+        "operationId": "ListHighRisks",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HighRiskItem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/contractors": {
       "get": {
         "tags": [
@@ -3525,6 +3548,52 @@
           }
         }
       }
+    },
+    "/api/actions/mine": {
+      "get": {
+        "tags": [
+          "Actions"
+        ],
+        "operationId": "ListMyActions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ActionSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/actions/overdue": {
+      "get": {
+        "tags": [
+          "Actions"
+        ],
+        "operationId": "ListOverdueActions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ActionSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3685,6 +3754,79 @@
           "Done",
           "Cancelled"
         ]
+      },
+      "ActionSummary": {
+        "required": [
+          "id",
+          "projectId",
+          "projectCode",
+          "projectName",
+          "title",
+          "ownerId",
+          "ownerName",
+          "dueDate",
+          "priority",
+          "status",
+          "isOverdue",
+          "link",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectCode": {
+            "type": "string"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "string"
+          },
+          "ownerName": {
+            "type": "string"
+          },
+          "dueDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/ActionPriority"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ActionStatus"
+          },
+          "isOverdue": {
+            "type": "boolean"
+          },
+          "link": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ActionLinkDto"
+              }
+            ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
       },
       "ActionVersionRequest": {
         "required": [
@@ -6147,6 +6289,67 @@
           },
           "description": {
             "type": "string"
+          }
+        }
+      },
+      "HighRiskItem": {
+        "required": [
+          "id",
+          "projectId",
+          "projectCode",
+          "projectName",
+          "title",
+          "category",
+          "score",
+          "band",
+          "status",
+          "owner",
+          "dueDate"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectCode": {
+            "type": "string"
+          },
+          "projectName": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "category": {
+            "$ref": "#/components/schemas/RiskCategory"
+          },
+          "score": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "band": {
+            "$ref": "#/components/schemas/RiskBand"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RiskStatus"
+          },
+          "owner": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "dueDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
           }
         }
       },

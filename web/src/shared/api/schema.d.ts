@@ -180,6 +180,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/risks/high": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListHighRisks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/contractors": {
         parameters: {
             query?: never;
@@ -868,6 +884,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/actions/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListMyActions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/actions/overdue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListOverdueActions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -911,6 +959,25 @@ export interface components {
         ActionPriority: "Low" | "Normal" | "High";
         /** @enum {unknown} */
         ActionStatus: "Open" | "InProgress" | "Done" | "Cancelled";
+        ActionSummary: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            projectCode: string;
+            projectName: string;
+            title: string;
+            ownerId: string;
+            ownerName: string;
+            /** Format: date */
+            dueDate: null | string;
+            priority: components["schemas"]["ActionPriority"];
+            status: components["schemas"]["ActionStatus"];
+            isOverdue: boolean;
+            link: null | components["schemas"]["ActionLinkDto"];
+            /** Format: int64 */
+            version: number;
+        };
         ActionVersionRequest: {
             /** Format: int64 */
             version: number;
@@ -1522,6 +1589,23 @@ export interface components {
             name: string;
             title: string;
             description: string;
+        };
+        HighRiskItem: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            projectCode: string;
+            projectName: string;
+            title: string;
+            category: components["schemas"]["RiskCategory"];
+            /** Format: int32 */
+            score: number;
+            band: components["schemas"]["RiskBand"];
+            status: components["schemas"]["RiskStatus"];
+            owner: null | string;
+            /** Format: date */
+            dueDate: null | string;
         };
         HttpValidationProblemDetails: {
             type?: null | string;
@@ -2557,6 +2641,26 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    ListHighRisks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HighRiskItem"][];
+                };
             };
         };
     };
@@ -4659,6 +4763,46 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    ListMyActions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionSummary"][];
+                };
+            };
+        };
+    };
+    ListOverdueActions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionSummary"][];
+                };
             };
         };
     };

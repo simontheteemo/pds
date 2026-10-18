@@ -33,6 +33,11 @@ public static class ActionsModule
         CreateAction.Map(group);
         UpdateAction.Map(group);
         ChangeActionStatus.Map(group);
+        var cross = app.MapGroup("/api/actions")
+            .WithTags("Actions")
+            .RequireAuthorization(Policies.CanRead);
+        ListMyActions.Map(cross);
+        ListOverdueActions.Map(cross);
         return app;
     }
 }

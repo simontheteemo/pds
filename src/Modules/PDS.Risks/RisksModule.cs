@@ -35,6 +35,10 @@ public static class RisksModule
         CreateRisk.Map(group);
         UpdateRisk.Map(group);
         CloseRisk.Map(group);
+        var cross = app.MapGroup("/api/risks")
+            .WithTags("Risks")
+            .RequireAuthorization(Policies.CanRead);
+        ListHighRisks.Map(cross);
         return app;
     }
 }
