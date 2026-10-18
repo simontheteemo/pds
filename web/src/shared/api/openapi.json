@@ -45,6 +45,29 @@
         }
       }
     },
+    "/api/people": {
+      "get": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "ListPeople",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Person"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/portfolio/projects": {
       "get": {
         "tags": [
@@ -5625,6 +5648,32 @@
           }
         }
       },
+      "Person": {
+        "required": [
+          "id",
+          "name",
+          "email",
+          "role"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "role": {
+            "type": "string"
+          }
+        }
+      },
       "ProblemDetails": {
         "type": "object",
         "properties": {
@@ -7657,6 +7706,9 @@
   "tags": [
     {
       "name": "Host"
+    },
+    {
+      "name": "People"
     },
     {
       "name": "Portfolio"

@@ -3,6 +3,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="AWSSDK.CognitoIdentityProvider" Version="4.0.106.3" />
     <PackageVersion Include="AWSSDK.DynamoDBv2" Version="4.0.106" />
     <PackageVersion Include="AWSSDK.S3" Version="4.0.103.4" />
     <PackageVersion Include="AWSSDK.SimpleNotificationService" Version="4.0.100.15" />
