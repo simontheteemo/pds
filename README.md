@@ -33,6 +33,8 @@ cd web && npm install && npm run dev   # SPA on http://localhost:5173 (proxies /
 
 To try another role locally, change `Auth:DevUser:Roles` in `src/PDS.Api/appsettings.Development.json`. Dev auth signs every request in as that user, so no token is needed.
 
+**People directory**: `GET /api/people` lists who work can be assigned to. Deployed, it reads the Cognito user pool's Admin/Manager/Viewer groups (`People__UserPoolId`, set by CDK; cached for 5 minutes; highest role wins). Locally it uses `People:Users` in `appsettings.Development.json`, plus the dev user if not listed.
+
 Per-module local settings, all already set in `appsettings.Development.json`:
 
 - **Tables**: `Dynamo:CreateTablesOnStartup` creates every module's tables in DynamoDB Local on first run.

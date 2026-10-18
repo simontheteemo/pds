@@ -106,6 +106,7 @@ public sealed class AppStack : Stack
         foreach (var (logicalName, table) in tables)
             environment[$"Tables__{logicalName}"] = table.TableName;
         environment["Documents__BucketName"] = documents.Bucket.BucketName;
+        environment["People__UserPoolId"] = userPool.UserPoolId; // People directory: read-only listing of the role groups.
 
         var apiLogs = new LogGroup(this, "api-logs", new LogGroupProps
         {
@@ -128,6 +129,7 @@ public sealed class AppStack : Stack
         foreach (var table in tables.Values)
             table.GrantReadWriteData(api);
         documents.GrantApi(api);
+        userPool.Grant(api, "cognito-idp:ListUsersInGroup"); // People directory: read-only listing of the role groups.
 
         // HTTP API: /api/config is public; everything else requires a Cognito ID token for this client
         var integration = new HttpLambdaIntegration("api-integration", api);

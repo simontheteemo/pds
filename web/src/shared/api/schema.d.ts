@@ -36,6 +36,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/people": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListPeople"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/portfolio/projects": {
         parameters: {
             query?: never;
@@ -158,6 +174,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["ReopenRisk"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/risks/high": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListHighRisks"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -772,10 +804,184 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/actions/projects/{projectId}/actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListProjectActions"];
+        put?: never;
+        post: operations["CreateAction"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/actions/projects/{projectId}/actions/{actionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetAction"];
+        put: operations["UpdateAction"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/actions/projects/{projectId}/actions/{actionId}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["CompleteAction"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/actions/projects/{projectId}/actions/{actionId}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["CancelAction"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/actions/projects/{projectId}/actions/{actionId}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ReopenAction"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/actions/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListMyActions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/actions/overdue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListOverdueActions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        ActionDetails: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            title: string;
+            description: null | string;
+            ownerId: string;
+            ownerName: string;
+            /** Format: date */
+            dueDate: null | string;
+            priority: components["schemas"]["ActionPriority"];
+            status: components["schemas"]["ActionStatus"];
+            isOverdue: boolean;
+            link: null | components["schemas"]["ActionLinkDto"];
+            /** Format: date-time */
+            completedAt: null | string;
+            completedBy: null | string;
+            /** Format: date-time */
+            createdAt: string;
+            createdBy: string;
+            /** Format: date-time */
+            updatedAt: string;
+            updatedBy: string;
+            /** Format: int64 */
+            version: number;
+        };
+        ActionLinkDto: {
+            module: null | components["schemas"]["ActionLinkedModule"];
+            /** Format: uuid */
+            recordId: string;
+            label: string;
+        };
+        /** @enum {unknown} */
+        ActionLinkedModule: "Risk" | "Consent" | "Contract" | "Milestone" | "Meeting" | null;
+        /** @enum {unknown} */
+        ActionPriority: "Low" | "Normal" | "High";
+        /** @enum {unknown} */
+        ActionStatus: "Open" | "InProgress" | "Done" | "Cancelled";
+        ActionSummary: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            projectCode: string;
+            projectName: string;
+            title: string;
+            ownerId: string;
+            ownerName: string;
+            /** Format: date */
+            dueDate: null | string;
+            priority: components["schemas"]["ActionPriority"];
+            status: components["schemas"]["ActionStatus"];
+            isOverdue: boolean;
+            link: null | components["schemas"]["ActionLinkDto"];
+            /** Format: int64 */
+            version: number;
+        };
+        ActionVersionRequest: {
+            /** Format: int64 */
+            version: number;
+        };
         ActualCostDetails: {
             /** Format: uuid */
             id: string;
@@ -1144,6 +1350,15 @@ export interface components {
             line: components["schemas"]["BudgetLineDetails"];
             figures: components["schemas"]["CostFiguresDto"];
         };
+        CreateActionRequest: {
+            title: string;
+            description: null | string;
+            ownerId: null | string;
+            /** Format: date */
+            dueDate: null | string;
+            priority: null | components["schemas"]["ActionPriority"];
+            link: null | components["schemas"]["ActionLinkDto"];
+        };
         CreateActualCostRequest: {
             /** Format: uuid */
             budgetLineId: null | string;
@@ -1375,6 +1590,23 @@ export interface components {
             title: string;
             description: string;
         };
+        HighRiskItem: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            projectCode: string;
+            projectName: string;
+            title: string;
+            category: components["schemas"]["RiskCategory"];
+            /** Format: int32 */
+            score: number;
+            band: components["schemas"]["RiskBand"];
+            status: components["schemas"]["RiskStatus"];
+            owner: null | string;
+            /** Format: date */
+            dueDate: null | string;
+        };
         HttpValidationProblemDetails: {
             type?: null | string;
             title?: null | string;
@@ -1402,6 +1634,12 @@ export interface components {
             pageSize: number;
             /** Format: int32 */
             totalCount: number;
+        };
+        Person: {
+            id: string;
+            name: string;
+            email: null | string;
+            role: string;
         };
         ProblemDetails: {
             type?: null | string;
@@ -1672,6 +1910,18 @@ export interface components {
             /** Format: double */
             salePrice: number;
         };
+        UpdateActionRequest: {
+            title: string;
+            description: null | string;
+            ownerId: null | string;
+            /** Format: date */
+            dueDate: null | string;
+            priority: null | components["schemas"]["ActionPriority"];
+            link: null | components["schemas"]["ActionLinkDto"];
+            status: null | components["schemas"]["ActionStatus"];
+            /** Format: int64 */
+            version: number;
+        };
         UpdateActualCostRequest: {
             /** Format: uuid */
             budgetLineId: null | string;
@@ -1932,6 +2182,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Me"];
+                };
+            };
+        };
+    };
+    ListPeople: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Person"][];
                 };
             };
         };
@@ -2371,6 +2641,26 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    ListHighRisks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HighRiskItem"][];
+                };
             };
         };
     };
@@ -4198,6 +4488,321 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    ListProjectActions: {
+        parameters: {
+            query?: {
+                includeClosed?: boolean;
+            };
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionDetails"][];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CreateAction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    GetAction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                actionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UpdateAction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                actionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateActionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CompleteAction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                actionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CancelAction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                actionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ReopenAction: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                projectId: string;
+                actionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActionVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ListMyActions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionSummary"][];
+                };
+            };
+        };
+    };
+    ListOverdueActions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionSummary"][];
+                };
             };
         };
     };

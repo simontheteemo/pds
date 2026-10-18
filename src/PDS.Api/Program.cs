@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
 using Amazon.Lambda.AspNetCoreServer.Hosting;
+using PDS.Actions;
 using PDS.Api;
+using PDS.Api.People;
 using PDS.Api.Security;
 using PDS.Cashflow;
 using PDS.Consents;
@@ -44,6 +46,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddPdsSettings(builder.Configuration);
 builder.Services.AddPdsSecurity(builder.Configuration);
 builder.Services.AddDynamo();
+builder.Services.AddPeopleDirectory(builder.Configuration);
 builder.Services.AddPortfolioModule();
 builder.Services.AddRisksModule();
 builder.Services.AddContractorsModule();
@@ -53,6 +56,7 @@ builder.Services.AddSalesModule();
 builder.Services.AddReportingModule();
 builder.Services.AddDocumentsModule();
 builder.Services.AddCashflowModule();
+builder.Services.AddActionsModule();
 
 var app = builder.Build();
 
@@ -75,6 +79,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 
 app.MapHostEndpoints();
+app.MapPeopleEndpoints();
 app.MapPortfolioEndpoints();
 app.MapRisksEndpoints();
 app.MapContractorsEndpoints();
@@ -84,6 +89,7 @@ app.MapSalesEndpoints();
 app.MapReportingEndpoints();
 app.MapDocumentsEndpoints();
 app.MapCashflowEndpoints();
+app.MapActionsEndpoints();
 
 await app.RunAsync();
 
