@@ -1,4 +1,5 @@
 using Amazon.CDK;
+using PDS.Actions;
 using PDS.Consents;
 using PDS.Contractors;
 using PDS.Costs;
@@ -14,5 +15,5 @@ var deployment = app.Node.TryGetContext("deployment") as string
 var settings = DeploymentSettings.Load(Path.Combine("deployments", $"{deployment}.json"));
 var assets = new AssetPaths(Api: Path.GetFullPath("../artifacts/api"), Web: Path.GetFullPath("../web/dist"));
 
-PdsApp.Define(app, settings, assets, [.. PortfolioModule.Tables, .. RisksModule.Tables, .. ContractorsModule.Tables, .. ConsentsModule.Tables, .. SalesModule.Tables, .. DocumentsModule.Tables, .. CostsModule.Tables]);
+PdsApp.Define(app, settings, assets, [.. PortfolioModule.Tables, .. RisksModule.Tables, .. ContractorsModule.Tables, .. ConsentsModule.Tables, .. SalesModule.Tables, .. DocumentsModule.Tables, .. CostsModule.Tables, .. ActionsModule.Tables]);
 app.Synth();
