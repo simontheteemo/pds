@@ -30,12 +30,12 @@ const optionalDate = z.string().regex(/^(\d{4}-\d{2}-\d{2})?$/, 'Enter a valid d
 
 /** Mirrors the API's milestone validators. */
 export const milestoneSchema = z.object({
-  name: z.string().trim().min(1, 'Name is required').max(200, 'Use 200 characters or fewer'),
+  name: z.string().trim().min(1, 'Name is required').max(100, 'Use 100 characters or fewer'),
   category: z.string().refine((v) => (milestoneCategories as readonly string[]).includes(v), 'Category is required'),
   plannedDate: optionalDate,
   forecastDate: optionalDate,
   actualDate: optionalDate,
-  owner: z.string().trim().max(100, 'Use 100 characters or fewer'),
+  owner: z.string().trim().max(200, 'Use 200 characters or fewer'),
   sortOrder: z
     .union([z.number(), z.literal('')])
     .refine((v) => v !== '' && Number.isInteger(v) && v >= 0 && v <= 9999, 'Enter a whole number from 0 to 9999'),

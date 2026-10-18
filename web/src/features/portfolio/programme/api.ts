@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { unwrap, useApi } from '../../../shared/api/client';
-import { dueDate, type MilestoneDetails, type MilestoneInput, type MilestoneList, type MilestoneUpdateInput } from './types';
+import { dueDate, isSlipping, type MilestoneDetails, type MilestoneInput, type MilestoneList, type MilestoneUpdateInput } from './types';
 
 export const milestonesKey = (projectId: string) => ['milestones', projectId];
 
@@ -93,5 +93,5 @@ export function useNextMilestones(projectId: string, count = 5) {
 
 export function useSlippingMilestoneCount(projectId: string): number {
   const { data } = useMilestones(projectId);
-  return (data?.items ?? []).filter((m) => m.status === 'AtRisk' || m.status === 'Overdue').length;
+  return (data?.items ?? []).filter((m) => isSlipping(m.status)).length;
 }

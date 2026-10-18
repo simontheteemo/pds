@@ -1,5 +1,4 @@
-import type { paths } from '../../../shared/api/schema';
-import type { components } from '../../../shared/api/schema';
+import type { components, paths } from '../../../shared/api/schema';
 import type { DeepRequired } from '../../../shared/api/types';
 
 type MilestonesPath = paths['/api/portfolio/projects/{id}/milestones'];
