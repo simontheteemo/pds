@@ -1765,6 +1765,40 @@
         }
       }
     },
+    "/api/costs/contractors/{contractorId}/invoices": {
+      "get": {
+        "tags": [
+          "Costs"
+        ],
+        "operationId": "GetContractorInvoices",
+        "parameters": [
+          {
+            "name": "contractorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractorInvoices"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/api/consents/projects/{projectId}/consents": {
       "get": {
         "tags": [
@@ -4284,6 +4318,185 @@
           "version": {
             "type": "integer",
             "format": "int64"
+          }
+        }
+      },
+      "ContractorInvoice": {
+        "required": [
+          "entry",
+          "projectId",
+          "projectCode",
+          "projectName",
+          "projectArchived",
+          "budgetLineName",
+          "contractTitle"
+        ],
+        "type": "object",
+        "properties": {
+          "entry": {
+            "$ref": "#/components/schemas/ActualCostDetails"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "projectName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "projectArchived": {
+            "type": "boolean"
+          },
+          "budgetLineName": {
+            "type": "string"
+          },
+          "contractTitle": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ContractorInvoiceContract": {
+        "required": [
+          "contractId",
+          "projectId",
+          "projectCode",
+          "projectName",
+          "title",
+          "status",
+          "valueAmount",
+          "invoicedToDate",
+          "remaining"
+        ],
+        "type": "object",
+        "properties": {
+          "contractId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "projectName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "valueAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "invoicedToDate": {
+            "type": "number",
+            "format": "double"
+          },
+          "remaining": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "ContractorInvoices": {
+        "required": [
+          "contractorId",
+          "contractorName",
+          "contractorActive",
+          "currency",
+          "totals",
+          "invoices",
+          "contracts"
+        ],
+        "type": "object",
+        "properties": {
+          "contractorId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "contractorName": {
+            "type": "string"
+          },
+          "contractorActive": {
+            "type": "boolean"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/ContractorInvoiceTotals"
+          },
+          "invoices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContractorInvoice"
+            }
+          },
+          "contracts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContractorInvoiceContract"
+            }
+          }
+        }
+      },
+      "ContractorInvoiceTotals": {
+        "required": [
+          "invoiced",
+          "paid",
+          "outstanding",
+          "disputed",
+          "gst"
+        ],
+        "type": "object",
+        "properties": {
+          "invoiced": {
+            "type": "number",
+            "format": "double"
+          },
+          "paid": {
+            "type": "number",
+            "format": "double"
+          },
+          "outstanding": {
+            "type": "number",
+            "format": "double"
+          },
+          "disputed": {
+            "type": "number",
+            "format": "double"
+          },
+          "gst": {
+            "type": "number",
+            "format": "double"
           }
         }
       },

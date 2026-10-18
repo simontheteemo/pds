@@ -36,6 +36,7 @@ To try another role locally, change `Auth:DevUser:Roles` in `src/PDS.Api/appsett
 Per-module local settings, all already set in `appsettings.Development.json`:
 
 - **Tables**: `Dynamo:CreateTablesOnStartup` creates every module's tables in DynamoDB Local on first run.
+- **Costs table**: an existing local `pds-costs` table created before the contractor-invoices change lacks `gsi1`, and the bootstrap only creates missing tables. Delete it so it is recreated, e.g. `aws dynamodb delete-table --table-name pds-costs --endpoint-url http://localhost:8000`. Local cost data is lost.
 - **Documents**: `Documents:Storage=Local` replaces S3 with files on disk plus signed stand-ins for the presigned PUT/GET URLs (`/api/documents/local-files/...`). Files go to `<temp>/pds-documents`; set `Documents:LocalPath` to change that. The API refuses to start with `Local` outside the `Development` environment, so a deployed Lambda always uses S3 (`Documents__BucketName` is set by CDK).
 - **Reporting, Cashflow, Sales, Consents, Costs, Risks, Contractors**: nothing to configure.
 

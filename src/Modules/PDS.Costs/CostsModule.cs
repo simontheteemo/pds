@@ -45,6 +45,11 @@ public static class CostsModule
         CreateActualCost.Map(costs);
         UpdateActualCost.Map(costs);
         DeleteActualCost.Map(costs);
+
+        var contractors = app.MapGroup("/api/costs/contractors/{contractorId:guid}")
+            .WithTags("Costs")
+            .RequireAuthorization(Policies.CanRead);
+        GetContractorInvoices.Map(contractors);
         return app;
     }
 }
