@@ -7,10 +7,14 @@ import type {
   BudgetLineUpdateInput,
   CommitmentInput,
   CommitmentUpdateInput,
+  ContractorInvoices,
+  ContractorOption,
   ProjectCostReport,
 } from './types';
 
 export const costReportKey = (projectId: string) => ['cost-report', projectId];
+export const contractorInvoicesKey = (contractorId?: string) =>
+  contractorId ? ['contractor-invoices', contractorId] : ['contractor-invoices'];
 
 function useRefreshReport(projectId: string) {
   const queryClient = useQueryClient();
@@ -18,6 +22,7 @@ function useRefreshReport(projectId: string) {
     Promise.all([
       queryClient.invalidateQueries({ queryKey: costReportKey(projectId) }),
       queryClient.invalidateQueries({ queryKey: ['cashflow', projectId] }),
+      queryClient.invalidateQueries({ queryKey: contractorInvoicesKey() }),
     ]);
 }
 
@@ -27,6 +32,32 @@ export function useCostReport(projectId: string) {
     queryKey: costReportKey(projectId),
     queryFn: () =>
       unwrap<ProjectCostReport>(api.GET('/api/costs/projects/{projectId}', { params: { path: { projectId } } })),
+  });
+}
+
+/**
+ * Every contractor, inactive included, for the invoice form's Contractor select (which offers the active ones plus the
+ * entry's current one). Keyed under ['contractors'] so the Contractors module's invalidation refreshes it.
+ */
+export function useContractorOptions() {
+  const api = useApi();
+  return useQuery({
+    queryKey: ['contractors', { includeInactive: true }],
+    queryFn: () =>
+      unwrap<ContractorOption[]>(api.GET('/api/contractors', { params: { query: { includeInactive: true } } })),
+    staleTime: 60_000,
+  });
+}
+
+/** One contractor's invoices across all projects, with totals and per-contract invoiced-to-date. */
+export function useContractorInvoices(contractorId: string) {
+  const api = useApi();
+  return useQuery({
+    queryKey: contractorInvoicesKey(contractorId),
+    queryFn: () =>
+      unwrap<ContractorInvoices>(
+        api.GET('/api/costs/contractors/{contractorId}/invoices', { params: { path: { contractorId } } }),
+      ),
   });
 }
 

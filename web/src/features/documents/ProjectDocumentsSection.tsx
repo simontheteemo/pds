@@ -21,7 +21,7 @@ import { formatBytes } from './format';
 import { DeleteDocumentModal } from './DeleteDocumentModal';
 import { EditDocumentModal } from './EditDocumentModal';
 import { NewVersionModal } from './NewVersionModal';
-import type { DocumentDetails } from './types';
+import { linkedModuleLabel, type DocumentDetails, type LinkedModule } from './types';
 import { UploadDocumentModal } from './UploadDocumentModal';
 import { VersionsModal } from './VersionsModal';
 
@@ -143,7 +143,9 @@ export function ProjectDocumentsSection({
                     )}
                   </Table.Td>
                   <Table.Td>{d.category}</Table.Td>
-                  <Table.Td>{d.link ? `${d.link.module} · ${d.link.label}` : '—'}</Table.Td>
+                  <Table.Td>{d.link
+                      ? `${linkedModuleLabel[d.link.module as LinkedModule] ?? d.link.module} · ${d.link.label}`
+                      : '—'}</Table.Td>
                   <Table.Td>v{d.currentVersion}</Table.Td>
                   <Table.Td>{formatBytes(d.sizeBytes, config.culture)}</Table.Td>
                   <Table.Td>

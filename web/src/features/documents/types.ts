@@ -9,5 +9,11 @@ export type DocumentSettings = DeepRequired<paths['/api/documents/settings']['ge
 export type CreateDocumentInput = ListPath['post']['requestBody']['content']['application/json'];
 export type UpdateDocumentInput = DocPath['put']['requestBody']['content']['application/json'];
 export type DocumentLink = NonNullable<CreateDocumentInput['link']>;
-export type LinkedModule = 'Consent' | 'Contract' | 'Risk';
-export const linkedModuleLabel: Record<LinkedModule, string> = { Consent: 'Consent', Contract: 'Contract', Risk: 'Risk' };
+export type LinkedModule = 'Consent' | 'Contract' | 'Risk' | 'Invoice';
+export const linkedModuleLabel: Record<LinkedModule, string> = {
+  Consent: 'Consent',
+  Contract: 'Contract',
+  Risk: 'Risk',
+  Invoice: 'Invoice',
+};
+export type DocumentListFilter = { linkModule?: LinkedModule; linkRecordId?: string };

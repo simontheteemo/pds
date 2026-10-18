@@ -46,7 +46,7 @@ export function CostReportPage() {
         <Tabs.List>
           <Tabs.Tab value="budget">Budget</Tabs.Tab>
           <Tabs.Tab value="commitments">Commitments</Tabs.Tab>
-          <Tabs.Tab value="actuals">Actuals</Tabs.Tab>
+          <Tabs.Tab value="actuals">Invoices &amp; claims</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value="budget" pt="md">
           <BudgetTab report={r} />
