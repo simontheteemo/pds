@@ -21,6 +21,8 @@ public static class PortfolioModule
     {
         services.AddSingleton(PortfolioTable.Definition);
         services.AddSingleton<ProjectStore>();
+        services.AddSingleton<MilestoneStore>();
+        services.AddOptions<PortfolioOptions>().BindConfiguration(PortfolioOptions.Section);
         services.AddScoped<IExportDataset, ProjectsExport>();
         services.AddScoped<IPortfolioQueries, PortfolioQueries>();
         services.AddValidatorsFromAssemblyContaining<CreateProjectValidator>(includeInternalTypes: true);
@@ -35,6 +37,11 @@ public static class PortfolioModule
         GetProject.Map(group);
         UpdateProject.Map(group);
         ArchiveProject.Map(group);
+        ListMilestones.Map(group);
+        CreateMilestone.Map(group);
+        AddStandardMilestones.Map(group);
+        UpdateMilestone.Map(group);
+        DeleteMilestone.Map(group);
         return app;
     }
 }

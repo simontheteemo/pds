@@ -9,6 +9,7 @@ namespace PDS.Portfolio.Data;
 /// <summary>
 /// Project item: pk=PROJECT#id, sk=PROJECT, gsi1pk=PROJECT, gsi1sk=code.
 /// Code guard item: pk=CODE#code, sk=CODE, projectId. Optional attributes are omitted when empty.
+/// The PROJECT# partition also holds this project's MILESTONE# items (see <see cref="MilestoneItemMapper"/>); never query it without an sk filter.
 /// </summary>
 internal static class ProjectItemMapper
 {
