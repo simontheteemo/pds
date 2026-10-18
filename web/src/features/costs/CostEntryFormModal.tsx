@@ -5,7 +5,13 @@ import { useState } from 'react';
 import { useConfig } from '../../shared/config';
 import { joinLabel, numberInputParts } from '../../shared/format';
 import { zodValidate } from '../../shared/validation';
-import { useCreateActualCost, useCreateCommitment, useUpdateActualCost, useUpdateCommitment } from './api';
+import {
+  useContractorOptions,
+  useCreateActualCost,
+  useCreateCommitment,
+  useUpdateActualCost,
+  useUpdateCommitment,
+} from './api';
 import {
   costEntrySchema,
   emptyCostEntryValues,
@@ -21,6 +27,8 @@ import {
   actualCostTypes,
   commitmentTypeLabel,
   commitmentTypes,
+  invoiceStatuses,
+  invoiceStatusLabel,
   type CostReportActual,
   type CostReportCommitment,
   type CostReportContract,
@@ -38,6 +46,8 @@ type Props = {
   entry: CostEntry | 'new' | undefined;
   /** Budget line preselected for a new entry. */
   defaultLineId: string | null;
+  /** Actuals only: the contractor is preset and can't be changed, and only its contracts are offered. */
+  fixedContractorId?: string;
   onClose: () => void;
 };
 
@@ -48,6 +58,7 @@ function CostEntryFormModalInner({
   contracts,
   entry,
   defaultLineId,
+  fixedContractorId,
   onClose,
 }: Props & { entry: CostEntry | 'new' }) {
   const { currency, culture } = useConfig();
@@ -59,12 +70,19 @@ function CostEntryFormModalInner({
   const [submitting, setSubmitting] = useState(false);
   const [topError, setTopError] = useState<string | null>(null);
   const isNew = entry === 'new';
-  const noun = kind === 'commitment' ? 'commitment' : 'actual';
+  const isActual = kind === 'actual';
+  const noun = isActual ? 'invoice' : 'commitment';
+  const contractors = useContractorOptions();
+  const fixedContractor = isActual ? (fixedContractorId ?? null) : null;
   const form = useForm<CostEntryFormValues>({
     mode: 'controlled',
-    initialValues: isNew ? emptyCostEntryValues(defaultLineId) : fromEntry(entry),
+    initialValues: isNew
+      ? emptyCostEntryValues(defaultLineId, fixedContractor)
+      : { ...fromEntry(entry, contracts), ...(fixedContractor ? { contractorId: fixedContractor } : {}) },
     validate: zodValidate<CostEntryFormValues>(costEntrySchema(kind)),
   });
+  const initialContractorId = form.getInitialValues().contractorId;
+  const contractorId = form.values.contractorId;
 
   const handleSubmit = form.onSubmit(async (values) => {
     setSubmitting(true);
@@ -85,7 +103,7 @@ function CostEntryFormModalInner({
           body: { ...toActualCostInput(values), version: entry.version },
         });
       }
-      notifications.show({ color: 'green', message: `${kind === 'commitment' ? 'Commitment' : 'Actual'} saved` });
+      notifications.show({ color: 'green', message: `${isActual ? 'Invoice' : 'Commitment'} saved` });
       onClose();
     } catch (error) {
       handleMutationError(error, {
@@ -105,6 +123,8 @@ function CostEntryFormModalInner({
     form.setFieldValue('contractId', contractId);
     const contract = contracts.find((c) => c.id === contractId);
     if (!contract) return;
+    // The server requires an invoice's contractor to be its contract's contractor.
+    if (isActual) form.setFieldValue('contractorId', contract.contractorId);
     if (form.values.description.trim() === '') form.setFieldValue('description', contract.title);
     if (
       kind === 'commitment' &&
@@ -115,6 +135,28 @@ function CostEntryFormModalInner({
       form.setFieldValue('amount', contract.valueAmount);
     }
   };
+
+  const onContractorChange = (next: string | null) => {
+    form.setFieldValue('contractorId', next);
+    const contract = contracts.find((c) => c.id === form.values.contractId);
+    if (contract && contract.contractorId !== next) form.setFieldValue('contractId', null);
+  };
+
+  // Actuals offer only the chosen contractor's contracts (and keep the entry's current contract listed regardless).
+  const contractData = contracts
+    .filter(
+      (c) =>
+        !isActual ||
+        (fixedContractor ?? contractorId) === null ||
+        c.contractorId === (fixedContractor ?? contractorId) ||
+        c.id === form.values.contractId,
+    )
+    .map((c) => ({ value: c.id, label: joinLabel(c.contractorName, c.title) }));
+
+  // Active contractors, plus the current / saved one even if it has since been made inactive.
+  const contractorData = (contractors.data ?? [])
+    .filter((c) => c.isActive || c.id === contractorId || c.id === initialContractorId)
+    .map((c) => ({ value: c.id, label: c.isActive ? c.name : `${c.name} (inactive)` }));
 
   const typeData =
     kind === 'commitment'
@@ -135,22 +177,49 @@ function CostEntryFormModalInner({
             />
             <Select label="Type" withAsterisk data={typeData} {...form.getInputProps('type')} />
           </SimpleGrid>
+          {isActual && (
+            <SimpleGrid cols={{ base: 1, sm: 2 }}>
+              <Select
+                label="Contractor"
+                withAsterisk={form.values.type !== 'Other'}
+                clearable={!fixedContractor}
+                searchable
+                placeholder={contractors.isLoading ? 'Loading…' : 'None'}
+                disabled={fixedContractor !== null}
+                data={contractorData}
+                {...form.getInputProps('contractorId')}
+                onChange={onContractorChange}
+              />
+              <Select
+                label="Status"
+                withAsterisk
+                allowDeselect={false}
+                data={invoiceStatuses.map((s) => ({ value: s, label: invoiceStatusLabel[s] }))}
+                {...form.getInputProps('status')}
+              />
+            </SimpleGrid>
+          )}
           <Select
             label="Contract"
             clearable
             searchable
             placeholder="None"
-            data={contracts.map((c) => ({ value: c.id, label: joinLabel(c.contractorName, c.title) }))}
+            data={contractData}
             {...form.getInputProps('contractId')}
             onChange={onContractChange}
           />
-          {kind === 'actual' && <TextInput label="Payee" {...form.getInputProps('payee')} />}
+          {isActual && contractorId === null && <TextInput label="Payee" {...form.getInputProps('payee')} />}
           <TextInput label="Description" withAsterisk {...form.getInputProps('description')} />
           <SimpleGrid cols={{ base: 1, sm: 3 }}>
-            <TextInput label="Reference" {...form.getInputProps('reference')} />
-            <TextInput label="Date" type="date" withAsterisk {...form.getInputProps('date')} />
+            <TextInput label={isActual ? 'Invoice / claim no.' : 'Reference'} {...form.getInputProps('reference')} />
+            <TextInput
+              label={isActual ? 'Invoice date' : 'Date'}
+              type="date"
+              withAsterisk
+              {...form.getInputProps('date')}
+            />
             <NumberInput
-              label={`Amount (${currency})`}
+              label={isActual ? `Amount excl. GST (${currency})` : `Amount (${currency})`}
               withAsterisk
               prefix={currencySymbol}
               thousandSeparator={groupSeparator}
@@ -160,6 +229,23 @@ function CostEntryFormModalInner({
               {...form.getInputProps('amount')}
             />
           </SimpleGrid>
+          {isActual && (
+            <SimpleGrid cols={{ base: 1, sm: 3 }}>
+              <TextInput label="Due date" type="date" {...form.getInputProps('dueDate')} />
+              <NumberInput
+                label={`GST (${currency})`}
+                prefix={currencySymbol}
+                thousandSeparator={groupSeparator}
+                decimalSeparator={decimalSeparator}
+                decimalScale={2}
+                allowNegative
+                {...form.getInputProps('gstAmount')}
+              />
+              {form.values.status === 'Paid' && (
+                <TextInput label="Paid date" type="date" withAsterisk {...form.getInputProps('paidDate')} />
+              )}
+            </SimpleGrid>
+          )}
           <Textarea label="Notes" autosize minRows={3} {...form.getInputProps('notes')} />
           <Group>
             <Button type="submit" loading={submitting}>

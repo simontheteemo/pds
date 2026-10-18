@@ -39,3 +39,30 @@ export const actualCostTypeLabel: Record<ActualCostType, string> = {
   Claim: 'Payment claim',
   Other: 'Other',
 };
+
+export const invoiceStatuses = ['Received', 'Approved', 'Paid', 'Disputed'] as const satisfies readonly components['schemas']['InvoiceStatus'][];
+export type InvoiceStatus = (typeof invoiceStatuses)[number];
+export const invoiceStatusLabel: Record<InvoiceStatus, string> = {
+  Received: 'Received',
+  Approved: 'Approved',
+  Paid: 'Paid',
+  Disputed: 'Disputed',
+};
+export const invoiceStatusColor: Record<InvoiceStatus, string> = {
+  Received: 'gray',
+  Approved: 'blue',
+  Paid: 'green',
+  Disputed: 'red',
+};
+
+export type ContractorInvoices = DeepRequired<
+  paths['/api/costs/contractors/{contractorId}/invoices']['get']['responses'][200]['content']['application/json']
+>;
+export type ContractorInvoice = ContractorInvoices['invoices'][number];
+export type ContractorInvoiceContract = ContractorInvoices['contracts'][number];
+export type ContractorInvoiceTotals = ContractorInvoices['totals'];
+
+/** A contractor as offered by the invoice form's Contractor select (active and inactive). */
+export type ContractorOption = DeepRequired<
+  paths['/api/contractors']['get']['responses'][200]['content']['application/json']
+>[number];

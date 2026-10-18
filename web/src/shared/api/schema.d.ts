@@ -404,6 +404,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/costs/contractors/{contractorId}/invoices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetContractorInvoices"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/consents/projects/{projectId}/consents": {
         parameters: {
             query?: never;
@@ -784,13 +800,22 @@ export interface components {
             type: components["schemas"]["ActualCostType"];
             /** Format: uuid */
             contractId: null | string;
+            /** Format: uuid */
+            contractorId: null | string;
             payee: null | string;
             description: string;
             reference: null | string;
             /** Format: date */
             date: string;
+            /** Format: date */
+            dueDate: null | string;
+            status: components["schemas"]["InvoiceStatus"];
+            /** Format: date */
+            paidDate: null | string;
             /** Format: double */
             amount: number;
+            /** Format: double */
+            gstAmount: null | number;
             currency: string;
             notes: null | string;
             /** Format: date-time */
@@ -1089,6 +1114,54 @@ export interface components {
             /** Format: int64 */
             version: number;
         };
+        ContractorInvoice: {
+            entry: components["schemas"]["ActualCostDetails"];
+            /** Format: uuid */
+            projectId: string;
+            projectCode: null | string;
+            projectName: null | string;
+            projectArchived: boolean;
+            budgetLineName: string;
+            contractTitle: null | string;
+        };
+        ContractorInvoiceContract: {
+            /** Format: uuid */
+            contractId: string;
+            /** Format: uuid */
+            projectId: string;
+            projectCode: null | string;
+            projectName: null | string;
+            title: string;
+            status: string;
+            /** Format: double */
+            valueAmount: null | number;
+            /** Format: double */
+            invoicedToDate: number;
+            /** Format: double */
+            remaining: null | number;
+        };
+        ContractorInvoices: {
+            /** Format: uuid */
+            contractorId: string;
+            contractorName: string;
+            contractorActive: boolean;
+            currency: string;
+            totals: components["schemas"]["ContractorInvoiceTotals"];
+            invoices: components["schemas"]["ContractorInvoice"][];
+            contracts: components["schemas"]["ContractorInvoiceContract"][];
+        };
+        ContractorInvoiceTotals: {
+            /** Format: double */
+            invoiced: number;
+            /** Format: double */
+            paid: number;
+            /** Format: double */
+            outstanding: number;
+            /** Format: double */
+            disputed: number;
+            /** Format: double */
+            gst: number;
+        };
         ContractorListItem: {
             /** Format: uuid */
             id: string;
@@ -1139,6 +1212,8 @@ export interface components {
             status: string;
             /** Format: double */
             valueAmount: null | number;
+            /** Format: double */
+            invoicedToDate: number;
         };
         CostReportLine: {
             line: components["schemas"]["BudgetLineDetails"];
@@ -1150,13 +1225,22 @@ export interface components {
             type: null | components["schemas"]["ActualCostType"];
             /** Format: uuid */
             contractId: null | string;
+            /** Format: uuid */
+            contractorId: null | string;
             payee: null | string;
             description: null | string;
             reference: null | string;
             /** Format: date */
             date: null | string;
+            /** Format: date */
+            dueDate: null | string;
+            status: null | components["schemas"]["InvoiceStatus"];
+            /** Format: date */
+            paidDate: null | string;
             /** Format: double */
             amount: null | number;
+            /** Format: double */
+            gstAmount: null | number;
             notes: null | string;
         };
         CreateBudgetLineRequest: {
@@ -1387,7 +1471,9 @@ export interface components {
             };
         };
         /** @enum {unknown} */
-        LinkedModule: "Consent" | "Contract" | "Risk" | null;
+        InvoiceStatus: "Received" | "Approved" | "Paid" | "Disputed";
+        /** @enum {unknown} */
+        LinkedModule: "Consent" | "Contract" | "Risk" | "Invoice" | null;
         Me: {
             id: string;
             name: string;
@@ -1678,13 +1764,22 @@ export interface components {
             type: null | components["schemas"]["ActualCostType"];
             /** Format: uuid */
             contractId: null | string;
+            /** Format: uuid */
+            contractorId: null | string;
             payee: null | string;
             description: null | string;
             reference: null | string;
             /** Format: date */
             date: null | string;
+            /** Format: date */
+            dueDate: null | string;
+            status: null | components["schemas"]["InvoiceStatus"];
+            /** Format: date */
+            paidDate: null | string;
             /** Format: double */
             amount: null | number;
+            /** Format: double */
+            gstAmount: null | number;
             notes: null | string;
             /** Format: int64 */
             version: number;
@@ -3207,6 +3302,35 @@ export interface operations {
             };
         };
     };
+    GetContractorInvoices: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contractorId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContractorInvoices"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     ListConsents: {
         parameters: {
             query?: never;
@@ -3915,7 +4039,10 @@ export interface operations {
     };
     ListDocuments: {
         parameters: {
-            query?: never;
+            query?: {
+                linkModule?: components["schemas"]["LinkedModule"];
+                linkRecordId?: string;
+            };
             header?: never;
             path: {
                 projectId: string;

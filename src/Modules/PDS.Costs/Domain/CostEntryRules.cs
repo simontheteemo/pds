@@ -19,6 +19,7 @@ internal static class CostEntryRules
         Payee = Clean(f.Payee),
         Description = (f.Description ?? string.Empty).Trim(),
         Reference = Clean(f.Reference),
+        PaidDate = f.Status == InvoiceStatus.Paid ? f.PaidDate : null,
         Notes = Clean(f.Notes),
     };
 
@@ -41,6 +42,19 @@ internal static class CostEntryRules
             throw new ArgumentException("Amount must have at most 2 decimal places.", nameof(f));
         if (f.Amount.Amount == 0)
             throw new ArgumentException("Amount can't be zero.", nameof(f));
+        if (f.ContractorId is null && f.Type is ActualCostType.Invoice or ActualCostType.Claim)
+            throw new ArgumentException("An invoice or claim needs a contractor.", nameof(f));
+        if (f.Status == InvoiceStatus.Paid && f.PaidDate is null)
+            throw new ArgumentException("A paid entry needs a paid date.", nameof(f));
+        if (f.DueDate is { } due && due < f.Date)
+            throw new ArgumentException("The due date can't be before the invoice date.", nameof(f));
+        if (f.Gst is { } gst)
+        {
+            if (!MoneyRules.IsValidAmount(gst.Amount))
+                throw new ArgumentException("GST must have at most 2 decimal places.", nameof(f));
+            if (Math.Sign(gst.Amount) == -Math.Sign(f.Amount.Amount))
+                throw new ArgumentException("GST can't be the opposite sign to the amount.", nameof(f));
+        }
     }
 
     private static string? Clean(string? value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();

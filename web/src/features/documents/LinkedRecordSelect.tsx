@@ -17,6 +17,10 @@ type Risk = DeepRequired<
   paths['/api/risks/projects/{projectId}/risks']['get']['responses'][200]['content']['application/json']
 >[number];
 
+type CostReport = DeepRequired<
+  paths['/api/costs/projects/{projectId}']['get']['responses'][200]['content']['application/json']
+>;
+
 type Option = { value: string; label: string };
 const SAVED = ' (saved)';
 const MAX_LABEL = 200;
@@ -46,8 +50,14 @@ function useOptions(projectId: string) {
         }),
       ),
   });
+  const invoices = useQuery({
+    queryKey: ['documents', 'link-options', projectId, 'invoices'],
+    queryFn: () =>
+      unwrap<CostReport>(api.GET('/api/costs/projects/{projectId}', { params: { path: { projectId } } })),
+    select: (report) => report.actuals,
+  });
   return {
-    loading: consents.isLoading || contracts.isLoading || risks.isLoading,
+    loading: consents.isLoading || contracts.isLoading || risks.isLoading || invoices.isLoading,
     consents: (consents.data ?? []).map<Option>((c) => ({
       value: `Consent:${c.id}`,
       label: `${c.title}${c.reference ? ` (${c.reference})` : ''}`,
@@ -57,13 +67,17 @@ function useOptions(projectId: string) {
       label: [c.title, c.contractorName].filter(Boolean).join(' · '),
     })),
     risks: (risks.data ?? []).map<Option>((r) => ({ value: `Risk:${r.id}`, label: r.title })),
+    invoices: (invoices.data ?? []).map<Option>((a) => ({
+      value: `Invoice:${a.entry.id}`,
+      label: [a.contractorName ?? a.entry.payee, a.entry.reference ?? a.entry.description].filter(Boolean).join(' · '),
+    })),
   };
 }
 
 type Props = { projectId: string; value: LinkValue; onChange: (v: LinkValue) => void; error?: ReactNode };
 
 export function LinkedRecordSelect({ projectId, value, onChange, error }: Props) {
-  const { loading, consents, contracts, risks } = useOptions(projectId);
+  const { loading, consents, contracts, risks, invoices } = useOptions(projectId);
   const selected = value ? `${value.module}:${value.recordId}` : null;
 
   const groups = useMemo(() => {
@@ -71,6 +85,7 @@ export function LinkedRecordSelect({ projectId, value, onChange, error }: Props)
       Consent: [...consents],
       Contract: [...contracts],
       Risk: [...risks],
+      Invoice: [...invoices],
     };
     if (value && selected && !byModule[value.module].some((o) => o.value === selected)) {
       byModule[value.module].push({ value: selected, label: `${value.label}${SAVED}` });
@@ -78,9 +93,10 @@ export function LinkedRecordSelect({ projectId, value, onChange, error }: Props)
     return [
       { group: 'Consents', items: byModule.Consent },
       { group: 'Contracts', items: byModule.Contract },
+      { group: 'Invoices', items: byModule.Invoice },
       { group: 'Risks', items: byModule.Risk },
     ].filter((g) => g.items.length > 0);
-  }, [consents, contracts, risks, value, selected]);
+  }, [consents, contracts, risks, invoices, value, selected]);
 
   const handleChange = (next: string | null) => {
     if (!next) {
@@ -98,7 +114,7 @@ export function LinkedRecordSelect({ projectId, value, onChange, error }: Props)
   return (
     <Select
       label="Linked record"
-      description="Optional: a consent, contract or risk on this project"
+      description="Optional: a consent, contract, invoice or risk on this project"
       placeholder="None"
       searchable
       clearable

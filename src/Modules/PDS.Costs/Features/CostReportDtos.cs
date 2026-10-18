@@ -19,7 +19,8 @@ internal sealed record CostReportActual(
     ActualCostDetails Entry, string BudgetLineName, string? ContractTitle, string? ContractorName);
 
 internal sealed record CostReportContract(
-    Guid Id, Guid ContractorId, string ContractorName, string Title, string? Reference, string Status, decimal? ValueAmount);
+    Guid Id, Guid ContractorId, string ContractorName, string Title, string? Reference, string Status, decimal? ValueAmount,
+    decimal InvoicedToDate);
 
 internal sealed record ProjectCostReport(
     Guid ProjectId, string ProjectCode, string ProjectName, bool ProjectArchived, string Currency,

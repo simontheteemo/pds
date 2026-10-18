@@ -24,7 +24,8 @@ internal static class UpdateActualCost
 
     internal static async Task<Results<Ok<ActualCostDetails>, NotFound, ValidationProblem, ProblemHttpResult>> Handle(
         Guid projectId, Guid entryId, UpdateActualCostRequest request, CostStore store, IPortfolioQueries portfolio,
-        IContractQueries contracts, ICurrentUser user, TimeProvider clock, IOptions<LocaleOptions> locale, CancellationToken ct)
+        IContractQueries contracts, IContractorQueries contractors, ICurrentUser user, TimeProvider clock,
+        IOptions<LocaleOptions> locale, CancellationToken ct)
     {
         var project = await ProjectLookup.FindAsync(portfolio, projectId, ct);
         if (project is null)
@@ -38,7 +39,9 @@ internal static class UpdateActualCost
             return TypedResults.NotFound();
 
         var data = await store.LoadProjectAsync(pid, ct);
-        if (await CostReferences.CheckAsync(pid, data, request.BudgetLineId!.Value, request.ContractId, contracts, ct) is { } problem)
+        if (await CostReferences.CheckActualAsync(
+                pid, data, request.BudgetLineId!.Value, request.ContractId, request.ContractorId, entry.Fields.ContractorId, entry.Id.Value,
+                contracts, contractors, store, request.Reference, ct) is { } problem)
             return problem;
         if (entry.Version != request.Version)
             return CostsProblems.VersionConflict("actual cost");

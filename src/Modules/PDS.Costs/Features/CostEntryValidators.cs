@@ -47,6 +47,22 @@ internal abstract class ActualCostInputValidator<T> : AbstractValidator<T> where
             .NotEqual(0m).WithMessage("Amount can't be zero.")
             .OverridePropertyName(nameof(IActualCostInput.Amount))
             .When(x => x.Amount is not null);
+        RuleFor(x => x.ContractorId).NotNull().WithMessage("Choose a contractor.")
+            .When(x => x.Type is ActualCostType.Invoice or ActualCostType.Claim);
+        RuleFor(x => x.Status).NotNull().WithMessage("Choose a status.").IsInEnum();
+        RuleFor(x => x.PaidDate).NotNull().WithMessage("Enter the paid date.")
+            .When(x => x.Status == InvoiceStatus.Paid);
+        RuleFor(x => x.DueDate!.Value)
+            .GreaterThanOrEqualTo(x => x.Date!.Value).WithMessage("The due date can't be before the invoice date.")
+            .OverridePropertyName(nameof(IActualCostInput.DueDate))
+            .When(x => x.DueDate is not null && x.Date is not null);
+        RuleFor(x => x.GstAmount!.Value).Cascade(CascadeMode.Stop)
+            .Must(g => Math.Abs(g) <= MoneyRules.MaxAbs).WithMessage("GST is too large.")
+            .PrecisionScale(18, 2, ignoreTrailingZeros: true).WithMessage("Use at most 2 decimal places.")
+            .Must((x, g) => x.Amount is not { } a || Math.Sign(g) != -Math.Sign(a))
+            .WithMessage("GST can't be the opposite sign to the amount.")
+            .OverridePropertyName(nameof(IActualCostInput.GstAmount))
+            .When(x => x.GstAmount is not null);
         RuleFor(x => x.Notes).MaximumLength(CostEntryRules.NotesMaxLength);
     }
 }

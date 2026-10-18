@@ -20,6 +20,18 @@ internal static class CostsProblems
     public static ValidationProblem UnknownContract() =>
         Problems.Field("contractId", "Choose a contract on this project.");
 
+    public static ValidationProblem ContractorUnknown() =>
+        Problems.Field("contractorId", "Choose a contractor.");
+
+    public static ValidationProblem ContractorMismatch() =>
+        Problems.Field("contractorId", "The contractor must match the contract's contractor.");
+
+    public static ValidationProblem ContractorInactive() =>
+        Problems.Field("contractorId", "Choose an active contractor.");
+
+    public static ValidationProblem DuplicateInvoiceNumber() =>
+        Problems.Field("reference", "This contractor already has an invoice with this number.");
+
     public static ValidationProblem InvalidVersion() =>
         Problems.Field("version", "Version is required.");
 

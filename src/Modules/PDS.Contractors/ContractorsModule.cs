@@ -22,7 +22,9 @@ public static class ContractorsModule
         services.AddSingleton(ContractorsTable.Definition);
         services.AddSingleton<ContractorStore>();
         services.AddSingleton<ContractStore>();
-        services.AddSingleton<IContractQueries, ContractQueries>();
+        services.AddSingleton<ContractQueries>();
+        services.AddSingleton<IContractQueries>(sp => sp.GetRequiredService<ContractQueries>());
+        services.AddSingleton<IContractorQueries>(sp => sp.GetRequiredService<ContractQueries>());
         services.AddScoped<IExportDataset, ContractsExport>();
         services.AddValidatorsFromAssemblyContaining<CreateContractorValidator>(includeInternalTypes: true);
         return services;

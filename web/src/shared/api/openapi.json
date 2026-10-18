@@ -1765,6 +1765,40 @@
         }
       }
     },
+    "/api/costs/contractors/{contractorId}/invoices": {
+      "get": {
+        "tags": [
+          "Costs"
+        ],
+        "operationId": "GetContractorInvoices",
+        "parameters": [
+          {
+            "name": "contractorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContractorInvoices"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/api/consents/projects/{projectId}/consents": {
       "get": {
         "tags": [
@@ -2731,6 +2765,21 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "linkModule",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/LinkedModule"
+            }
+          },
+          {
+            "name": "linkRecordId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
@@ -3123,11 +3172,16 @@
           "budgetLineId",
           "type",
           "contractId",
+          "contractorId",
           "payee",
           "description",
           "reference",
           "date",
+          "dueDate",
+          "status",
+          "paidDate",
           "amount",
+          "gstAmount",
           "currency",
           "notes",
           "createdAt",
@@ -3156,6 +3210,13 @@
             ],
             "format": "uuid"
           },
+          "contractorId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
           "payee": {
             "type": [
               "null",
@@ -3175,8 +3236,32 @@
             "type": "string",
             "format": "date"
           },
+          "dueDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "status": {
+            "$ref": "#/components/schemas/InvoiceStatus"
+          },
+          "paidDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
           "amount": {
             "type": "number",
+            "format": "double"
+          },
+          "gstAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
             "format": "double"
           },
           "currency": {
@@ -4236,6 +4321,185 @@
           }
         }
       },
+      "ContractorInvoice": {
+        "required": [
+          "entry",
+          "projectId",
+          "projectCode",
+          "projectName",
+          "projectArchived",
+          "budgetLineName",
+          "contractTitle"
+        ],
+        "type": "object",
+        "properties": {
+          "entry": {
+            "$ref": "#/components/schemas/ActualCostDetails"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "projectName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "projectArchived": {
+            "type": "boolean"
+          },
+          "budgetLineName": {
+            "type": "string"
+          },
+          "contractTitle": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ContractorInvoiceContract": {
+        "required": [
+          "contractId",
+          "projectId",
+          "projectCode",
+          "projectName",
+          "title",
+          "status",
+          "valueAmount",
+          "invoicedToDate",
+          "remaining"
+        ],
+        "type": "object",
+        "properties": {
+          "contractId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "projectName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "valueAmount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "invoicedToDate": {
+            "type": "number",
+            "format": "double"
+          },
+          "remaining": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "ContractorInvoices": {
+        "required": [
+          "contractorId",
+          "contractorName",
+          "contractorActive",
+          "currency",
+          "totals",
+          "invoices",
+          "contracts"
+        ],
+        "type": "object",
+        "properties": {
+          "contractorId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "contractorName": {
+            "type": "string"
+          },
+          "contractorActive": {
+            "type": "boolean"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/ContractorInvoiceTotals"
+          },
+          "invoices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContractorInvoice"
+            }
+          },
+          "contracts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContractorInvoiceContract"
+            }
+          }
+        }
+      },
+      "ContractorInvoiceTotals": {
+        "required": [
+          "invoiced",
+          "paid",
+          "outstanding",
+          "disputed",
+          "gst"
+        ],
+        "type": "object",
+        "properties": {
+          "invoiced": {
+            "type": "number",
+            "format": "double"
+          },
+          "paid": {
+            "type": "number",
+            "format": "double"
+          },
+          "outstanding": {
+            "type": "number",
+            "format": "double"
+          },
+          "disputed": {
+            "type": "number",
+            "format": "double"
+          },
+          "gst": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
       "ContractorListItem": {
         "required": [
           "id",
@@ -4391,7 +4655,8 @@
           "title",
           "reference",
           "status",
-          "valueAmount"
+          "valueAmount",
+          "invoicedToDate"
         ],
         "type": "object",
         "properties": {
@@ -4424,6 +4689,10 @@
               "number"
             ],
             "format": "double"
+          },
+          "invoicedToDate": {
+            "type": "number",
+            "format": "double"
           }
         }
       },
@@ -4447,11 +4716,16 @@
           "budgetLineId",
           "type",
           "contractId",
+          "contractorId",
           "payee",
           "description",
           "reference",
           "date",
+          "dueDate",
+          "status",
+          "paidDate",
           "amount",
+          "gstAmount",
           "notes"
         ],
         "type": "object",
@@ -4474,6 +4748,13 @@
             ]
           },
           "contractId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "contractorId": {
             "type": [
               "null",
               "string"
@@ -4505,7 +4786,38 @@
             ],
             "format": "date"
           },
+          "dueDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "status": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/InvoiceStatus"
+              }
+            ]
+          },
+          "paidDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
           "amount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "gstAmount": {
             "type": [
               "null",
               "number"
@@ -5559,11 +5871,20 @@
           }
         }
       },
+      "InvoiceStatus": {
+        "enum": [
+          "Received",
+          "Approved",
+          "Paid",
+          "Disputed"
+        ]
+      },
       "LinkedModule": {
         "enum": [
           "Consent",
           "Contract",
           "Risk",
+          "Invoice",
           null
         ]
       },
@@ -6660,11 +6981,16 @@
           "budgetLineId",
           "type",
           "contractId",
+          "contractorId",
           "payee",
           "description",
           "reference",
           "date",
+          "dueDate",
+          "status",
+          "paidDate",
           "amount",
+          "gstAmount",
           "notes",
           "version"
         ],
@@ -6688,6 +7014,13 @@
             ]
           },
           "contractId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "contractorId": {
             "type": [
               "null",
               "string"
@@ -6719,7 +7052,38 @@
             ],
             "format": "date"
           },
+          "dueDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "status": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/InvoiceStatus"
+              }
+            ]
+          },
+          "paidDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
           "amount": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "gstAmount": {
             "type": [
               "null",
               "number"

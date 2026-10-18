@@ -23,7 +23,7 @@ internal static class CreateActualCost
 
     internal static async Task<Results<Created<ActualCostDetails>, NotFound, ValidationProblem>> Handle(
         Guid projectId, CreateActualCostRequest request, CostStore store, IPortfolioQueries portfolio, IContractQueries contracts,
-        ICurrentUser user, TimeProvider clock, IOptions<LocaleOptions> locale, CancellationToken ct)
+        IContractorQueries contractors, ICurrentUser user, TimeProvider clock, IOptions<LocaleOptions> locale, CancellationToken ct)
     {
         var project = await ProjectLookup.FindAsync(portfolio, projectId, ct);
         if (project is null)
@@ -33,7 +33,9 @@ internal static class CreateActualCost
 
         var pid = new ProjectId(projectId);
         var data = await store.LoadProjectAsync(pid, ct);
-        if (await CostReferences.CheckAsync(pid, data, request.BudgetLineId!.Value, request.ContractId, contracts, ct) is { } problem)
+        if (await CostReferences.CheckActualAsync(
+                pid, data, request.BudgetLineId!.Value, request.ContractId, request.ContractorId, null, null,
+                contracts, contractors, store, request.Reference, ct) is { } problem)
             return problem;
 
         var entry = ActualCost.Create(pid, request.ToFields(locale.Value.Currency), new AuditStamp(clock.GetUtcNow(), user.Name));

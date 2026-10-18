@@ -22,7 +22,7 @@ internal static class GetCostReport
 
     internal static async Task<Results<Ok<ProjectCostReport>, NotFound>> Handle(
         Guid projectId, CostStore store, IPortfolioQueries portfolio, IContractQueries contractQueries,
-        IOptions<LocaleOptions> locale, CancellationToken ct)
+        IContractorQueries contractorQueries, IOptions<LocaleOptions> locale, CancellationToken ct)
     {
         var project = await ProjectLookup.FindAsync(portfolio, projectId, ct);
         if (project is null)
@@ -39,6 +39,18 @@ internal static class GetCostReport
             .ToList();
         var lineNames = lines.ToDictionary(l => l.Id, l => l.Fields.Name);
         var contractById = contracts.ToDictionary(c => c.Id);
+        var contractorIds = data.Actuals
+            .Where(a => a.Fields.ContractorId is not null)
+            .Select(a => a.Fields.ContractorId!.Value)
+            .Distinct()
+            .ToList();
+        var contractorNames = contractorIds.Count == 0
+            ? new Dictionary<ContractorId, string>()
+            : (await contractorQueries.GetContractors(contractorIds, ct)).ToDictionary(c => c.Id, c => c.Name);
+        var invoicedByContract = data.Actuals
+            .Where(a => a.Fields.ContractId is not null)
+            .GroupBy(a => a.Fields.ContractId!.Value)
+            .ToDictionary(g => g.Key, g => decimal.Round(g.Sum(a => a.Fields.Amount.Amount), 2));
 
         // An entry can reference a line deleted in a race the spec accepts; it then counts toward no line.
         string LineName(BudgetLineId id) => lineNames.GetValueOrDefault(id, DeletedLine);
@@ -62,7 +74,10 @@ internal static class GetCostReport
             .ThenBy(a => a.Fields.Description, StringComparer.OrdinalIgnoreCase)
             .Select(a =>
             {
-                var (title, contractor) = ContractNames(a.Fields.ContractId);
+                var (title, contractContractor) = ContractNames(a.Fields.ContractId);
+                var contractor = a.Fields.ContractorId is { } kid && contractorNames.TryGetValue(kid, out var name)
+                    ? name
+                    : contractContractor;
                 return new CostReportActual(ActualCostDetails.From(a), LineName(a.Fields.BudgetLineId), title, contractor);
             })
             .ToList();
@@ -77,7 +92,8 @@ internal static class GetCostReport
                 .OrderBy(c => c.ContractorName, StringComparer.OrdinalIgnoreCase)
                 .ThenBy(c => c.Title, StringComparer.OrdinalIgnoreCase)
                 .Select(c => new CostReportContract(
-                    c.Id.Value, c.ContractorId.Value, c.ContractorName, c.Title, c.Reference, c.Status, c.ValueAmount))
+                    c.Id.Value, c.ContractorId.Value, c.ContractorName, c.Title, c.Reference, c.Status, c.ValueAmount,
+                    invoicedByContract.GetValueOrDefault(c.Id, 0m)))
                 .ToList());
         return TypedResults.Ok(report);
     }

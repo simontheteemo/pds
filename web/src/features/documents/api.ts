@@ -1,7 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { unwrap, useApi } from '../../shared/api/client';
-import type { CreateDocumentInput, DocumentDetails, DocumentSettings, UpdateDocumentInput } from './types';
+import { unwrap, useApi, type Api } from '../../shared/api/client';
+import type {
+  CreateDocumentInput,
+  DocumentDetails,
+  DocumentListFilter,
+  DocumentSettings,
+  UpdateDocumentInput,
+} from './types';
 
+/** Every list query of a project sits under this prefix, so a mutation's invalidation refreshes filtered lists too. */
 const documentsKey = (projectId: string) => ['documents', projectId];
 
 type UploadTicket = { uploadId: string; uploadUrl: string; contentType: string; expiresAt: string };
@@ -28,13 +35,22 @@ export function useDocumentSettings() {
   });
 }
 
-export function useDocuments(projectId: string) {
-  const api = useApi();
-  return useQuery({
-    queryKey: documentsKey(projectId),
+/** Query options for a project's documents, optionally filtered by link; shared by `useDocuments` and `useQueries` callers. */
+export function documentsQuery(api: Api, projectId: string, filter?: DocumentListFilter) {
+  return {
+    queryKey: filter ? [...documentsKey(projectId), filter] : documentsKey(projectId),
     queryFn: () =>
-      unwrap<DocumentDetails[]>(api.GET('/api/documents/projects/{projectId}/documents', { params: { path: { projectId } } })),
-  });
+      unwrap<DocumentDetails[]>(
+        api.GET('/api/documents/projects/{projectId}/documents', {
+          params: { path: { projectId }, query: filter ?? {} },
+        }),
+      ),
+  };
+}
+
+export function useDocuments(projectId: string, filter?: DocumentListFilter) {
+  const api = useApi();
+  return useQuery(documentsQuery(api, projectId, filter));
 }
 
 /** Requests a presigned URL and PUTs the file straight to storage. Returns the upload id to confirm. */
