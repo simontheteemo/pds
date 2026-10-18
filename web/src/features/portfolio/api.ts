@@ -1,7 +1,7 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { unwrap, useApi } from '../../shared/api/client';
 import type { paths } from '../../shared/api/schema';
-import type { ListQuery, ProjectDetails, ProjectInput, ProjectPage, ProjectUpdateInput } from './types';
+import type { ListQuery, PortfolioSummary, ProjectDetails, ProjectInput, ProjectPage, ProjectUpdateInput } from './types';
 
 type WireQuery = NonNullable<paths['/api/portfolio/projects']['get']['parameters']['query']>;
 
@@ -21,6 +21,7 @@ function useStoreProject() {
   return (project: ProjectDetails) => {
     queryClient.setQueryData(['project', project.id], project);
     void queryClient.invalidateQueries({ queryKey: ['projects'] });
+    void queryClient.invalidateQueries({ queryKey: ['portfolio-summary'] });
   };
 }
 
@@ -30,6 +31,14 @@ export function useProjects(query: ListQuery) {
     queryKey: ['projects', query],
     queryFn: () => unwrap<ProjectPage>(api.GET('/api/portfolio/projects', { params: { query: toWireQuery(query) } })),
     placeholderData: keepPreviousData,
+  });
+}
+
+export function usePortfolioSummary() {
+  const api = useApi();
+  return useQuery({
+    queryKey: ['portfolio-summary'],
+    queryFn: () => unwrap<PortfolioSummary>(api.GET('/api/portfolio/summary')),
   });
 }
 

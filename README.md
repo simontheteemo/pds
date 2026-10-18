@@ -11,7 +11,7 @@ Web system for managing a property development portfolio. It's single-tenant: on
 
 One project per module under `src/Modules/`, one feature folder under `web/src/features/`. Each has its own spec.
 
-- **Portfolio**: projects, stage, status and budget. [Foundation spec](docs/superpowers/specs/2026-09-29-foundation-design.md)
+- **Portfolio**: projects, stage, status and budget, plus programme milestones. [Foundation spec](docs/superpowers/specs/2026-09-29-foundation-design.md)
 - **Risks**: per-project risk registry with ratings. [Spec](docs/superpowers/specs/2026-09-30-risk-registry-design.md)
 - **Contractors**: contractors and their contracts. [Spec](docs/superpowers/specs/2026-09-30-contractors-design.md)
 - **Costs**: cost lines, commitments and actuals with running totals. [Spec](docs/superpowers/specs/2026-10-14-costs-design.md)
@@ -37,6 +37,7 @@ Per-module local settings, all already set in `appsettings.Development.json`:
 
 - **Tables**: `Dynamo:CreateTablesOnStartup` creates every module's tables in DynamoDB Local on first run.
 - **Documents**: `Documents:Storage=Local` replaces S3 with files on disk plus signed stand-ins for the presigned PUT/GET URLs (`/api/documents/local-files/...`). Files go to `<temp>/pds-documents`; set `Documents:LocalPath` to change that. The API refuses to start with `Local` outside the `Development` environment, so a deployed Lambda always uses S3 (`Documents__BucketName` is set by CDK).
+- **Portfolio**: `Portfolio:StandardMilestones` (a list of `{ name, category }`) optionally overrides the default NZ milestone set.
 - **Reporting, Cashflow, Sales, Consents, Costs, Risks, Contractors**: nothing to configure.
 
 The shared `Locale` settings (currency, culture, time zone) live in `appsettings.json`. The API fails at startup if `Locale:TimeZone` is not a valid time zone.
