@@ -19,6 +19,7 @@ import { ProjectSalesSection } from '../../sales/ProjectSalesSection';
 import { useSlippingMilestoneCount } from '../programme/api';
 import { ProgrammeTab } from '../programme/ProgrammeTab';
 import type { ProjectDetails } from '../types';
+import { useConsentAttentionCount, useRiskAttentionCount } from './attention';
 import { OverviewTab } from './OverviewTab';
 
 export type ProjectTabProps = { project: ProjectDetails };
@@ -55,6 +56,7 @@ export const projectTabs: ProjectTab[] = [
     key: 'consents',
     label: 'Consents',
     Panel: ({ project }) => <ProjectConsentsSection projectId={project.id} projectArchived={project.isArchived} />,
+    useAttentionCount: useConsentAttentionCount,
   },
   {
     key: 'sales',
@@ -70,5 +72,6 @@ export const projectTabs: ProjectTab[] = [
     key: 'risks',
     label: 'Risks',
     Panel: ({ project }) => <ProjectRisksSection projectId={project.id} projectArchived={project.isArchived} />,
+    useAttentionCount: useRiskAttentionCount,
   },
 ];

@@ -9,9 +9,19 @@
  */
 import type { ComponentType } from 'react';
 import type { ProjectDetails } from '../types';
+import { CostsPanel } from './CostsPanel';
 import { KeyFactsPanel } from './KeyFactsPanel';
+import { NeedsAttentionPanel } from './NeedsAttentionPanel';
+import { NextMilestonesPanel } from './NextMilestonesPanel';
+import { SalesPositionPanel } from './SalesPositionPanel';
 
 export type OverviewPanelProps = { project: ProjectDetails };
 export type OverviewPanel = { id: string; span: 'full' | 'half'; Panel: ComponentType<OverviewPanelProps> };
 
-export const overviewPanels: OverviewPanel[] = [{ id: 'key-facts', span: 'full', Panel: KeyFactsPanel }];
+export const overviewPanels: OverviewPanel[] = [
+  { id: 'key-facts', span: 'full', Panel: KeyFactsPanel },
+  { id: 'needs-attention', span: 'half', Panel: NeedsAttentionPanel },
+  { id: 'next-milestones', span: 'half', Panel: NextMilestonesPanel },
+  { id: 'costs', span: 'half', Panel: CostsPanel },
+  { id: 'sales', span: 'half', Panel: SalesPositionPanel },
+];

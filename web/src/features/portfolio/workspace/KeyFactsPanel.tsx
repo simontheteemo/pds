@@ -6,7 +6,7 @@ import { Field } from './Field';
 
 export function KeyFactsPanel({ project: p }: OverviewPanelProps) {
   const config = useConfig();
-  const address = [p.site.addressLine, p.site.suburb, p.site.city].filter(Boolean).join(', ');
+  const address = [p.site.addressLine, p.site.suburb, p.site.city, p.site.region, p.site.postcode].filter(Boolean).join(', ');
   const range = (start: string | null, end: string | null) =>
     start || end ? `${formatDate(start, config.culture)} → ${formatDate(end, config.culture)}` : null;
   const legal = [p.site.legalDescription, p.site.titleReference].filter(Boolean).join(' / ');
