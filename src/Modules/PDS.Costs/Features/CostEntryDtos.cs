@@ -34,6 +34,8 @@ internal interface IActualCostInput
 
     Guid? ContractId { get; }
 
+    Guid? ContractorId { get; }
+
     string? Payee { get; }
 
     string? Description { get; }
@@ -42,7 +44,15 @@ internal interface IActualCostInput
 
     DateOnly? Date { get; }
 
+    DateOnly? DueDate { get; }
+
+    InvoiceStatus? Status { get; }
+
+    DateOnly? PaidDate { get; }
+
     decimal? Amount { get; }
+
+    decimal? GstAmount { get; }
 
     string? Notes { get; }
 }
@@ -56,12 +66,14 @@ internal sealed record UpdateCommitmentRequest(
     DateOnly? Date, decimal? Amount, string? Notes, long Version) : ICommitmentInput;
 
 internal sealed record CreateActualCostRequest(
-    Guid? BudgetLineId, ActualCostType? Type, Guid? ContractId, string? Payee, string? Description, string? Reference,
-    DateOnly? Date, decimal? Amount, string? Notes) : IActualCostInput;
+    Guid? BudgetLineId, ActualCostType? Type, Guid? ContractId, Guid? ContractorId, string? Payee, string? Description,
+    string? Reference, DateOnly? Date, DateOnly? DueDate, InvoiceStatus? Status, DateOnly? PaidDate, decimal? Amount,
+    decimal? GstAmount, string? Notes) : IActualCostInput;
 
 internal sealed record UpdateActualCostRequest(
-    Guid? BudgetLineId, ActualCostType? Type, Guid? ContractId, string? Payee, string? Description, string? Reference,
-    DateOnly? Date, decimal? Amount, string? Notes, long Version) : IActualCostInput;
+    Guid? BudgetLineId, ActualCostType? Type, Guid? ContractId, Guid? ContractorId, string? Payee, string? Description,
+    string? Reference, DateOnly? Date, DateOnly? DueDate, InvoiceStatus? Status, DateOnly? PaidDate, decimal? Amount,
+    decimal? GstAmount, string? Notes, long Version) : IActualCostInput;
 
 internal static class CostEntryInputMapping
 {
@@ -81,11 +93,16 @@ internal static class CostEntryInputMapping
         new BudgetLineId(input.BudgetLineId!.Value),
         input.Type!.Value,
         input.ContractId is { } c ? new ContractId(c) : null,
+        input.ContractorId is { } k ? new ContractorId(k) : null,
         input.Payee,
         input.Description!,
         input.Reference,
         input.Date!.Value,
+        input.DueDate,
+        input.Status!.Value,
+        input.PaidDate,
         new Money(input.Amount!.Value, currency),
+        input.GstAmount is { } g ? new Money(g, currency) : null,
         input.Notes);
 }
 
@@ -121,11 +138,16 @@ internal sealed record ActualCostDetails(
     Guid BudgetLineId,
     ActualCostType Type,
     Guid? ContractId,
+    Guid? ContractorId,
     string? Payee,
     string Description,
     string? Reference,
     DateOnly Date,
+    DateOnly? DueDate,
+    InvoiceStatus Status,
+    DateOnly? PaidDate,
     decimal Amount,
+    decimal? GstAmount,
     string Currency,
     string? Notes,
     DateTimeOffset CreatedAt,
@@ -138,8 +160,8 @@ internal sealed record ActualCostDetails(
     {
         var f = a.Fields;
         return new ActualCostDetails(
-            a.Id.Value, f.BudgetLineId.Value, f.Type, f.ContractId?.Value, f.Payee, f.Description, f.Reference, f.Date,
-            f.Amount.Amount, f.Amount.Currency, f.Notes,
+            a.Id.Value, f.BudgetLineId.Value, f.Type, f.ContractId?.Value, f.ContractorId?.Value, f.Payee, f.Description,
+            f.Reference, f.Date, f.DueDate, f.Status, f.PaidDate, f.Amount.Amount, f.Gst?.Amount, f.Amount.Currency, f.Notes,
             a.Created.At, a.Created.By, a.Updated.At, a.Updated.By, a.Version);
     }
 }

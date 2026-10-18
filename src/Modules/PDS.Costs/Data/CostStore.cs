@@ -1,5 +1,6 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
+using PDS.Contractors.Contracts;
 using PDS.Costs.Contracts;
 using PDS.Costs.Domain;
 using PDS.Portfolio.Contracts;
@@ -68,6 +69,56 @@ internal sealed class CostStore(IAmazonDynamoDB dynamo, TableNames names)
             .ToDictionary(
                 id => id,
                 id => new ProjectCostData(linesBy[id].ToList(), commitmentsBy[id].ToList(), actualsBy[id].ToList()));
+    }
+
+    /// <summary>Every actual linked to the contractor, across projects (gsi1; eventually consistent).</summary>
+    public async Task<IReadOnlyList<ActualCost>> ListActualsForContractorAsync(ContractorId id, CancellationToken ct)
+    {
+        var actuals = new List<ActualCost>();
+        Dictionary<string, AttributeValue>? start = null;
+        do
+        {
+            var response = await dynamo.QueryAsync(new QueryRequest
+            {
+                TableName = Table,
+                IndexName = CostsTable.Gsi1,
+                KeyConditionExpression = "gsi1pk = :pk",
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue> { [":pk"] = Attr.S(CostKeys.ContractorKey(id)) },
+                ExclusiveStartKey = start,
+            }, ct);
+            actuals.AddRange((response.Items ?? []).Select(ActualCostItemMapper.FromItem));
+            start = response.LastEvaluatedKey is { Count: > 0 } next ? next : null;
+        }
+        while (start is not null);
+
+        return actuals;
+    }
+
+    /// <summary>The project's budget lines only (no commitments or actuals).</summary>
+    public async Task<IReadOnlyList<BudgetLine>> ListLinesAsync(ProjectId projectId, CancellationToken ct)
+    {
+        var lines = new List<BudgetLine>();
+        Dictionary<string, AttributeValue>? start = null;
+        do
+        {
+            var response = await dynamo.QueryAsync(new QueryRequest
+            {
+                TableName = Table,
+                KeyConditionExpression = "pk = :pk AND begins_with(sk, :prefix)",
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue>
+                {
+                    [":pk"] = Attr.S(CostKeys.Pk(projectId)),
+                    [":prefix"] = Attr.S(CostKeys.LinePrefix),
+                },
+                ConsistentRead = true,
+                ExclusiveStartKey = start,
+            }, ct);
+            lines.AddRange((response.Items ?? []).Select(BudgetLineItemMapper.FromItem));
+            start = response.LastEvaluatedKey is { Count: > 0 } next ? next : null;
+        }
+        while (start is not null);
+
+        return lines;
     }
 
     private static void Dispatch(
