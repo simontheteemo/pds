@@ -101,6 +101,14 @@ export function riskAttention(risks: RiskDetails[], fmt: DateFmt): AttentionItem
   return items;
 }
 
+/**
+ * Builds the Overview "Needs attention" list. To contribute a new source from another feature:
+ *  1. Write a pure `xxxAttention(data, fmt): AttentionItem[]` (see the functions above).
+ *  2. Call its query hook here.
+ *  3. Push its label to `errors` when the query fails.
+ *  4. Spread its result into `items` (sorting by severity happens below).
+ *  5. Include its pending state in `isLoading`.
+ */
 export function useProjectAttention(projectId: string): { items: AttentionItem[]; isLoading: boolean; errors: string[] } {
   const config = useConfig();
   const fmt: DateFmt = (iso) => formatDate(iso, config.culture);
@@ -124,7 +132,7 @@ export function useProjectAttention(projectId: string): { items: AttentionItem[]
 
 export function useConsentAttentionCount(projectId: string): number {
   const { data } = useConsents(projectId);
-  return consentAttention(data ?? [], () => '').length;
+  return consentAttention(data ?? [], () => '').length; // same rules as the list, formatter unused
 }
 
 export function useRiskAttentionCount(projectId: string): number {

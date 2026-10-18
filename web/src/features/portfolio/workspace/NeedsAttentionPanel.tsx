@@ -30,7 +30,7 @@ export function NeedsAttentionPanel({ project }: OverviewPanelProps) {
         <Loader size="sm" />
       ) : items.length === 0 ? (
         errors.length === 0 && (
-          <Text c="green">&#10003; Nothing needs attention.</Text>
+          <Text c="green">Nothing needs attention.</Text>
         )
       ) : (
         <Stack gap="xs">
