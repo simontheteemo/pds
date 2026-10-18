@@ -52,6 +52,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/portfolio/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetPortfolioSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/portfolio/projects/{id}": {
         parameters: {
             query?: never;
@@ -95,6 +111,54 @@ export interface paths {
         put?: never;
         post: operations["RestoreProject"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/portfolio/projects/{id}/milestones": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListMilestones"];
+        put?: never;
+        post: operations["CreateMilestone"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/portfolio/projects/{id}/milestones/standard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AddStandardMilestones"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/portfolio/projects/{id}/milestones/{milestoneId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["UpdateMilestone"];
+        post?: never;
+        delete: operations["DeleteMilestone"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1248,6 +1312,20 @@ export interface components {
             tags: null | string[];
             notes: null | string;
         };
+        CreateMilestoneRequest: {
+            name: null | string;
+            category: null | components["schemas"]["MilestoneCategory"];
+            /** Format: date */
+            plannedDate: null | string;
+            /** Format: date */
+            forecastDate: null | string;
+            /** Format: date */
+            actualDate: null | string;
+            owner: null | string;
+            notes: null | string;
+            /** Format: int32 */
+            sortOrder: null | number;
+        };
         CreateProjectRequest: {
             code: string;
             name: string;
@@ -1394,6 +1472,54 @@ export interface components {
             email: null | string;
             roles: string[];
         };
+        /** @enum {unknown} */
+        MilestoneCategory: "Land" | "Design" | "ResourceConsent" | "BuildingConsent" | "Construction" | "Completion" | "Titles" | "Sales" | "Finance" | "Other";
+        MilestoneDetails: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            projectId: string;
+            name: string;
+            category: components["schemas"]["MilestoneCategory"];
+            /** Format: date */
+            plannedDate: null | string;
+            /** Format: date */
+            forecastDate: null | string;
+            /** Format: date */
+            actualDate: null | string;
+            status: components["schemas"]["MilestoneStatus"];
+            /** Format: int32 */
+            slippageDays: null | number;
+            /** Format: int32 */
+            daysOverdue: null | number;
+            owner: null | string;
+            notes: null | string;
+            /** Format: int32 */
+            sortOrder: number;
+            /** Format: date-time */
+            createdAt: string;
+            createdBy: string;
+            /** Format: date-time */
+            updatedAt: string;
+            updatedBy: string;
+            /** Format: int64 */
+            version: number;
+        };
+        MilestoneList: {
+            /** Format: date */
+            today: string;
+            items: components["schemas"]["MilestoneDetails"][];
+        };
+        /** @enum {unknown} */
+        MilestoneStatus: "NotStarted" | "OnTrack" | "AtRisk" | "Overdue" | "Complete";
+        NextMilestoneDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** Format: date */
+            date: null | string;
+            status: components["schemas"]["MilestoneStatus"];
+        };
         PagedResultOfProjectListItem: {
             items: components["schemas"]["ProjectListItem"][];
             /** Format: int32 */
@@ -1402,6 +1528,18 @@ export interface components {
             pageSize: number;
             /** Format: int32 */
             totalCount: number;
+        };
+        PortfolioSummary: {
+            /** Format: int32 */
+            activeProjects: number;
+            byStage: components["schemas"]["StageCount"][];
+            /** Format: double */
+            totalBudget: number;
+            currency: string;
+            /** Format: int32 */
+            projectsSlipping: number;
+            /** Format: int32 */
+            overdueMilestones: number;
         };
         ProblemDetails: {
             type?: null | string;
@@ -1487,6 +1625,7 @@ export interface components {
             budgetAmount: null | number;
             currency: string;
             isArchived: boolean;
+            nextMilestone: null | components["schemas"]["NextMilestoneDto"];
         };
         ProjectSales: {
             summary: components["schemas"]["SalesSummary"];
@@ -1616,6 +1755,11 @@ export interface components {
             titleReference: null | string;
             /** Format: double */
             landAreaSqm: null | number;
+        };
+        StageCount: {
+            stage: components["schemas"]["ProjectStage"];
+            /** Format: int32 */
+            count: number;
         };
         UnitDetails: {
             /** Format: uuid */
@@ -1786,6 +1930,22 @@ export interface components {
             link: null | components["schemas"]["DocumentLink"];
             tags: null | string[];
             notes: null | string;
+            /** Format: int64 */
+            version: number;
+        };
+        UpdateMilestoneRequest: {
+            name: null | string;
+            category: null | components["schemas"]["MilestoneCategory"];
+            /** Format: date */
+            plannedDate: null | string;
+            /** Format: date */
+            forecastDate: null | string;
+            /** Format: date */
+            actualDate: null | string;
+            owner: null | string;
+            notes: null | string;
+            /** Format: int32 */
+            sortOrder: null | number;
             /** Format: int64 */
             version: number;
         };
@@ -2005,6 +2165,26 @@ export interface operations {
             };
         };
     };
+    GetPortfolioSummary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PortfolioSummary"];
+                };
+            };
+        };
+    };
     GetProject: {
         parameters: {
             query?: never;
@@ -2131,6 +2311,197 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProjectDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ListMilestones: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MilestoneList"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CreateMilestone: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateMilestoneRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MilestoneDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AddStandardMilestones: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MilestoneDetails"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UpdateMilestone: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                milestoneId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateMilestoneRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MilestoneDetails"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    DeleteMilestone: {
+        parameters: {
+            query?: {
+                version?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+                milestoneId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["HttpValidationProblemDetails"];
                 };
             };
             /** @description Not Found */

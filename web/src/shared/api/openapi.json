@@ -159,6 +159,26 @@
         }
       }
     },
+    "/api/portfolio/summary": {
+      "get": {
+        "tags": [
+          "Portfolio"
+        ],
+        "operationId": "GetPortfolioSummary",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortfolioSummary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/portfolio/projects/{id}": {
       "get": {
         "tags": [
@@ -329,6 +349,254 @@
           },
           "404": {
             "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/portfolio/projects/{id}/milestones": {
+      "get": {
+        "tags": [
+          "Portfolio"
+        ],
+        "operationId": "ListMilestones",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MilestoneList"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Portfolio"
+        ],
+        "operationId": "CreateMilestone",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMilestoneRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MilestoneDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/portfolio/projects/{id}/milestones/standard": {
+      "post": {
+        "tags": [
+          "Portfolio"
+        ],
+        "operationId": "AddStandardMilestones",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MilestoneDetails"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/portfolio/projects/{id}/milestones/{milestoneId}": {
+      "put": {
+        "tags": [
+          "Portfolio"
+        ],
+        "operationId": "UpdateMilestone",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "milestoneId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMilestoneRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MilestoneDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Portfolio"
+        ],
+        "operationId": "DeleteMilestone",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "milestoneId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -4981,6 +5249,77 @@
           }
         }
       },
+      "CreateMilestoneRequest": {
+        "required": [
+          "name",
+          "category",
+          "plannedDate",
+          "forecastDate",
+          "actualDate",
+          "owner",
+          "notes",
+          "sortOrder"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "category": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/MilestoneCategory"
+              }
+            ]
+          },
+          "plannedDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "forecastDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "actualDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "owner": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "sortOrder": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          }
+        }
+      },
       "CreateProjectRequest": {
         "required": [
           "code",
@@ -5596,6 +5935,187 @@
           }
         }
       },
+      "MilestoneCategory": {
+        "enum": [
+          "Land",
+          "Design",
+          "ResourceConsent",
+          "BuildingConsent",
+          "Construction",
+          "Completion",
+          "Titles",
+          "Sales",
+          "Finance",
+          "Other"
+        ]
+      },
+      "MilestoneDetails": {
+        "required": [
+          "id",
+          "projectId",
+          "name",
+          "category",
+          "plannedDate",
+          "forecastDate",
+          "actualDate",
+          "status",
+          "slippageDays",
+          "daysOverdue",
+          "owner",
+          "notes",
+          "sortOrder",
+          "createdAt",
+          "createdBy",
+          "updatedAt",
+          "updatedBy",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "$ref": "#/components/schemas/MilestoneCategory"
+          },
+          "plannedDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "forecastDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "actualDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "status": {
+            "$ref": "#/components/schemas/MilestoneStatus"
+          },
+          "slippageDays": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "daysOverdue": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "owner": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "sortOrder": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedBy": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "MilestoneList": {
+        "required": [
+          "today",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "today": {
+            "type": "string",
+            "format": "date"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MilestoneDetails"
+            }
+          }
+        }
+      },
+      "MilestoneStatus": {
+        "enum": [
+          "NotStarted",
+          "OnTrack",
+          "AtRisk",
+          "Overdue",
+          "Complete"
+        ]
+      },
+      "NextMilestoneDto": {
+        "required": [
+          "id",
+          "name",
+          "date",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "date": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "status": {
+            "$ref": "#/components/schemas/MilestoneStatus"
+          }
+        }
+      },
       "PagedResultOfProjectListItem": {
         "required": [
           "items",
@@ -5620,6 +6140,44 @@
             "format": "int32"
           },
           "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PortfolioSummary": {
+        "required": [
+          "activeProjects",
+          "byStage",
+          "totalBudget",
+          "currency",
+          "projectsSlipping",
+          "overdueMilestones"
+        ],
+        "type": "object",
+        "properties": {
+          "activeProjects": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "byStage": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StageCount"
+            }
+          },
+          "totalBudget": {
+            "type": "number",
+            "format": "double"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "projectsSlipping": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "overdueMilestones": {
             "type": "integer",
             "format": "int32"
           }
@@ -5917,7 +6475,8 @@
           "plannedCompletion",
           "budgetAmount",
           "currency",
-          "isArchived"
+          "isArchived",
+          "nextMilestone"
         ],
         "type": "object",
         "properties": {
@@ -5965,6 +6524,16 @@
           },
           "isArchived": {
             "type": "boolean"
+          },
+          "nextMilestone": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/NextMilestoneDto"
+              }
+            ]
           }
         }
       },
@@ -6438,6 +7007,22 @@
               "number"
             ],
             "format": "double"
+          }
+        }
+      },
+      "StageCount": {
+        "required": [
+          "stage",
+          "count"
+        ],
+        "type": "object",
+        "properties": {
+          "stage": {
+            "$ref": "#/components/schemas/ProjectStage"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -7218,6 +7803,82 @@
               "null",
               "string"
             ]
+          },
+          "version": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "UpdateMilestoneRequest": {
+        "required": [
+          "name",
+          "category",
+          "plannedDate",
+          "forecastDate",
+          "actualDate",
+          "owner",
+          "notes",
+          "sortOrder",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "category": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/MilestoneCategory"
+              }
+            ]
+          },
+          "plannedDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "forecastDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "actualDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "owner": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "sortOrder": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "version": {
             "type": "integer",

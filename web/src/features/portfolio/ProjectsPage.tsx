@@ -6,6 +6,9 @@ import { useConfig } from '../../shared/config';
 import { formatDate, formatMoney } from '../../shared/format';
 import { usePermissions } from '../../shared/me';
 import { useProjects } from './api';
+import { MilestoneStatusBadge } from './programme/MilestoneStatusBadge';
+import { isSlipping } from './programme/types';
+import { PortfolioSummaryStrip } from './PortfolioSummaryStrip';
 import { StatusBadge } from './StatusBadge';
 import { stageLabel, stages, statuses, statusLabel, type Stage, type Status } from './types';
 
@@ -42,6 +45,8 @@ export function ProjectsPage() {
           </Button>
         )}
       </Group>
+
+      <PortfolioSummaryStrip />
 
       <Group align="flex-end" wrap="wrap">
         <TextInput
@@ -96,7 +101,7 @@ export function ProjectsPage() {
       ) : data.items.length === 0 ? (
         <Text c="dimmed">No projects match these filters.</Text>
       ) : (
-        <Table.ScrollContainer minWidth={760}>
+        <Table.ScrollContainer minWidth={880}>
           <Table striped highlightOnHover>
             <Table.Thead>
               <Table.Tr>
@@ -104,6 +109,7 @@ export function ProjectsPage() {
                 <Table.Th>Name</Table.Th>
                 <Table.Th>Stage</Table.Th>
                 <Table.Th>Status</Table.Th>
+                <Table.Th>Next milestone</Table.Th>
                 <Table.Th>Location</Table.Th>
                 <Table.Th>Planned completion</Table.Th>
                 <Table.Th ta="right">Budget</Table.Th>
@@ -128,6 +134,19 @@ export function ProjectsPage() {
                   <Table.Td>{stageLabel[project.stage]}</Table.Td>
                   <Table.Td>
                     <StatusBadge status={project.status} />
+                  </Table.Td>
+                  <Table.Td>
+                    {project.nextMilestone ? (
+                      <Stack gap={2} align="flex-start">
+                        <Text size="sm">{project.nextMilestone.name}</Text>
+                        <Text size="xs" c="dimmed">
+                          {formatDate(project.nextMilestone.date, config.culture)}
+                        </Text>
+                        {isSlipping(project.nextMilestone.status) && <MilestoneStatusBadge status={project.nextMilestone.status} />}
+                      </Stack>
+                    ) : (
+                      '—'
+                    )}
                   </Table.Td>
                   <Table.Td>{[project.suburb, project.city].filter(Boolean).join(', ')}</Table.Td>
                   <Table.Td>{formatDate(project.plannedCompletion, config.culture)}</Table.Td>

@@ -2,10 +2,12 @@ import type { paths } from '../../shared/api/schema';
 import type { DeepRequired } from '../../shared/api/types';
 
 type ProjectsPath = paths['/api/portfolio/projects'];
+type SummaryPath = paths['/api/portfolio/summary'];
 type ProjectPath = paths['/api/portfolio/projects/{id}'];
 
 export type ProjectDetails = DeepRequired<ProjectPath['get']['responses'][200]['content']['application/json']>;
 export type ProjectPage = DeepRequired<ProjectsPath['get']['responses'][200]['content']['application/json']>;
+export type PortfolioSummary = DeepRequired<SummaryPath['get']['responses'][200]['content']['application/json']>;
 export type ProjectListItem = ProjectPage['items'][number];
 export type ProjectInput = ProjectsPath['post']['requestBody']['content']['application/json'];
 export type ProjectUpdateInput = ProjectPath['put']['requestBody']['content']['application/json'];
