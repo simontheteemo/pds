@@ -16,6 +16,7 @@ import { ProjectCostsCard } from '../../costs/ProjectCostsCard';
 import { ProjectDocumentsSection } from '../../documents/ProjectDocumentsSection';
 import { ProjectRisksSection } from '../../risks/ProjectRisksSection';
 import { ProjectSalesSection } from '../../sales/ProjectSalesSection';
+import { useSlippingMilestoneCount } from '../programme/api';
 import { ProgrammeTab } from '../programme/ProgrammeTab';
 import type { ProjectDetails } from '../types';
 import { OverviewTab } from './OverviewTab';
@@ -34,7 +35,7 @@ export const DEFAULT_TAB = 'overview';
 
 export const projectTabs: ProjectTab[] = [
   { key: 'overview', label: 'Overview', Panel: OverviewTab },
-  { key: 'programme', label: 'Programme', Panel: ProgrammeTab },
+  { key: 'programme', label: 'Programme', Panel: ProgrammeTab, useAttentionCount: useSlippingMilestoneCount },
   {
     key: 'costs',
     label: 'Costs',
